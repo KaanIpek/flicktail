@@ -48,8 +48,8 @@ let W = 0, H = 0, DPR = 1;
 function resize() {
   const vw = window.visualViewport ? window.visualViewport.width : innerWidth;
   const vh = window.visualViewport ? window.visualViewport.height : innerHeight;
-  // portrait stage, letterboxed on wide screens
-  const aspect = 9 / 16;
+  // portrait stage; on landscape/desktop windows allow a slightly wider column
+  const aspect = vw > vh ? 0.60 : 9 / 16;
   let w = vw, h = vh;
   if (w / h > aspect) w = h * aspect;
   DPR = Math.min(devicePixelRatio || 1, 2);
@@ -67,10 +67,12 @@ function resize() {
   uiRoot.style.height = h + 'px';
   uiRoot.style.left = (vw - w) / 2 + 'px';
   uiRoot.style.top = '0px';
-  view.camH = 1100;
-  view.camZ = -420;
-  view.pitch = 1.05;
-  view.fit(W, H, TABLE.halfW, 0.97, 0.965);
+  // Pulled-in camera: the near rails run off the bottom corners so the player
+  // sits AT the table; the far rail lands around 0.40H under the backdrop.
+  view.camH = 1050;
+  view.camZ = -460;
+  view.pitch = 1.00;
+  view.fit(W, H, TABLE.halfW, 1.18, 1.02);
   if (currentLevel) renderer.setLevel(currentLevel, W, H);
   backdrop.render();
 }
@@ -105,12 +107,18 @@ function musicFor(level) {
 
 // ---- screen flow ----
 
+function setBgFill(key) {
+  const el = document.getElementById('bgfill');
+  if (el) el.style.backgroundImage = `url(assets/backdrops/${key}.webp)`;
+}
+
 function showTitle() {
   screen = 'title';
   zenMode = false;
   input.enabled = false;
   backdrop.set('waikiki');
   backdrop.render();
+  setBgFill('waikiki');
   ui.showTitle();
   audio.music('music_morning');
 }
@@ -130,6 +138,7 @@ function startLevel(id, { zen = false, seed = null, restore = null } = {}) {
   paused = false;
   backdrop.set(level.backdrop);
   backdrop.render();
+  setBgFill(level.backdrop);
   renderer.setLevel(level, W, H);
   game.loadLevel(level, { zen, seed, restore });
   ui.showIntro(level, zen);

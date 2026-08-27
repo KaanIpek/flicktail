@@ -272,7 +272,7 @@ export class UI {
 
   showTutorial(step) {
     const texts = {
-      1: 'Drag back from the drink, then let go — like a slingshot! 🎯',
+      1: 'Pull back anywhere on the table, then let go — like a slingshot! 🎯',
       2: 'Hit the matching drink to MERGE them into a bigger one!',
       3: 'Careful: past the white line, drinks fall off the front edge!',
     };

@@ -91,6 +91,51 @@ export class Backdrop {
 
     if (s.birds) this.drawBirds(ctx, w, h);
     if (s.shootingStars) this.drawShootingStar(ctx, w, h);
+    if (s.night) this.drawFireflies(ctx, w, h);
+    else this.drawLightRays(ctx, w, h);
+  }
+
+  // volumetric-ish sun rays sweeping slowly from the top corner (day scenes)
+  drawLightRays(ctx, w, h) {
+    const t = this.t;
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    for (let i = 0; i < 3; i++) {
+      const ang = 0.55 + i * 0.16 + Math.sin(t * 0.11 + i * 2.1) * 0.05;
+      const ox = w * 0.92, oy = -h * 0.05;
+      const len = h * 0.85;
+      const wd = 0.05 + 0.015 * Math.sin(t * 0.17 + i);
+      const g = ctx.createLinearGradient(ox, oy, ox - Math.cos(ang) * len, oy + Math.sin(ang) * len);
+      g.addColorStop(0, `rgba(255,244,214,${0.10 - i * 0.02})`);
+      g.addColorStop(1, 'rgba(255,244,214,0)');
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.moveTo(ox, oy);
+      ctx.lineTo(ox - Math.cos(ang - wd) * len, oy + Math.sin(ang - wd) * len);
+      ctx.lineTo(ox - Math.cos(ang + wd) * len, oy + Math.sin(ang + wd) * len);
+      ctx.closePath();
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  drawFireflies(ctx, w, h) {
+    const t = this.t;
+    for (let i = 0; i < 9; i++) {
+      const px = w * ((0.08 + i * 0.11 + Math.sin(t * 0.14 + i * 1.7) * 0.04) % 1);
+      const py = h * (0.18 + 0.34 * ((i * 0.37 + Math.sin(t * 0.1 + i)) % 1 + 1) % 1 * 0.5);
+      const a = 0.25 + 0.55 * Math.max(0, Math.sin(t * (0.8 + i * 0.13) + i * 2.3));
+      ctx.globalAlpha = a;
+      const g = ctx.createRadialGradient(px, py, 0, px, py, 5);
+      g.addColorStop(0, '#fff8b0');
+      g.addColorStop(0.4, 'rgba(255,240,140,0.6)');
+      g.addColorStop(1, 'rgba(255,240,140,0)');
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(px, py, 5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
   }
 
   drawMover(ctx, w, h, bandY) {
