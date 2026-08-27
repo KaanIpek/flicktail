@@ -23,6 +23,7 @@ const save = new Save();
 const audio = new AudioMan();
 audio.muted.music = !save.data.settings.music;
 audio.muted.sfx = !save.data.settings.sfx;
+audio.hapticsOn = save.data.settings.haptics;
 const assets = new Assets();
 const view = new View();
 const physics = new Physics();
@@ -90,18 +91,15 @@ function preload() {
     if (screen === 'title' || screen === 'map') { /* backgrounds refresh next frame */ }
     backdrop.render();
   });
-  const sfx = ['clink', 'thunk', 'flick', 'splash', 'splashSmall', 'order', 'win', 'lose', 'tap', 'fanfare'];
-  for (const s of sfx) audio.load(s, 'assets/audio/' + s + '.ogg');
-  for (let i = 2; i <= 11; i++) audio.load('merge' + i, 'assets/audio/merge' + i + '.ogg');
-  for (const m of ['music_morning', 'music_golden', 'music_night', 'music_neon']) {
-    audio.load(m, 'assets/audio/' + m + '.ogg');
+  for (const m of ['music_morning', 'music_golden', 'music_last', 'music_neon']) {
+    audio.load(m, 'assets/audio/' + m + '.mp3');
   }
 }
 
 function musicFor(level) {
   if (!level) return 'music_morning';
   if (level.time === 'night') return 'music_neon';
-  if (level.time === 'sunset') return 'music_golden';
+  if (level.time === 'sunset') return level.id >= 7 ? 'music_last' : 'music_golden';
   return 'music_morning';
 }
 
@@ -175,6 +173,7 @@ ui.on('tgSfx', () => {
 });
 ui.on('tgHaptics', () => {
   save.data.settings.haptics = !save.data.settings.haptics; save.write();
+  audio.hapticsOn = save.data.settings.haptics;
   ui.closeModal(); ui.showPause(game, save.data.settings);
 });
 

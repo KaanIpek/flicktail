@@ -1,18 +1,19 @@
-// WebAudio: sample playback for SFX, streamed loop for music, unlock on first
-// gesture. Falls back to tiny synthesized sounds for anything with no sample,
-// so the game is never silent while assets stream in.
+// WebAudio: streamed music loops (mp3 files) + fully procedural SFX, so the
+// game needs zero sound-effect assets and always answers instantly.
+
+const PENTA = [523.25, 587.33, 659.25, 783.99, 880.00, 1046.5, 1174.7, 1318.5, 1568.0, 1760.0];
 
 export class AudioMan {
   constructor() {
     this.ctx = null;
     this.buffers = new Map();
-    this.musicGain = null;
-    this.sfxGain = null;
     this.musicSrc = null;
     this.currentMusic = null;
     this.pendingMusic = null;
     this.muted = { music: false, sfx: false };
+    this.hapticsOn = true;
     this.unlocked = false;
+    this.noise = null;
   }
 
   unlock() {
@@ -23,11 +24,16 @@ export class AudioMan {
     this.master = this.ctx.createGain();
     this.master.connect(this.ctx.destination);
     this.musicGain = this.ctx.createGain();
-    this.musicGain.gain.value = this.muted.music ? 0 : 0.55;
+    this.musicGain.gain.value = this.muted.music ? 0 : 0.5;
     this.musicGain.connect(this.master);
     this.sfxGain = this.ctx.createGain();
     this.sfxGain.gain.value = this.muted.sfx ? 0 : 1;
     this.sfxGain.connect(this.master);
+    // shared noise buffer for all percussive sounds
+    const len = this.ctx.sampleRate;
+    this.noise = this.ctx.createBuffer(1, len, this.ctx.sampleRate);
+    const d = this.noise.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
     this.unlocked = true;
     if (this.ctx.state === 'suspended') this.ctx.resume();
     if (this.pendingMusic) { const m = this.pendingMusic; this.pendingMusic = null; this.music(m); }
@@ -40,10 +46,9 @@ export class AudioMan {
   async load(name, url) {
     try {
       const res = await fetch(url);
-      const ab = await res.arrayBuffer();
-      // decode lazily once we have a context; stash raw bytes until then
-      this.buffers.set(name, { raw: ab, buf: null });
-    } catch (e) { /* missing samples fall back to synth */ }
+      if (!res.ok) return;
+      this.buffers.set(name, { raw: await res.arrayBuffer(), buf: null });
+    } catch {}
   }
 
   async buffer(name) {
@@ -56,66 +61,131 @@ export class AudioMan {
     return ent.buf;
   }
 
-  async play(name, { volume = 1, rate = 1, detune = 0 } = {}) {
-    if (!this.unlocked || this.muted.sfx) return;
-    const buf = await this.buffer(name);
-    if (buf) {
-      const src = this.ctx.createBufferSource();
-      src.buffer = buf;
-      src.playbackRate.value = rate * (1 + detune * (Math.random() * 2 - 1));
-      const g = this.ctx.createGain();
-      g.gain.value = volume;
-      src.connect(g); g.connect(this.sfxGain);
-      src.start();
-    } else {
-      this.synth(name, volume, rate);
-    }
+  // ---------- procedural SFX ----------
+
+  env(gainNode, t, peak, attack, decay) {
+    const g = gainNode.gain;
+    g.setValueAtTime(0.0001, t);
+    g.exponentialRampToValueAtTime(Math.max(0.0011, peak), t + attack);
+    g.exponentialRampToValueAtTime(0.001, t + attack + decay);
   }
 
-  // Small procedural stand-ins keyed by sound name.
-  synth(name, volume = 1, rate = 1) {
-    if (!this.ctx) return;
-    const t = this.ctx.currentTime;
-    const g = this.ctx.createGain();
-    g.connect(this.sfxGain);
+  osc(type, freq, t, dur, peak, { detune = 0, glideTo = null, glideTime = 0 } = {}) {
     const o = this.ctx.createOscillator();
-    o.connect(g);
-    const v = 0.22 * volume;
+    o.type = type;
+    o.frequency.setValueAtTime(freq, t);
+    if (glideTo) o.frequency.exponentialRampToValueAtTime(glideTo, t + (glideTime || dur));
+    if (detune) o.detune.value = detune;
+    const g = this.ctx.createGain();
+    this.env(g, t, peak, 0.004, dur);
+    o.connect(g); g.connect(this.sfxGain);
+    o.start(t); o.stop(t + dur + 0.15);
+    return o;
+  }
+
+  noiseBurst(t, dur, peak, { type = 'bandpass', freq = 2000, q = 1, sweepTo = null } = {}) {
+    const src = this.ctx.createBufferSource();
+    src.buffer = this.noise;
+    src.loop = true;
+    src.playbackRate.value = 0.9 + Math.random() * 0.2;
+    const f = this.ctx.createBiquadFilter();
+    f.type = type;
+    f.frequency.setValueAtTime(freq, t);
+    if (sweepTo) f.frequency.exponentialRampToValueAtTime(sweepTo, t + dur);
+    f.Q.value = q;
+    const g = this.ctx.createGain();
+    this.env(g, t, peak, 0.003, dur);
+    src.connect(f); f.connect(g); g.connect(this.sfxGain);
+    src.start(t); src.stop(t + dur + 0.1);
+  }
+
+  play(name, { volume = 1, rate = 1, detune = 0 } = {}) {
+    if (!this.unlocked || this.muted.sfx) return;
+    const t = this.ctx.currentTime;
+    const v = volume;
+    const jitter = 1 + (detune ? detune * (Math.random() * 2 - 1) : 0);
+
     if (name.startsWith('merge')) {
-      const step = parseInt(name.slice(5), 10) || 1;
-      const f = 300 * Math.pow(1.12, step);
-      o.type = 'triangle';
-      o.frequency.setValueAtTime(f, t);
-      o.frequency.exponentialRampToValueAtTime(f * 1.8, t + 0.12);
-      g.gain.setValueAtTime(v, t);
-      g.gain.exponentialRampToValueAtTime(0.001, t + 0.28);
-      o.start(t); o.stop(t + 0.3);
-    } else if (name === 'clink') {
-      o.type = 'sine';
-      o.frequency.setValueAtTime(1900 * rate, t);
-      g.gain.setValueAtTime(v * 0.7, t);
-      g.gain.exponentialRampToValueAtTime(0.001, t + 0.09);
-      o.start(t); o.stop(t + 0.1);
-    } else if (name === 'flick') {
-      o.type = 'sine';
-      o.frequency.setValueAtTime(300, t);
-      o.frequency.exponentialRampToValueAtTime(90, t + 0.15);
-      g.gain.setValueAtTime(v * 0.5, t);
-      g.gain.exponentialRampToValueAtTime(0.001, t + 0.16);
-      o.start(t); o.stop(t + 0.18);
-    } else if (name === 'splash') {
-      o.type = 'sawtooth';
-      o.frequency.setValueAtTime(160, t);
-      o.frequency.exponentialRampToValueAtTime(40, t + 0.3);
-      g.gain.setValueAtTime(v * 0.6, t);
-      g.gain.exponentialRampToValueAtTime(0.001, t + 0.32);
-      o.start(t); o.stop(t + 0.34);
-    } else {
-      o.type = 'square';
-      o.frequency.setValueAtTime(500 * rate, t);
-      g.gain.setValueAtTime(v * 0.4, t);
-      g.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
-      o.start(t); o.stop(t + 0.14);
+      const tier = Math.min(11, parseInt(name.slice(5), 10) || 2);
+      const note = PENTA[Math.min(PENTA.length - 1, tier - 2)];
+      // marimba-ish: fundamental + bright partial, plus a watery plip
+      this.osc('sine', note * jitter, t, 0.5, 0.32 * v);
+      this.osc('sine', note * 4.03 * jitter, t, 0.14, 0.12 * v);
+      this.osc('sine', note * 0.5, t + 0.01, 0.4, 0.10 * v);
+      this.noiseBurst(t, 0.09, 0.10 * v, { freq: 4200, q: 2, sweepTo: 1800 });
+      if (tier >= 7) {
+        this.osc('sine', note * 1.5, t + 0.06, 0.5, 0.14 * v);
+        this.osc('sine', note * 2, t + 0.12, 0.6, 0.11 * v);
+      }
+      if (tier >= 10) this.noiseBurst(t + 0.05, 0.7, 0.08 * v, { freq: 6000, q: 0.7, sweepTo: 9000 });
+      return;
+    }
+
+    switch (name) {
+      case 'clink': {
+        const f0 = 2800 * jitter;
+        this.osc('sine', f0, t, 0.09, 0.20 * v);
+        this.osc('sine', f0 * 1.83, t, 0.06, 0.10 * v);
+        this.noiseBurst(t, 0.02, 0.12 * v, { freq: 8000, q: 1.4 });
+        break;
+      }
+      case 'thunk':
+        this.osc('sine', 190 * rate, t, 0.13, 0.30 * v, { glideTo: 70 * rate });
+        this.noiseBurst(t, 0.05, 0.14 * v, { type: 'lowpass', freq: 900 });
+        break;
+      case 'flick':
+        this.noiseBurst(t, 0.16, 0.22 * v, { freq: 900, q: 1.2, sweepTo: 3400 });
+        break;
+      case 'splash': {
+        this.noiseBurst(t, 0.4, 0.30 * v, { type: 'lowpass', freq: 2600, sweepTo: 380 });
+        for (let i = 0; i < 4; i++) {
+          this.osc('sine', 900 + Math.random() * 1300, t + 0.06 + i * 0.05, 0.05, 0.07 * v, { glideTo: 500 });
+        }
+        break;
+      }
+      case 'splashSmall':
+        this.noiseBurst(t, 0.16, 0.14 * v, { type: 'lowpass', freq: 2200, sweepTo: 500 });
+        this.osc('sine', 1300 * jitter, t + 0.02, 0.06, 0.07 * v, { glideTo: 700 });
+        break;
+      case 'order': {
+        this.osc('sine', 1318.5, t, 0.12, 0.22 * v);
+        this.osc('sine', 1760, t + 0.09, 0.25, 0.22 * v);
+        this.osc('sine', 2637, t + 0.09, 0.2, 0.08 * v);
+        break;
+      }
+      case 'tap':
+        this.osc('sine', 700, t, 0.05, 0.10 * v, { glideTo: 500 });
+        break;
+      case 'win': {
+        const seq = [523.25, 659.25, 783.99, 1046.5];
+        seq.forEach((f, i) => {
+          this.osc('triangle', f, t + i * 0.11, 0.4, 0.20 * v);
+          this.osc('sine', f * 2, t + i * 0.11, 0.25, 0.07 * v);
+        });
+        this.noiseBurst(t + 0.44, 0.8, 0.06 * v, { freq: 7000, q: 0.6, sweepTo: 10000 });
+        break;
+      }
+      case 'lose': {
+        [392, 349.23, 311.13].forEach((f, i) => this.osc('triangle', f, t + i * 0.16, 0.4, 0.16 * v));
+        break;
+      }
+      case 'fanfare': {
+        const seq = [659.25, 783.99, 1046.5, 1318.5, 1568];
+        seq.forEach((f, i) => {
+          this.osc('triangle', f, t + i * 0.09, 0.5, 0.2 * v);
+          this.osc('sine', f * 1.5, t + i * 0.09 + 0.03, 0.3, 0.07 * v);
+        });
+        this.noiseBurst(t, 1.1, 0.07 * v, { freq: 6000, q: 0.5, sweepTo: 11000 });
+        break;
+      }
+      case 'gust':
+        this.noiseBurst(t, 1.2, 0.10 * v, { freq: 500, q: 0.8, sweepTo: 1400 });
+        break;
+      case 'countdown':
+        this.osc('sine', 880, t, 0.08, 0.14 * v);
+        break;
+      default:
+        this.osc('square', 500 * rate, t, 0.1, 0.08 * v);
     }
   }
 
@@ -150,11 +220,12 @@ export class AudioMan {
   setMuted(kind, m) {
     this.muted[kind] = m;
     if (!this.ctx) return;
-    if (kind === 'music' && this.musicGain) this.musicGain.gain.value = m ? 0 : 0.55;
+    if (kind === 'music' && this.musicGain) this.musicGain.gain.value = m ? 0 : 0.5;
     if (kind === 'sfx' && this.sfxGain) this.sfxGain.gain.value = m ? 0 : 1;
   }
 
-  haptic(ms) {
-    if (navigator.vibrate) { try { navigator.vibrate(ms); } catch {} }
+  haptic(pattern) {
+    if (!this.hapticsOn) return;
+    if (navigator.vibrate) { try { navigator.vibrate(pattern); } catch {} }
   }
 }
