@@ -287,7 +287,13 @@ export class Game {
     this.comboTimer = COMBO.window;
     const mult = Math.min(this.combo, COMBO.cap);
     let pts = nt.score * mult;
-    if (wasBank) { pts += 5; this.bankMerges++; this.emit('bankMerge'); }
+    if (wasBank) {
+      pts += 5;
+      this.bankMerges++;
+      const sg = this.level.sideGoal;
+      if (sg && sg.type === 'bank' && sg.bonus && this.bankMerges === sg.count) pts += sg.bonus;
+      this.emit('bankMerge');
+    }
     this.addScore(pts, nx, nz);
 
     if (tier + 1 > this.maxTierMade) {
@@ -388,26 +394,34 @@ export class Game {
 
   checkEnd(dt) {
     if (this.zen) return;
-    const sideOk = this.sideGoalDone();
-    if (this.goalDone && sideOk && this.state === S.AIMING) {
-      this.finish(true);
-      return;
-    }
+    // Reaching the goal does NOT end the level — the remaining flicks are
+    // the star budget. The player can cash out early via finishNow().
     if (this.flicksLeft <= 0 && this.tee.ready) {
-      // out of flicks: wait for the table to settle and the last cascade to end
       if (!this.phys.anyMoving() && this.comboTimer <= 0) {
-        if (this.goalDone && sideOk) this.finish(true);
+        if (this.goalDone && this.sideGoalDone()) this.finish(true);
         else this.finish(false, 'flicks');
       }
     }
   }
 
+  finishNow() {
+    if (this.state !== S.AIMING) return;
+    if (this.goalDone && this.sideGoalDone()) this.finish(true);
+  }
+
   sideGoalDone() {
     const sg = this.level.sideGoal;
-    if (!sg) return true;
+    if (!sg || !sg.required) return true;
     if (sg.type === 'bank') return this.bankMerges >= sg.count;
     if (sg.type === 'orders') return this.ordersServed >= sg.count;
     return true;
+  }
+
+  sideGoalHit() {
+    const sg = this.level.sideGoal;
+    if (!sg) return false;
+    const cur = sg.type === 'bank' ? this.bankMerges : this.ordersServed;
+    return cur >= sg.count;
   }
 
   sideGoalProgress() {

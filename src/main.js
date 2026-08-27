@@ -160,6 +160,7 @@ ui.on('replay', () => { ui.closeModal(); paused = false; startLevel(currentLevel
 ui.on('retry', () => startLevel(currentLevel.id, { seed: game.result?.seed }));
 ui.on('shuffle', () => startLevel(currentLevel.id));
 ui.on('pause', () => { paused = true; ui.showPause(game, save.data.settings); });
+ui.on('finishNow', () => game.finishNow());
 ui.on('resume', () => { paused = false; ui.closeModal(); });
 ui.on('tgMusic', () => {
   save.data.settings.music = !save.data.settings.music; save.write();
@@ -190,10 +191,15 @@ game.onEvent = (name, data) => {
       if (data >= 8) ui.showCallout(t.name + '!');
       break;
     }
-    case 'goalDone': ui.toast('Signature drink mixed! 🌟'); break;
+    case 'goalDone': ui.toast('Signature drink mixed! Keep going for stars 🌟', 2600); break;
     case 'bankMerge': ui.showCallout('Wall Kiss!'); break;
     case 'orderServed': ui.toast('Order served! +' + data.pts); break;
-    case 'spilled': ui.toast('Spilled! 🌊', 900); break;
+    case 'spilled':
+      if (currentLevel.id === 1 && !window.__spillTaught) {
+        window.__spillTaught = true;
+        ui.showTutorial(3);
+      } else ui.toast('Spilled! 🌊', 900);
+      break;
     case 'washed': ui.toast('Washed away!', 900); break;
     case 'autoServed': ui.toast('Auto-served ☀', 900); break;
     case 'atlasClink': ui.showCallout('LEGENDARY CLINK!'); break;

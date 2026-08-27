@@ -137,6 +137,7 @@ export class UI {
           <div id="nextQueue" class="next-queue"></div>
         </div>
         <div id="sideGoal" class="side-goal"></div>
+        <button id="finishBtn" class="btn tiny finish hidden" data-act="finishNow">FINISH ✓</button>
       </div>
       <div id="toast" class="toast hidden"></div>
     </div>`;
@@ -178,6 +179,8 @@ export class UI {
     if (game.goalDone) this.hudGoal.classList.add('done');
     const sg = game.sideGoalProgress();
     if (sg) this.sideGoalEl.textContent = `${sg.label}: ${Math.min(sg.cur, sg.count)}/${sg.count}`;
+    const fb = document.getElementById('finishBtn');
+    if (fb) fb.classList.toggle('hidden', !(game.goalDone && game.sideGoalDone() && !game.zen));
   }
 
   showCombo(mult) {
