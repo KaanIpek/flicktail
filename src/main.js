@@ -29,6 +29,7 @@ const view = new View();
 const physics = new Physics();
 const fx = new Fx();
 const game = new Game(physics, fx, audio, save);
+game.aimAssist = save.data.settings.aimLine;
 const ui = new UI(uiRoot, save, audio);
 const backdropCanvas = document.createElement('canvas');
 backdropCanvas.id = 'bg';
@@ -215,20 +216,31 @@ ui.on('shuffle', () => startLevel(currentLevel.id));
 ui.on('pause', () => { paused = true; ui.showPause(game, save.data.settings); });
 ui.on('finishNow', () => game.finishNow());
 ui.on('resume', () => { paused = false; ui.closeModal(); });
+function refreshSettingsUI() {
+  // toggles live on both the in-game pause modal and the title About screen
+  if (screen === 'about') { ui.showAbout(save.data.settings); }
+  else { ui.closeModal(); ui.showPause(game, save.data.settings); }
+}
+ui.on('about', () => { screen = 'about'; ui.showAbout(save.data.settings); });
 ui.on('tgMusic', () => {
   save.data.settings.music = !save.data.settings.music; save.write();
   audio.setMuted('music', !save.data.settings.music);
-  ui.closeModal(); ui.showPause(game, save.data.settings);
+  refreshSettingsUI();
 });
 ui.on('tgSfx', () => {
   save.data.settings.sfx = !save.data.settings.sfx; save.write();
   audio.setMuted('sfx', !save.data.settings.sfx);
-  ui.closeModal(); ui.showPause(game, save.data.settings);
+  refreshSettingsUI();
 });
 ui.on('tgHaptics', () => {
   save.data.settings.haptics = !save.data.settings.haptics; save.write();
   audio.hapticsOn = save.data.settings.haptics;
-  ui.closeModal(); ui.showPause(game, save.data.settings);
+  refreshSettingsUI();
+});
+ui.on('tgAim', () => {
+  save.data.settings.aimLine = !save.data.settings.aimLine; save.write();
+  game.aimAssist = save.data.settings.aimLine;
+  refreshSettingsUI();
 });
 
 // ---- game events -> UI ----

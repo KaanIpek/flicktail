@@ -37,6 +37,7 @@ export class UI {
     const endlessBest = this.save.data.endlessBest || 0;
     this.root.innerHTML = `
     <div class="screen title-screen">
+      <button class="btn corner-gear" data-act="about" aria-label="Settings & about">⚙</button>
       <div class="title-block">
         <h1 class="logo">FLICK<span>TAIL</span></h1>
         <p class="tagline">Slide &amp; Merge Cocktails</p>
@@ -141,6 +142,37 @@ export class UI {
         </div>
         <div class="pass-stamps-title">Destinations toasted</div>
         <div class="pass-stamps">${stamps}</div>
+      </div>
+    </div>`;
+  }
+
+  showAbout(settings) {
+    const tg = (act, label, on) =>
+      `<button class="btn toggle wide ${on ? 'on' : ''}" data-act="${act}">
+         <span>${label}</span><span class="tg-state">${on ? 'On' : 'Off'}</span>
+       </button>`;
+    this.root.innerHTML = `
+    <div class="screen about-screen">
+      <div class="map-head">
+        <button class="btn icon" data-act="title">‹</button>
+        <h2>Settings</h2><div></div>
+      </div>
+      <div class="about-scroll">
+        <div class="settings-rows wide-rows">
+          ${tg('tgMusic', 'Music', settings.music)}
+          ${tg('tgSfx', 'Sound effects', settings.sfx)}
+          ${tg('tgHaptics', 'Haptics', settings.haptics)}
+          ${tg('tgAim', 'Bounce guide', settings.aimLine)}
+        </div>
+        <div class="about-sec-title">About</div>
+        <p class="about-blurb">Flick drinks up the table and merge matching cocktails Suika-style, touring twelve real beach destinations from Waikiki to Bora&nbsp;Bora.</p>
+        <div class="about-credits">
+          <div class="cred-row"><span>Music &amp; ambience</span><span>Stable Audio · Stability AI</span></div>
+          <div class="cred-row"><span>Illustrations</span><span>AI-generated for this game</span></div>
+          <div class="cred-row"><span>Typefaces</span><span>Baloo 2 &amp; Nunito · OFL</span></div>
+          <div class="cred-row"><span>Engine</span><span>Hand-built, zero dependencies</span></div>
+        </div>
+        <p class="about-ver">Flicktail · v1.0</p>
       </div>
     </div>`;
   }

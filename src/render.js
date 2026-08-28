@@ -476,7 +476,7 @@ export class Renderer {
     const invalid = dz <= 0.05;
     const line = invalid ? `rgba(255,90,90,${0.5 + powFrac * 0.3})` : `rgba(255,255,255,${0.35 + powFrac * 0.45})`;
     dotLine(ctx, view, ox, oz, ox + dx * bestT, oz + dz * bestT, line);
-    if (hitWall && !invalid) {
+    if (hitWall && !invalid && game.aimAssist !== false) {
       const vn = dx * hitWall.nx + dz * hitWall.nz;
       const rx = dx - 2 * vn * hitWall.nx, rz = dz - 2 * vn * hitWall.nz;
       const hx = ox + dx * bestT, hz = oz + dz * bestT;
