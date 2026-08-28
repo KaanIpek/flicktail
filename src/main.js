@@ -261,15 +261,19 @@ function frame(now) {
   if (dt > 0.25) dt = 0.25;
 
   if (screen === 'game' && !paused) {
-    acc += dt;
+    game.advanceTimeScale(dt);         // recover slow-mo on REAL time
+    const sdt = dt * game.timeScale;   // simulation runs on scaled time
+    acc += sdt;
     while (acc >= FIXED) {
       game.update(FIXED);
       acc -= FIXED;
     }
-    fx.update(dt);
+    fx.update(sdt);
   } else if (screen === 'result') {
-    game.update(dt > FIXED ? FIXED : dt);   // let the celebration physics run
-    fx.update(dt);
+    game.advanceTimeScale(dt);
+    const sdt = Math.min(FIXED, dt) * game.timeScale;
+    game.update(sdt);                  // let the celebration physics run
+    fx.update(sdt);
   }
 
   backdrop.update(dt);

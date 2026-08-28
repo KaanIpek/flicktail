@@ -139,8 +139,12 @@ export const LEVELS = [
     id: 11, place: 'Tanah Lot', country: 'Bali, Indonesia', backdrop: 'bali',
     accent: '#FF8E53', felt: '#4f6f5f', rail: '#5a4a3a', time: 'sunset',
     goalTier: 9, flicks: 85, star2: 1100, star3: 1900,
-    friction: FRICTION.wood, rails: rectRails(),
+    friction: FRICTION.wood, rails: rectRails(), spawnTiers: [2, 3, 4, 5, 6],
     orders: { minTier: 3, maxTier: 7 },
+    preplace: [
+      { tier: 8, x: -150, z: 640 }, { tier: 7, x: 120, z: 700 },
+      { tier: 7, x: -60, z: 400 }, { tier: 6, x: 200, z: 520 },
+    ],
     tide: { period: 25, warn: 3, len: 2.2, fromZ: 640 },
     intro: 'The tide floods the far third — don’t park drinks up there.',
     mechanic: 'Tide hazard, telegraphed 3 s ahead.',
@@ -149,18 +153,23 @@ export const LEVELS = [
     id: 12, place: 'Bora Bora', country: 'French Polynesia', backdrop: 'borabora',
     accent: '#43D9C7', felt: '#2fa8a0', rail: '#b98a5a', time: 'day',
     goalTier: 11, flicks: 150, star2: 2000, star3: 3400,
-    friction: FRICTION.wood, rails: rectRails(),
-    orders: { minTier: 4, maxTier: 8 },
+    friction: FRICTION.wood, rails: rectRails(), spawnTiers: [3, 4, 5, 6, 7],
+    orders: { minTier: 4, maxTier: 6 },
     obstacles: [
       { x: -120, z: 560, r: 52, kind: 'motu' },
       { x: 140, z: 700, r: 44, kind: 'motu' },
     ],
+    // a running head start toward the Paradise Atlas so the finale is a
+    // victory lap of skill, not a starvation grind: two tier-10s already on the
+    // table (merge them for the Atlas = 1★), plus tier-9/8 pairs and a wide
+    // pool to keep chasing the score thresholds for 2★/3★.
     preplace: [
-      { tier: 8, x: -60, z: 780 }, { tier: 8, x: 200, z: 480 },
-      { tier: 5, x: -200, z: 620 }, { tier: 4, x: 80, z: 380 },
-      { tier: 3, x: -100, z: 300 }, { tier: 3, x: 220, z: 640 },
+      { tier: 10, x: -180, z: 760 }, { tier: 10, x: 210, z: 640 },
+      { tier: 9, x: -60, z: 500 }, { tier: 9, x: 90, z: 420 },
+      { tier: 8, x: -220, z: 560 }, { tier: 8, x: 160, z: 320 },
+      { tier: 7, x: 40, z: 300 },
     ],
-    wind: { period: 18, warn: 2, len: 1.4, accel: 480 },
+    wind: { period: 22, warn: 2.5, len: 1.2, accel: 320 },
     intro: 'The lagoon finale. Mix the Paradise Atlas.',
     mechanic: 'Everything you learned — motu islands, wind, royal orders.',
     finale: true,

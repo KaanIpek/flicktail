@@ -325,8 +325,7 @@ export class Renderer {
     const bodies = game.phys.bodies.filter(b => !b.dead).sort((x, y) => y.z - x.z);
     const glossA = this.gloss();
     for (const b of bodies) {
-      if (b.born !== undefined && b.born < 1) b.born = Math.min(1, b.born + 0.09);
-      this.drawBody(ctx, b, time, glossA);
+      this.drawBody(ctx, b, time, glossA);   // b.born advanced by game.update on the fixed step
     }
 
     if (game.tee.ready && game.state === 'aiming') this.drawTee(ctx, game, time);
@@ -471,8 +470,13 @@ export class Renderer {
     }
 
     const powFrac = Math.min(1, a.power / 1100);
-    dotLine(ctx, view, ox, oz, ox + dx * bestT, oz + dz * bestT, `rgba(255,255,255,${0.35 + powFrac * 0.45})`);
-    if (hitWall) {
+    // A flick that points at or behind the near edge can't be launched
+    // (game.flick rejects dirZ <= 0.05). Show that in red so the aim never
+    // looks valid when it isn't — a silent no-op reads as "rigged".
+    const invalid = dz <= 0.05;
+    const line = invalid ? `rgba(255,90,90,${0.5 + powFrac * 0.3})` : `rgba(255,255,255,${0.35 + powFrac * 0.45})`;
+    dotLine(ctx, view, ox, oz, ox + dx * bestT, oz + dz * bestT, line);
+    if (hitWall && !invalid) {
       const vn = dx * hitWall.nx + dz * hitWall.nz;
       const rx = dx - 2 * vn * hitWall.nx, rz = dz - 2 * vn * hitWall.nz;
       const hx = ox + dx * bestT, hz = oz + dz * bestT;
@@ -480,7 +484,7 @@ export class Renderer {
     }
 
     const p = view.project(0, 0, TABLE.launchZ);
-    ctx.strokeStyle = powFrac > 0.85 ? '#ff6d7f' : '#7fe3ff';
+    ctx.strokeStyle = invalid ? '#ff5a5a' : (powFrac > 0.85 ? '#ff6d7f' : '#7fe3ff');
     ctx.lineWidth = 5;
     ctx.beginPath();
     ctx.arc(p.x, p.y + 30, 34, Math.PI * 0.75, Math.PI * 0.75 + Math.PI * 1.5 * powFrac);

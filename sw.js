@@ -2,11 +2,14 @@
 // else (backdrops, sprites, audio) so the game is fully playable offline
 // after the first visit.
 
-const VERSION = 'flicktail-v6';
+const VERSION = 'flicktail-v7';
 const BACKDROPS = ['waikiki', 'miami', 'cancun', 'rio', 'nice', 'positano',
   'santorini', 'ibiza', 'dubai', 'phuket', 'bali', 'borabora'];
 const SHELL = [
   '.', 'index.html', 'css/style.css', 'manifest.webmanifest',
+  'assets/fonts/fonts.css',
+  ...['baloo2-600', 'baloo2-700', 'baloo2-800', 'nunito-400', 'nunito-700', 'nunito-800']
+    .map(f => `assets/fonts/${f}.woff2`),
   'src/main.js', 'src/config.js', 'src/levels.js', 'src/physics.js',
   'src/view.js', 'src/input.js', 'src/game.js', 'src/render.js',
   'src/backdrop.js', 'src/fx.js', 'src/audio.js', 'src/assets.js',

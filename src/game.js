@@ -23,6 +23,7 @@ export class Game {
     this.audio = audio;
     this.save = save;
     this.level = null;
+    this.reducedMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
     this.onEvent = null;   // (name, data) -> UI hooks
   }
 
@@ -55,6 +56,8 @@ export class Game {
     this.overcrowdT = 0;
     this.time = 0;
     this.result = null;
+    this.timeScale = 1;
+    this.tScale = { value: 1, target: 1, hold: 0 };
     this.spawnPool = level.spawnTiers || SPAWN.tiers;
 
     // hazards
@@ -143,6 +146,30 @@ export class Game {
     return true;
   }
 
+  // ---- time scaling: slow-mo / freeze-frame on big merges ----
+  // The reveal the design brief calls "the product" resolves in the same
+  // instant as a tier-3 without this. A brief dip in simulation speed lets the
+  // eye land on it. Audio/haptics are event-fired, so they stay at real time —
+  // motion slows, the sound still hits.
+
+  setTimeScale(target, hold) {
+    if (this.reducedMotion) { target = Math.max(0.7, target); hold = Math.min(hold, 0.06); }
+    this.tScale.target = target;
+    this.tScale.hold = hold;
+    this.tScale.value = target;   // snap down for the punch
+    this.timeScale = target;
+  }
+
+  // advanced with UNSCALED dt every frame — running it on scaled time would
+  // slow its own recovery and never return to 1.
+  advanceTimeScale(rawDt) {
+    const ts = this.tScale;
+    if (ts.hold > 0) { ts.hold -= rawDt; this.timeScale = ts.value; return; }
+    ts.value += (1 - ts.value) * Math.min(1, rawDt / 0.25);
+    if (ts.value > 0.995) ts.value = 1;
+    this.timeScale = ts.value;
+  }
+
   // ---- per fixed step ----
 
   update(dt) {
@@ -157,6 +184,12 @@ export class Game {
     if (!this.tee.ready) {
       this.tee.t += dt * 1.8;
       if (this.tee.t >= 1) { this.tee.ready = true; this.tee.t = 1; }
+    }
+
+    // merge pop-in, advanced on the fixed step (was per render-frame, so it
+    // played 2x fast on a 120Hz screen)
+    for (const b of this.phys.bodies) {
+      if (!b.dead && b.born !== undefined && b.born < 1) b.born = Math.min(1, b.born + dt * 7.5);
     }
 
     // hazards
@@ -253,6 +286,7 @@ export class Game {
       this.fx.addFlash('#ffd700', 0.35);
       this.fx.addShake(1.2);
       this.fx.burst((a.x + b.x) / 2, (a.z + b.z) / 2, [t.color, t.alt, '#ffffff'], 40, 160, { up: 2 });
+      this.setTimeScale(0.04, 0.16);   // near-freeze on the legendary clink
       this.audio.play('fanfare');
       this.emit('atlasClink');
       return;
@@ -309,7 +343,12 @@ export class Game {
     this.fx.burst(nx, nz, [t.color, t.alt], 12 + tier * 2, 70 + tier * 8);
     this.fx.ring(nx, nz, nt.color, nt.r * 1.8);
     if (mult >= 2) this.emit('combo', { mult, callout: COMBO_CALLOUTS[Math.min(mult, 5)] });
-    if (tier + 1 >= 8) { this.fx.addShake(0.5 + (tier - 7) * 0.2); this.fx.addFlash(nt.color, 0.18); this.emit('bigMerge', tier + 1); }
+    if (tier + 1 >= 8) {
+      this.fx.addShake(0.5 + (tier - 7) * 0.2);
+      this.fx.addFlash(nt.color, 0.18);
+      this.setTimeScale(0.34, 0.13 + (tier - 7) * 0.03);  // savour the reveal
+      this.emit('bigMerge', tier + 1);
+    }
     this.audio.play('merge' + (tier + 1), { volume: 0.8 });
     this.audio.play('splashSmall', { volume: 0.5, detune: 0.1 });
     this.audio.haptic(this.combo >= 3 ? [10, 30, 20] : 8);
@@ -434,6 +473,10 @@ export class Game {
   finish(won, reason = null) {
     if (this.state === S.WON || this.state === S.FAILED) return;
     this.state = won ? S.WON : S.FAILED;
+    // Capture the PRIOR records before recordResult overwrites them, so the
+    // result screen can honestly say "NEW BEST" and how far the next star is.
+    const prevBest = this.save.data.bestScore[this.level.id] || 0;
+    const prevStars = this.save.starsFor(this.level.id);
     let stars = 0;
     if (won) {
       stars = 1;
@@ -445,7 +488,12 @@ export class Game {
     } else {
       this.audio.play('lose');
     }
-    this.result = { won, stars, reason, score: this.score, seed: this.seed };
+    const nextStar = stars >= 3 ? null : (stars >= 2 || this.score >= this.level.star2 ? this.level.star3 : this.level.star2);
+    this.result = {
+      won, stars, reason, score: this.score, seed: this.seed,
+      prevBest, prevStars, newBest: won && this.score > prevBest,
+      nextStar, toNextStar: nextStar ? Math.max(0, nextStar - this.score) : 0,
+    };
     this.clearSaved();
     this.emit('finished', this.result);
   }

@@ -110,6 +110,7 @@ export class UI {
           ${level.sideGoal ? `<div class="goal-side">+ ${level.sideGoal.label}</div>` : ''}
           <div class="goal-flicks">${level.flicks} drinks in the cooler</div>`}
         </div>
+        ${level.id === 1 && !zen ? `<div class="intro-teach">${level.intro}</div>` : ''}
         <div class="intro-mech">💡 ${level.mechanic}</div>
         <button class="btn big primary" data-act="start">${zen ? 'RELAX' : 'SERVE!'}</button>
       </div>
@@ -213,16 +214,23 @@ export class UI {
     const l = game.level;
     const next = LEVELS.find(x => x.id === l.id + 1);
     if (result.won) {
+      const starLine = result.nextStar
+        ? `<div class="result-next">${result.toNextStar} more for ${result.stars + 1}★</div>`
+        : `<div class="result-next perfect">Perfect — 3 stars! ⭐</div>`;
+      const bestLine = result.newBest
+        ? `<div class="result-best newbest">🎉 NEW BEST</div>`
+        : `<div class="result-best">Best: ${this.save.data.bestScore[l.id] || result.score}</div>`;
       this.root.innerHTML = `
       <div class="screen result-screen">
         <div class="result-card win">
           <div class="result-title">${l.place} toasted! 🥂</div>
           ${this.stars(result.stars, 'big-stars')}
           <div class="result-score">${result.score}</div>
-          <div class="result-best">Best: ${this.save.data.bestScore[l.id] || result.score}</div>
+          ${bestLine}
+          ${starLine}
           <div class="result-buttons">
             ${next ? `<button class="btn big primary" data-act="level" data-id="${next.id}">NEXT: ${next.place.toUpperCase()}</button>` : `<button class="btn big primary" data-act="map">WORLD MAP</button>`}
-            <button class="btn ghost" data-act="replay">Replay</button>
+            <button class="btn ghost" data-act="replay">${result.stars < 3 ? 'Replay for ★★★' : 'Replay'}</button>
             <button class="btn ghost" data-act="map">Map</button>
           </div>
         </div>
