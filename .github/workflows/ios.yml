@@ -141,13 +141,16 @@ jobs:
           KEY_B64: ${{ secrets.ASC_KEY_P8_B64 }}
           KEY_ID: ${{ secrets.ASC_KEY_ID }}
         run: |
-          mkdir -p ~/private_keys
+          mkdir -p ~/private_keys ~/.private_keys ~/.appstoreconnect/private_keys
           printf '%s' "$KEY_B64" | tr -dc 'A-Za-z0-9+/=' | base64 -d > ~/private_keys/AuthKey_${KEY_ID}.p8
           chmod 600 ~/private_keys/AuthKey_${KEY_ID}.p8
           if ! head -1 ~/private_keys/AuthKey_${KEY_ID}.p8 | grep -q 'BEGIN PRIVATE KEY'; then
             echo "ASC_KEY_P8_B64 did not decode to a PEM private key."
             exit 1
           fi
+          # xcodebuild/altool discover keys in several places; cover them all.
+          cp ~/private_keys/AuthKey_${KEY_ID}.p8 ~/.private_keys/
+          cp ~/private_keys/AuthKey_${KEY_ID}.p8 ~/.appstoreconnect/private_keys/
           echo "key installed"
 
       - name: Archive (unsigned)
