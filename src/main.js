@@ -230,8 +230,17 @@ ui.on('endless', () => { audio.unlock(); startEndless(); });
 ui.on('daily', () => { audio.unlock(); startDaily(); });
 ui.on('endlessAgain', () => startEndless());
 ui.on('start', beginPlay);
-ui.on('replay', () => { ui.closeModal(); paused = false; startLevel(currentLevel.id, { zen: zenMode }); });
-ui.on('retry', () => startLevel(currentLevel.id, { seed: game.result?.seed }));
+// Restart the CURRENT run in its own mode — a campaign restart must not silently
+// drop an Endless/Daily run back to a finite campaign level (or re-roll the
+// day's shared board). game keeps the mode flags from loadLevel.
+function restartCurrent(seed = null) {
+  ui.closeModal(); paused = false;
+  if (game.daily) startDaily();
+  else if (game.endless) startEndless();
+  else startLevel(currentLevel.id, { zen: zenMode, seed });
+}
+ui.on('replay', () => restartCurrent());
+ui.on('retry', () => restartCurrent(game.result?.seed));
 ui.on('shuffle', () => startLevel(currentLevel.id));
 ui.on('pause', () => { paused = true; ui.showPause(game, save.data.settings); });
 ui.on('finishNow', () => game.finishNow());

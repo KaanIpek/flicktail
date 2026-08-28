@@ -141,7 +141,7 @@ export class UI {
           ${stat('drinks mixed', d.totalMerges || 0)}
           ${stat('best combo', `×${d.maxCombo || 0}`)}
           ${stat('endless best', d.endlessBest || 0)}
-          ${stat('daily streak', `🔥${d.dailyStreak || 0}`, true)}
+          ${stat('daily streak', `🔥${this.save.liveStreak(todayKey())}`, true)}
           ${stat('daily best', d.dailyBest || 0)}
           ${stat('top mix', d.bestTier >= 1 ? TIERS[d.bestTier - 1].name : '—')}
         </div>
@@ -300,7 +300,9 @@ export class UI {
     const sg = game.sideGoalProgress();
     if (sg) this.sideGoalEl.textContent = `${sg.label}: ${Math.min(sg.cur, sg.count)}/${sg.count}`;
     const fb = document.getElementById('finishBtn');
-    if (fb) fb.classList.toggle('hidden', !(game.goalDone && game.sideGoalDone() && !game.zen));
+    // Endless/Daily are survival runs — no early "FINISH ✓" cash-out (daily
+    // would burn the one scored run on a mis-tap). endless covers daily too.
+    if (fb) fb.classList.toggle('hidden', !(game.goalDone && game.sideGoalDone() && !game.zen && !game.endless));
   }
 
   showCombo(mult) {

@@ -186,10 +186,22 @@ export class Game {
 
   // ---- per fixed step ----
 
+  advancePopIn(dt) {
+    for (const b of this.phys.bodies) {
+      if (!b.dead && b.born !== undefined && b.born < 1) b.born = Math.min(1, b.born + dt * 7.5);
+    }
+  }
+
   update(dt) {
+    // merge pop-in, advanced on the fixed step (was per render-frame, so it
+    // played 2x fast on a 120Hz screen). Runs even after WON/FAILED so a drink
+    // that merges during the celebration/result settle still pops to full size.
+    this.advancePopIn(dt);
+
     if (this.state === S.WON || this.state === S.FAILED) {
       this.phys.step(dt);
       this.processEvents();
+      this.advancePopIn(dt);   // catch products spawned by this step's merges
       return;
     }
     this.time += dt;
@@ -198,12 +210,6 @@ export class Game {
     if (!this.tee.ready) {
       this.tee.t += dt * 1.8;
       if (this.tee.t >= 1) { this.tee.ready = true; this.tee.t = 1; }
-    }
-
-    // merge pop-in, advanced on the fixed step (was per render-frame, so it
-    // played 2x fast on a 120Hz screen)
-    for (const b of this.phys.bodies) {
-      if (!b.dead && b.born !== undefined && b.born < 1) b.born = Math.min(1, b.born + dt * 7.5);
     }
 
     // hazards
@@ -328,7 +334,7 @@ export class Game {
     nb.mergeLock = SPAWN.mergeLock;
     nb.immunity = SPAWN.spawnImmunity;
     nb.vy = 140;                 // little celebratory hop
-    nb.born = 0;                 // 0..1 pop-in tween, advanced by renderer
+    nb.born = 0;                 // 0..1 pop-in tween, advanced by advancePopIn()
 
     // lifetime stats (the dead totalMerges/maxCombo fields, now wired)
     this.save.data.totalMerges = (this.save.data.totalMerges || 0) + 1;
@@ -477,6 +483,8 @@ export class Game {
 
   finishNow() {
     if (this.state !== S.AIMING) return;
+    // Zen/Endless/Daily have no "cash out" — they end only by clogging the line.
+    if (this.zen || this.endless) return;
     if (this.goalDone && this.sideGoalDone()) this.finish(true);
   }
 
@@ -527,7 +535,9 @@ export class Game {
         newBest: isBest, best: this.daily ? this.save.data.dailyBest : this.save.data.endlessBest,
         streak, maxTier: this.maxTierMade,
       };
-      this.clearSaved();
+      // NOTE: do NOT clearSaved() here. Endless/Daily never write the campaign
+      // run slot (autosave skips them), so clearing it would wipe an unrelated
+      // in-progress campaign resume the player still expects on the title.
       this.emit('finished', this.result);
       return;
     }
