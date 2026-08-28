@@ -31,7 +31,7 @@ export class UI {
 
   // ---------- screens ----------
 
-  showTitle() {
+  showTitle(resume = null) {
     const streak = this.save.liveStreak(todayKey());
     const dailyDone = this.save.data.dailyTodayDone === todayKey();
     const endlessBest = this.save.data.endlessBest || 0;
@@ -43,7 +43,12 @@ export class UI {
         <p class="tagline">Slide &amp; Merge Cocktails</p>
       </div>
       <div class="title-buttons">
-        <button class="btn big primary" data-act="play">PLAY</button>
+        ${resume ? `<button class="btn big primary resume-btn" data-act="resumeRun">
+          <span class="resume-lead">Continue</span>
+          <span class="resume-sub">${resume.place} · ${resume.score}</span>
+        </button>
+        <button class="btn ghost" data-act="play">New game</button>` :
+        `<button class="btn big primary" data-act="play">PLAY</button>`}
         <div class="title-row">
           <button class="btn ghost half" data-act="daily">Daily${streak > 0 ? ` 🔥${streak}` : ''}${dailyDone ? ' ✓' : ''}</button>
           <button class="btn ghost half" data-act="endless">Endless${endlessBest ? ` · ${endlessBest}` : ''}</button>

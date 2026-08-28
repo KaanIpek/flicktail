@@ -130,9 +130,28 @@ function showTitle() {
   backdrop.set('waikiki');
   backdrop.render();
   setBgFill('waikiki');
-  ui.showTitle();
+  const run = Game.savedRun();
+  const resume = run && levelById(run.level)
+    ? { place: levelById(run.level).place, score: run.score } : null;
+  ui.showTitle(resume);
   audio.music('music_morning');
   audio.ambient('amb_beach_day');
+}
+
+// Resume the autosaved campaign run straight into play, skipping the intro.
+function resumeSaved() {
+  const s = Game.savedRun();
+  const level = s && levelById(s.level);
+  if (!level) { game.clearSaved(); showTitle(); return; }
+  audio.unlock();
+  currentLevel = level;
+  zenMode = false;
+  paused = false;
+  backdrop.set(level.backdrop); backdrop.render(); setBgFill(level.backdrop);
+  renderer.setLevel(level, W, H);
+  game.loadLevel(level, { seed: s.seed, restore: s });
+  audio.music(musicFor(level)); audio.ambient(ambientFor(level));
+  beginPlay();
 }
 
 function showMap() {
@@ -200,6 +219,7 @@ function beginPlay() {
 // ---- UI wiring ----
 
 ui.on('play', () => { audio.unlock(); showMap(); });
+ui.on('resumeRun', () => resumeSaved());
 ui.on('title', showTitle);
 ui.on('map', () => { game.clearSaved(); showMap(); });
 ui.on('collection', () => { screen = 'collection'; ui.showCollection(); });
@@ -409,20 +429,8 @@ window.__ft = {
 resize();
 preload();
 
-const saved = Game.savedRun();
-if (saved && levelById(saved.level)) {
-  // resume mid-run: jump straight back to the table
-  currentLevel = levelById(saved.level);
-  backdrop.set(currentLevel.backdrop);
-  renderer.setLevel(currentLevel, W, H);
-  game.loadLevel(currentLevel, { seed: saved.seed, restore: saved });
-  screen = 'game';
-  ui.showHud(game);
-  input.enabled = true;
-  audio.music(musicFor(currentLevel));
-  audio.ambient(ambientFor(currentLevel));
-  setBgFill(currentLevel.backdrop);
-} else {
-  showTitle();
-}
+// Land on the title. If a campaign run was autosaved, showTitle surfaces a
+// "Continue" banner (place · score) that resumes it — a friendlier choice than
+// silently dropping the player back into a half-finished table with no way out.
+showTitle();
 requestAnimationFrame(frame);

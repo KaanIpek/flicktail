@@ -80,7 +80,9 @@ export class Game {
       }));
       this.ballWanderT = 0;
     }
-    if (level.preplace) {
+    // A restored run's snapshot already contains the preplaced drinks (they are
+    // ordinary mergeable bodies), so skip the fresh preplace or they double up.
+    if (level.preplace && !restore) {
       for (const p of level.preplace) {
         const b = this.phys.add(makeBody(p.tier, p.x, p.z, TIERS[p.tier - 1].r));
         b.immunity = 0;
@@ -366,7 +368,13 @@ export class Game {
     }
     this.audio.play('merge' + (tier + 1), { volume: 0.8 });
     this.audio.play('splashSmall', { volume: 0.5, detune: 0.1 });
-    this.audio.haptic(this.combo >= 3 ? [10, 30, 20] : 8);
+    // Big mixes get their own escalating buzz so the top of the chain FEELS rare;
+    // the tier-11 finale (Atlas) earns a celebratory five-pulse.
+    const made = tier + 1;
+    this.audio.haptic(
+      made >= 11 ? [30, 40, 30, 40, 60] :
+      made >= 9 ? [18, 35, 18, 35, 30] :
+      this.combo >= 3 ? [10, 30, 20] : 8);
     this.emit('merge', { tier: tier + 1, x: nx, z: nz, mult });
     this.autosave();
   }
@@ -539,7 +547,10 @@ export class Game {
   // ---- mid-run persistence ("picks up right where you left off") ----
 
   autosave() {
-    if (this.zen || this.state !== S.AIMING) return;
+    // Only the campaign is resumable. Zen/Endless/Daily keep their own best-score
+    // state and must never be restored through the single-slot campaign run (that
+    // would drop the mode flag and reload them as an ordinary level).
+    if (this.zen || this.endless || this.state !== S.AIMING) return;
     try {
       const bodies = this.phys.bodies
         .filter(b => !b.dead && !b.fixed && b.kind !== 'ball')
