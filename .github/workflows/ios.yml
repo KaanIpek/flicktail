@@ -1,0 +1,202 @@
+# Flicktail → TestFlight.
+#
+# The pipeline proven on LUMEN (Capacitor) and BulkSift (Expo), with their
+# hard-won fixes kept:
+#   - newest Xcode on the runner (old SDKs are refused at UPLOAD, not build)
+#   - the iOS project is GENERATED here (`cap add ios`), never committed
+#   - Capacitor writes CODE_SIGN_IDENTITY = "iPhone Developer"; those lines
+#     must be DELETED or automatic signing requests a development profile,
+#     which needs registered devices this account does not have
+#   - archive UNSIGNED, sign at export with the ASC API key
+#     (-allowProvisioningUpdates also registers the App ID + profile)
+#   - build number = run number (Apple refuses repeats)
+#   - the ASC key secret is base64; strip non-base64 bytes before decoding
+#     (a secret pasted from Windows carries a trailing CR)
+#
+# Secrets: ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_P8_B64, APPLE_TEAM_ID
+
+name: ios
+
+on:
+  workflow_dispatch:
+    inputs:
+      upload_to_testflight:
+        description: 'Upload the build to TestFlight'
+        type: boolean
+        default: true
+  push:
+    tags: ['v*']
+
+concurrency:
+  group: ios
+  cancel-in-progress: false
+
+jobs:
+  ios:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use the newest Xcode on this runner
+        run: |
+          ls -d /Applications/Xcode*.app
+          NEWEST=$(ls -d /Applications/Xcode*.app | sort -V | tail -1)
+          echo "selecting $NEWEST"
+          sudo xcode-select -s "$NEWEST/Contents/Developer"
+          xcodebuild -version
+          xcodebuild -showsdks | grep -i iphoneos
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Copy the game into the shell
+        run: node mobile/sync-web.mjs
+
+      - name: Install Capacitor and generate the iOS project
+        working-directory: mobile
+        run: |
+          npm install
+          npx cap add ios
+          npx cap sync ios
+
+      # `cap add ios` leaves Capacitor's own placeholder icon in the catalog.
+      - name: Install the app icon
+        working-directory: mobile/ios/App/App/Assets.xcassets/AppIcon.appiconset
+        run: |
+          rm -f *.png
+          cp "$GITHUB_WORKSPACE/assets/icon-1024-ios.png" AppIcon-512@2x.png
+          cat > Contents.json <<'JSON'
+          {
+            "images" : [
+              {
+                "filename" : "AppIcon-512@2x.png",
+                "idiom" : "universal",
+                "platform" : "ios",
+                "size" : "1024x1024"
+              }
+            ],
+            "info" : { "author" : "xcode", "version" : 1 }
+          }
+          JSON
+          ls -l
+
+      - name: Install the launch image
+        working-directory: mobile/ios/App/App/Assets.xcassets/Splash.imageset
+        run: |
+          rm -f *.png
+          for n in splash-2732x2732.png splash-2732x2732-1.png splash-2732x2732-2.png; do
+            cp "$GITHUB_WORKSPACE/assets/splash-2732.png" "$n"
+          done
+          ls -l
+
+      # ITSAppUsesNonExemptEncryption=false answers the export-compliance
+      # question permanently (the game does HTTPS only). Portrait is locked —
+      # a mid-run rotation on a physics table is a death. UIRequiresFullScreen
+      # keeps it out of iPad multitasking for the same reason.
+      - name: Info.plist facts
+        working-directory: mobile/ios/App/App
+        run: |
+          PB=/usr/libexec/PlistBuddy
+          $PB -c "Add :ITSAppUsesNonExemptEncryption bool false" Info.plist || $PB -c "Set :ITSAppUsesNonExemptEncryption false" Info.plist
+          $PB -c "Add :UIRequiresFullScreen bool true" Info.plist || $PB -c "Set :UIRequiresFullScreen true" Info.plist
+          $PB -c "Delete :UISupportedInterfaceOrientations" Info.plist || true
+          $PB -c "Add :UISupportedInterfaceOrientations array" Info.plist
+          $PB -c "Add :UISupportedInterfaceOrientations:0 string UIInterfaceOrientationPortrait" Info.plist
+          $PB -c "Delete :UISupportedInterfaceOrientations~ipad" Info.plist || true
+          $PB -c "Add :UISupportedInterfaceOrientations~ipad array" Info.plist
+          $PB -c "Add :UISupportedInterfaceOrientations~ipad:0 string UIInterfaceOrientationPortrait" Info.plist
+          $PB -c "Print" Info.plist | grep -E "NonExempt|FullScreen|Orientation" -A 2
+
+      - name: Stamp the version
+        working-directory: mobile/ios/App
+        env:
+          BUILD_NUMBER: ${{ github.run_number }}
+          VERSION_NAME: 1.0.0
+        run: |
+          python3 - <<'PY'
+          import io, os, re
+          p = 'App.xcodeproj/project.pbxproj'
+          s = io.open(p, encoding='utf-8').read()
+          v, b = os.environ['VERSION_NAME'], os.environ['BUILD_NUMBER']
+          s, n1 = re.subn(r'MARKETING_VERSION = [^;]+;', 'MARKETING_VERSION = %s;' % v, s)
+          s, n2 = re.subn(r'CURRENT_PROJECT_VERSION = [^;]+;', 'CURRENT_PROJECT_VERSION = %s;' % b, s)
+          io.open(p, 'w', encoding='utf-8').write(s)
+          print('MARKETING_VERSION=%s in %d configs, CURRENT_PROJECT_VERSION=%s in %d' % (v, n1, b, n2))
+          if n1 == 0 or n2 == 0:
+              raise SystemExit('generated project did not carry the expected settings')
+          PY
+
+      # See the header: the identity lines must go, not change.
+      - name: Let automatic signing choose the identity
+        working-directory: mobile/ios/App
+        run: |
+          grep -n 'CODE_SIGN_IDENTITY' App.xcodeproj/project.pbxproj || echo "(none)"
+          sed -i '' '/CODE_SIGN_IDENTITY/d' App.xcodeproj/project.pbxproj
+          echo "--- after ---"
+          grep -n 'CODE_SIGN_IDENTITY' App.xcodeproj/project.pbxproj || echo "(none, which is the point)"
+
+      - name: Install the App Store Connect key
+        env:
+          KEY_B64: ${{ secrets.ASC_KEY_P8_B64 }}
+          KEY_ID: ${{ secrets.ASC_KEY_ID }}
+        run: |
+          mkdir -p ~/private_keys
+          printf '%s' "$KEY_B64" | tr -dc 'A-Za-z0-9+/=' | base64 -d > ~/private_keys/AuthKey_${KEY_ID}.p8
+          chmod 600 ~/private_keys/AuthKey_${KEY_ID}.p8
+          if ! head -1 ~/private_keys/AuthKey_${KEY_ID}.p8 | grep -q 'BEGIN PRIVATE KEY'; then
+            echo "ASC_KEY_P8_B64 did not decode to a PEM private key."
+            exit 1
+          fi
+          echo "key installed"
+
+      - name: Archive (unsigned)
+        working-directory: mobile/ios/App
+        run: |
+          xcodebuild -workspace App.xcworkspace -scheme App \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$RUNNER_TEMP/Flicktail.xcarchive" \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO \
+            archive
+
+      - name: Export and sign
+        working-directory: mobile/ios/App
+        run: |
+          cat > ExportOptions.plist <<PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0"><dict>
+            <key>method</key><string>app-store</string>
+            <key>destination</key><string>export</string>
+            <key>signingStyle</key><string>automatic</string>
+            <key>teamID</key><string>${{ secrets.APPLE_TEAM_ID }}</string>
+            <key>stripSwiftSymbols</key><true/>
+            <key>uploadSymbols</key><false/>
+          </dict></plist>
+          PLIST
+          xcodebuild -exportArchive \
+            -archivePath "$RUNNER_TEMP/Flicktail.xcarchive" \
+            -exportPath "$RUNNER_TEMP/export" \
+            -exportOptionsPlist ExportOptions.plist \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath ~/private_keys/AuthKey_${{ secrets.ASC_KEY_ID }}.p8 \
+            -authenticationKeyID ${{ secrets.ASC_KEY_ID }} \
+            -authenticationKeyIssuerID ${{ secrets.ASC_ISSUER_ID }}
+          ls -l "$RUNNER_TEMP/export"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: flicktail-ios
+          path: ${{ runner.temp }}/export/*.ipa
+          if-no-files-found: error
+
+      # Fails with ITMS-90083 "could not find the app record" until the app is
+      # created once on appstoreconnect.apple.com — the one step the API cannot
+      # do. Everything before this still produced the signed IPA artifact.
+      - name: Upload to TestFlight
+        if: ${{ inputs.upload_to_testflight || startsWith(github.ref, 'refs/tags/v') }}
+        run: |
+          xcrun altool --upload-app -f "$RUNNER_TEMP"/export/*.ipa -t ios \
+            --apiKey ${{ secrets.ASC_KEY_ID }} \
+            --apiIssuer ${{ secrets.ASC_ISSUER_ID }}

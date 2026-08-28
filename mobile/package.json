@@ -1,0 +1,11 @@
+{
+  "name": "flicktail-mobile",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Capacitor shell for Flicktail",
+  "dependencies": {
+    "@capacitor/cli": "^7.4.2",
+    "@capacitor/core": "^7.4.2",
+    "@capacitor/ios": "^7.4.2"
+  }
+}
