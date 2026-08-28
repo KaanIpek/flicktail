@@ -160,14 +160,38 @@ jobs:
             CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO \
             archive
 
+      # exportArchive re-signs nested code that already carries a signature and
+      # SKIPS code that arrived bare (it preserves metadata, which needs an
+      # existing signature). The archive was built with signing off, so the
+      # Capacitor/Cordova frameworks and the app itself are bare — ad-hoc sign
+      # them so export has something to replace with the distribution identity.
+      # (Learned on Rushhouse as upload rejection ITMS-90035.)
+      - name: Ad-hoc sign bare code so export will re-sign it
+        run: |
+          APP=$(ls -d "$RUNNER_TEMP"/Flicktail.xcarchive/Products/Applications/*.app | head -1)
+          echo "app: $APP"
+          for fw in "$APP"/Frameworks/*; do
+            [ -e "$fw" ] || continue
+            if codesign -v "$fw" >/dev/null 2>&1; then
+              echo "$(basename "$fw") already signed"
+            else
+              echo "$(basename "$fw") bare -> ad-hoc"
+              codesign --force --sign - "$fw"
+            fi
+          done
+          codesign --force --sign - "$APP" 2>/dev/null || true
+
       - name: Export and sign
         working-directory: mobile/ios/App
         run: |
+          # method must be app-store-connect on modern Xcode — the legacy
+          # "app-store" name authenticates against a retired endpoint and dies
+          # with "Unauthenticated" before signing even starts.
           cat > ExportOptions.plist <<PLIST
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
           <plist version="1.0"><dict>
-            <key>method</key><string>app-store</string>
+            <key>method</key><string>app-store-connect</string>
             <key>destination</key><string>export</string>
             <key>signingStyle</key><string>automatic</string>
             <key>teamID</key><string>${{ secrets.APPLE_TEAM_ID }}</string>
