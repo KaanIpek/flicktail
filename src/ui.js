@@ -47,7 +47,10 @@ export class UI {
           <button class="btn ghost half" data-act="daily">Daily${streak > 0 ? ` 🔥${streak}` : ''}${dailyDone ? ' ✓' : ''}</button>
           <button class="btn ghost half" data-act="endless">Endless${endlessBest ? ` · ${endlessBest}` : ''}</button>
         </div>
-        <button class="btn ghost" data-act="collection">Collection</button>
+        <div class="title-row">
+          <button class="btn ghost half" data-act="collection">Collection</button>
+          <button class="btn ghost half" data-act="passport">Passport</button>
+        </div>
       </div>
       <p class="title-foot">A world tour in 12 drinks 🍹</p>
     </div>`;
@@ -102,6 +105,43 @@ export class UI {
       </div>
       <div class="col-grid">${rows}</div>
       <p class="col-foot">Highest mix: ${best >= 1 ? TIERS[best - 1].name : '—'}</p>
+    </div>`;
+  }
+
+  showPassport() {
+    const d = this.save.data;
+    const toasted = LEVELS.filter(l => (d.stars[l.id] || 0) >= 1).length;
+    const stat = (label, value, accent) =>
+      `<div class="pass-stat"><div class="pass-val ${accent ? 'accent' : ''}">${value}</div><div class="pass-label">${label}</div></div>`;
+    const stamps = LEVELS.map(l => {
+      const done = (d.stars[l.id] || 0) >= 1;
+      const st = d.stars[l.id] || 0;
+      return `<div class="pass-stamp ${done ? 'done' : ''}" title="${l.place}">
+        <div class="pass-stamp-thumb" style="background-image:url(assets/backdrops/${l.backdrop}.webp)"></div>
+        <div class="pass-stamp-name">${l.place}</div>
+        <div class="pass-stamp-stars">${done ? '★'.repeat(st) + '☆'.repeat(3 - st) : '🔒'}</div>
+      </div>`;
+    }).join('');
+    this.root.innerHTML = `
+    <div class="screen passport-screen">
+      <div class="map-head">
+        <button class="btn icon" data-act="title">‹</button>
+        <h2>Passport</h2><div></div>
+      </div>
+      <div class="pass-scroll">
+        <div class="pass-stats">
+          ${stat('destinations', `${toasted}/12`)}
+          ${stat('stars', `${this.save.totalStars()}/36`, true)}
+          ${stat('drinks mixed', d.totalMerges || 0)}
+          ${stat('best combo', `×${d.maxCombo || 0}`)}
+          ${stat('endless best', d.endlessBest || 0)}
+          ${stat('daily streak', `🔥${d.dailyStreak || 0}`, true)}
+          ${stat('daily best', d.dailyBest || 0)}
+          ${stat('top mix', d.bestTier >= 1 ? TIERS[d.bestTier - 1].name : '—')}
+        </div>
+        <div class="pass-stamps-title">Destinations toasted</div>
+        <div class="pass-stamps">${stamps}</div>
+      </div>
     </div>`;
   }
 

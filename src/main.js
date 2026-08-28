@@ -202,6 +202,7 @@ ui.on('play', () => { audio.unlock(); showMap(); });
 ui.on('title', showTitle);
 ui.on('map', () => { game.clearSaved(); showMap(); });
 ui.on('collection', () => { screen = 'collection'; ui.showCollection(); });
+ui.on('passport', () => { screen = 'passport'; ui.showPassport(); });
 ui.on('level', d => { audio.unlock(); startLevel(+d.id); });
 ui.on('zen', d => { audio.unlock(); startLevel(+d.id, { zen: true }); });
 ui.on('endless', () => { audio.unlock(); startEndless(); });
@@ -366,7 +367,7 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
 
 // QA / debug hook (harmless in production, invaluable for automated testing)
 window.__ft = {
-  game, view, renderer, physics, fx, save, audio, backdrop,
+  game, view, renderer, physics, fx, save, audio, backdrop, ui,
   startLevel, showMap,
   async spawn(tier, x, z, vx = 0, vz = 0) {
     const { makeBody } = await import('./physics.js');
