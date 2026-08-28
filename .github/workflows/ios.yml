@@ -148,10 +148,46 @@ jobs:
             echo "ASC_KEY_P8_B64 did not decode to a PEM private key."
             exit 1
           fi
-          # xcodebuild/altool discover keys in several places; cover them all.
+          # altool discovers keys in several places; cover them all.
           cp ~/private_keys/AuthKey_${KEY_ID}.p8 ~/.private_keys/
           cp ~/private_keys/AuthKey_${KEY_ID}.p8 ~/.appstoreconnect/private_keys/
           echo "key installed"
+
+      # MANUAL signing: xcodebuild's cloud signing (-allowProvisioningUpdates)
+      # died with "Unauthenticated" on every key this account owns, so the
+      # export signs with a real certificate instead. We hold the private key
+      # of the account's existing Apple Distribution certificate; the App Store
+      # profile was created once via the ASC API and lives in the secrets.
+      - name: Load the signing certificate and profile
+        env:
+          KEY_PEM_B64: ${{ secrets.SIGNING_KEY_PEM_B64 }}
+          CERT_DER_B64: ${{ secrets.SIGNING_CERT_DER_B64 }}
+          PROF_B64: ${{ secrets.PROFILE_B64 }}
+          PROF_UUID: ${{ secrets.PROFILE_UUID }}
+        run: |
+          cd "$RUNNER_TEMP"
+          printf '%s' "$KEY_PEM_B64" | tr -dc 'A-Za-z0-9+/=' | base64 -d > signkey.pem
+          printf '%s' "$CERT_DER_B64" | tr -dc 'A-Za-z0-9+/=' | base64 -d > distcert.der
+          openssl x509 -inform DER -in distcert.der -out distcert.pem
+          openssl x509 -in distcert.pem -noout -subject -enddate
+          openssl pkcs12 -export -inkey signkey.pem -in distcert.pem \
+            -name "Apple Distribution" -passout pass:ci -out dist.p12
+
+          KC="$RUNNER_TEMP/flicktail.keychain-db"
+          KCPASS=$(uuidgen)
+          security create-keychain -p "$KCPASS" "$KC"
+          security set-keychain-settings -lut 21600 "$KC"
+          security unlock-keychain -p "$KCPASS" "$KC"
+          security import dist.p12 -k "$KC" -P ci -T /usr/bin/codesign -T /usr/bin/security
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KCPASS" "$KC" >/dev/null
+          security list-keychains -d user -s "$KC" $(security list-keychains -d user | tr -d '"')
+          echo '--- identities ---'
+          security find-identity -v -p codesigning
+
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          printf '%s' "$PROF_B64" | tr -dc 'A-Za-z0-9+/=' | base64 -d \
+            > ~/Library/MobileDevice/Provisioning\ Profiles/"$PROF_UUID".mobileprovision
+          echo "installed profile $PROF_UUID"
 
       - name: Archive (unsigned)
         working-directory: mobile/ios/App
@@ -184,20 +220,22 @@ jobs:
           done
           codesign --force --sign - "$APP" 2>/dev/null || true
 
-      - name: Export and sign
+      - name: Export and sign (manual)
         working-directory: mobile/ios/App
         run: |
-          # method must be app-store-connect on modern Xcode — the legacy
-          # "app-store" name authenticates against a retired endpoint and dies
-          # with "Unauthenticated" before signing even starts.
           cat > ExportOptions.plist <<PLIST
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
           <plist version="1.0"><dict>
             <key>method</key><string>app-store-connect</string>
             <key>destination</key><string>export</string>
-            <key>signingStyle</key><string>automatic</string>
+            <key>signingStyle</key><string>manual</string>
+            <key>signingCertificate</key><string>Apple Distribution</string>
             <key>teamID</key><string>${{ secrets.APPLE_TEAM_ID }}</string>
+            <key>provisioningProfiles</key>
+            <dict>
+              <key>com.rldgames.flicktail</key><string>${{ secrets.PROFILE_UUID }}</string>
+            </dict>
             <key>stripSwiftSymbols</key><true/>
             <key>uploadSymbols</key><false/>
           </dict></plist>
@@ -205,11 +243,7 @@ jobs:
           xcodebuild -exportArchive \
             -archivePath "$RUNNER_TEMP/Flicktail.xcarchive" \
             -exportPath "$RUNNER_TEMP/export" \
-            -exportOptionsPlist ExportOptions.plist \
-            -allowProvisioningUpdates \
-            -authenticationKeyPath ~/private_keys/AuthKey_${{ secrets.ASC_KEY_ID }}.p8 \
-            -authenticationKeyID ${{ secrets.ASC_KEY_ID }} \
-            -authenticationKeyIssuerID ${{ secrets.ASC_ISSUER_ID }}
+            -exportOptionsPlist ExportOptions.plist
           ls -l "$RUNNER_TEMP/export"
 
       - uses: actions/upload-artifact@v4
