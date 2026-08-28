@@ -191,9 +191,16 @@ jobs:
           echo '--- identities ---'
           security find-identity -v -p codesigning
 
+          # Xcode 16+ reads ~/Library/Developer/Xcode/UserData/Provisioning Profiles;
+          # older tooling reads ~/Library/MobileDevice/Provisioning Profiles. Both.
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          mkdir -p ~/Library/Developer/Xcode/UserData/Provisioning\ Profiles
           printf '%s' "$PROF_B64" | tr -dc 'A-Za-z0-9+/=' | base64 -d \
             > ~/Library/MobileDevice/Provisioning\ Profiles/"$PROF_UUID".mobileprovision
+          cp ~/Library/MobileDevice/Provisioning\ Profiles/"$PROF_UUID".mobileprovision \
+             ~/Library/Developer/Xcode/UserData/Provisioning\ Profiles/
+          security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/"$PROF_UUID".mobileprovision \
+            | plutil -extract Name raw -o - - || true
           echo "installed profile $PROF_UUID"
 
       - name: Archive (unsigned)
