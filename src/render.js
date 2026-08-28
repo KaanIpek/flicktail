@@ -372,8 +372,9 @@ export class Renderer {
     const vis = 1.62 - 0.034 * (b.tier - 1);
     const wpx = b.r * 2 * p.s * vis * pop * (1 + bob);
     const hpx = view.project(b.x, b.y, b.z);
-    // billboard lean: drinks off-center shear subtly toward the camera axis
-    const shear = (this.view.cx - p.x) / this.view.w * 0.12;
+    // The 3D-rendered sprites already carry a fixed 3/4 perspective, so the old
+    // billboard shear would fight it — keep only a whisper of lean for life.
+    const shear = (this.view.cx - p.x) / this.view.w * 0.04;
 
     if (img) {
       const ih = wpx * (img.naturalHeight / img.naturalWidth);
