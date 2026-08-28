@@ -282,7 +282,14 @@ jobs:
       # do. Everything before this still produced the signed IPA artifact.
       - name: Upload to TestFlight
         if: ${{ inputs.upload_to_testflight || startsWith(github.ref, 'refs/tags/v') }}
+        env:
+          KEY_B64: ${{ secrets.ASC_KEY_P8_B64 }}
+          KEY_ID: ${{ secrets.ASC_KEY_ID }}
         run: |
+          # altool searches ./private_keys first and failed to expand ~ on this
+          # runner, so give it the key exactly where it looks.
+          mkdir -p private_keys
+          printf '%s' "$KEY_B64" | tr -dc 'A-Za-z0-9+/=' | base64 -d > private_keys/AuthKey_${KEY_ID}.p8
           xcrun altool --upload-app -f "$RUNNER_TEMP"/export/*.ipa -t ios \
-            --apiKey ${{ secrets.ASC_KEY_ID }} \
+            --apiKey ${KEY_ID} \
             --apiIssuer ${{ secrets.ASC_ISSUER_ID }}
