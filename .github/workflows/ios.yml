@@ -166,6 +166,7 @@ jobs:
           PROF_UUID: ${{ secrets.PROFILE_UUID }}
         run: |
           cd "$RUNNER_TEMP"
+          PROF_UUID=$(printf '%s' "$PROF_UUID" | tr -d '[:space:]')
           printf '%s' "$KEY_PEM_B64" | tr -dc 'A-Za-z0-9+/=' | base64 -d > signkey.pem
           printf '%s' "$CERT_DER_B64" | tr -dc 'A-Za-z0-9+/=' | base64 -d > distcert.der
           openssl x509 -inform DER -in distcert.der -out distcert.pem
@@ -242,6 +243,7 @@ jobs:
         env:
           PROF_UUID: ${{ secrets.PROFILE_UUID }}
         run: |
+          PROF_UUID=$(printf '%s' "$PROF_UUID" | tr -d '[:space:]')
           APP_SRC=$(ls -d "$RUNNER_TEMP"/Flicktail.xcarchive/Products/Applications/*.app | head -1)
           WORK="$RUNNER_TEMP/pack"; rm -rf "$WORK"; mkdir -p "$WORK/Payload"
           cp -R "$APP_SRC" "$WORK/Payload/"
@@ -286,13 +288,15 @@ jobs:
           KEY_B64: ${{ secrets.ASC_KEY_P8_B64 }}
           KEY_ID: ${{ secrets.ASC_KEY_ID }}
         run: |
-          # altool ignored every default key directory on this runner;
-          # API_PRIVATE_KEYS_DIR is the documented way to point at it directly.
+          # A secret set from a Windows shell can carry an invisible trailing
+          # CR; embedded in the key FILENAME it makes altool "not find" a file
+          # that ls shows. Strip whitespace from every identifier.
+          KEY_ID=$(printf '%s' "$KEY_ID" | tr -d '[:space:]')
+          ISSUER=$(printf '%s' "${{ secrets.ASC_ISSUER_ID }}" | tr -d '[:space:]')
           mkdir -p "$RUNNER_TEMP/asckeys"
           printf '%s' "$KEY_B64" | tr -dc 'A-Za-z0-9+/=' | base64 -d > "$RUNNER_TEMP/asckeys/AuthKey_${KEY_ID}.p8"
           ls -la "$RUNNER_TEMP/asckeys"
-          head -c 30 "$RUNNER_TEMP/asckeys/AuthKey_${KEY_ID}.p8"; echo
           export API_PRIVATE_KEYS_DIR="$RUNNER_TEMP/asckeys"
           xcrun altool --upload-app -f "$RUNNER_TEMP"/export/*.ipa -t ios \
-            --apiKey ${KEY_ID} \
-            --apiIssuer ${{ secrets.ASC_ISSUER_ID }}
+            --apiKey "$KEY_ID" \
+            --apiIssuer "$ISSUER"
