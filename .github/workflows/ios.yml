@@ -170,8 +170,15 @@ jobs:
           printf '%s' "$CERT_DER_B64" | tr -dc 'A-Za-z0-9+/=' | base64 -d > distcert.der
           openssl x509 -inform DER -in distcert.der -out distcert.pem
           openssl x509 -in distcert.pem -noout -subject -enddate
-          openssl pkcs12 -export -inkey signkey.pem -in distcert.pem \
-            -name "Apple Distribution" -passout pass:ci -out dist.p12
+          openssl version
+          # OpenSSL 3 writes AES/PBKDF2 p12s that `security import` rejects
+          # with "MAC verification failed"; the -legacy provider restores the
+          # 3DES/SHA1 format the keychain accepts. LibreSSL lacks the flag and
+          # writes the old format anyway — hence the fallback.
+          openssl pkcs12 -export -legacy -inkey signkey.pem -in distcert.pem \
+              -name "Apple Distribution" -passout pass:ci -out dist.p12 \
+            || openssl pkcs12 -export -inkey signkey.pem -in distcert.pem \
+              -name "Apple Distribution" -passout pass:ci -out dist.p12
 
           KC="$RUNNER_TEMP/flicktail.keychain-db"
           KCPASS=$(uuidgen)
