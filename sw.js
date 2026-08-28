@@ -1,8 +1,8 @@
-// Cache-first service worker: precache the shell, runtime-cache everything
+﻿// Cache-first service worker: precache the shell, runtime-cache everything
 // else (backdrops, sprites, audio) so the game is fully playable offline
 // after the first visit.
 
-const VERSION = 'flicktail-v3';
+const VERSION = 'flicktail-v4';
 const BACKDROPS = ['waikiki', 'miami', 'cancun', 'rio', 'nice', 'positano',
   'santorini', 'ibiza', 'dubai', 'phuket', 'bali', 'borabora'];
 const SHELL = [

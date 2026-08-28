@@ -20,6 +20,18 @@ export class AudioMan {
     if (this.unlocked) return;
     const Ctx = window.AudioContext || window.webkitAudioContext;
     if (!Ctx) return;
+    // iOS mutes WebAudio under the ringer silent switch; a looping <audio>
+    // element moves playback to the "media" session, which the switch ignores.
+    try {
+      const el = document.createElement('audio');
+      el.setAttribute('x-webkit-airplay', 'deny');
+      el.preload = 'auto';
+      el.loop = true;
+      // 50ms of silence, wav, ~150 bytes
+      el.src = 'data:audio/wav;base64,UklGRlIAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YS4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==';
+      el.play().catch(() => {});
+      this._silentEl = el;
+    } catch {}
     this.ctx = new Ctx();
     this.master = this.ctx.createGain();
     this.master.connect(this.ctx.destination);
