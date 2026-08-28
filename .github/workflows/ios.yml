@@ -286,10 +286,13 @@ jobs:
           KEY_B64: ${{ secrets.ASC_KEY_P8_B64 }}
           KEY_ID: ${{ secrets.ASC_KEY_ID }}
         run: |
-          # altool searches ./private_keys first and failed to expand ~ on this
-          # runner, so give it the key exactly where it looks.
-          mkdir -p private_keys
-          printf '%s' "$KEY_B64" | tr -dc 'A-Za-z0-9+/=' | base64 -d > private_keys/AuthKey_${KEY_ID}.p8
+          # altool ignored every default key directory on this runner;
+          # API_PRIVATE_KEYS_DIR is the documented way to point at it directly.
+          mkdir -p "$RUNNER_TEMP/asckeys"
+          printf '%s' "$KEY_B64" | tr -dc 'A-Za-z0-9+/=' | base64 -d > "$RUNNER_TEMP/asckeys/AuthKey_${KEY_ID}.p8"
+          ls -la "$RUNNER_TEMP/asckeys"
+          head -c 30 "$RUNNER_TEMP/asckeys/AuthKey_${KEY_ID}.p8"; echo
+          export API_PRIVATE_KEYS_DIR="$RUNNER_TEMP/asckeys"
           xcrun altool --upload-app -f "$RUNNER_TEMP"/export/*.ipa -t ios \
             --apiKey ${KEY_ID} \
             --apiIssuer ${{ secrets.ASC_ISSUER_ID }}
