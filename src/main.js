@@ -96,6 +96,9 @@ function preload() {
   for (const m of ['music_morning', 'music_golden', 'music_last', 'music_neon']) {
     audio.load(m, 'assets/audio/' + m + '.mp3');
   }
+  for (const a of ['amb_beach_day', 'amb_beach_sunset', 'amb_night']) {
+    audio.load(a, 'assets/audio/' + a + '.mp3');
+  }
 }
 
 function musicFor(level) {
@@ -103,6 +106,13 @@ function musicFor(level) {
   if (level.time === 'night') return 'music_neon';
   if (level.time === 'sunset') return level.id >= 7 ? 'music_last' : 'music_golden';
   return 'music_morning';
+}
+
+function ambientFor(level) {
+  if (!level) return 'amb_beach_day';
+  if (level.time === 'night') return 'amb_night';
+  if (level.time === 'sunset') return 'amb_beach_sunset';
+  return 'amb_beach_day';
 }
 
 // ---- screen flow ----
@@ -121,6 +131,7 @@ function showTitle() {
   setBgFill('waikiki');
   ui.showTitle();
   audio.music('music_morning');
+  audio.ambient('amb_beach_day');
 }
 
 function showMap() {
@@ -143,6 +154,7 @@ function startLevel(id, { zen = false, seed = null, restore = null } = {}) {
   game.loadLevel(level, { zen, seed, restore });
   ui.showIntro(level, zen);
   audio.music(musicFor(level));
+  audio.ambient(ambientFor(level));
 }
 
 function beginPlay() {
@@ -360,6 +372,8 @@ if (saved && levelById(saved.level)) {
   ui.showHud(game);
   input.enabled = true;
   audio.music(musicFor(currentLevel));
+  audio.ambient(ambientFor(currentLevel));
+  setBgFill(currentLevel.backdrop);
 } else {
   showTitle();
 }

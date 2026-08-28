@@ -14,6 +14,9 @@ export class AudioMan {
     this.hapticsOn = true;
     this.unlocked = false;
     this.noise = null;
+    this.ambSrc = null;
+    this.currentAmb = null;
+    this.pendingAmb = null;
   }
 
   unlock() {
@@ -41,6 +44,10 @@ export class AudioMan {
     this.sfxGain = this.ctx.createGain();
     this.sfxGain.gain.value = this.muted.sfx ? 0 : 1;
     this.sfxGain.connect(this.master);
+    // ambient bed rides on the music mute (it IS the environment's own sound)
+    this.ambGain = this.ctx.createGain();
+    this.ambGain.gain.value = this.muted.music ? 0 : 0.42;
+    this.ambGain.connect(this.master);
     // shared noise buffer for all percussive sounds
     const len = this.ctx.sampleRate;
     this.noise = this.ctx.createBuffer(1, len, this.ctx.sampleRate);
@@ -49,6 +56,7 @@ export class AudioMan {
     this.unlocked = true;
     if (this.ctx.state === 'suspended') this.ctx.resume();
     if (this.pendingMusic) { const m = this.pendingMusic; this.pendingMusic = null; this.music(m); }
+    if (this.pendingAmb) { const a = this.pendingAmb; this.pendingAmb = null; this.ambient(a); }
     document.addEventListener('visibilitychange', () => {
       if (!this.ctx) return;
       if (document.hidden) this.ctx.suspend(); else this.ctx.resume();
@@ -229,10 +237,41 @@ export class AudioMan {
     this.musicSrcGain = g;
   }
 
+  async ambient(name) {
+    if (!this.unlocked) { this.pendingAmb = name; return; }
+    if (this.currentAmb === name) return;
+    this.currentAmb = name;
+    const buf = await this.buffer(name);
+    const fade = 2.0;
+    const t = this.ctx.currentTime;
+    if (this.ambSrc) {
+      const old = this.ambSrc, oldG = this.ambSrcGain;
+      oldG.gain.setValueAtTime(oldG.gain.value, t);
+      oldG.gain.linearRampToValueAtTime(0, t + fade);
+      setTimeout(() => { try { old.stop(); } catch {} }, fade * 1000 + 60);
+      this.ambSrc = null;
+    }
+    if (!buf) return;
+    if (this.currentAmb !== name) return;
+    const src = this.ctx.createBufferSource();
+    src.buffer = buf;
+    src.loop = true;
+    const g = this.ctx.createGain();
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(1, t + fade);
+    src.connect(g); g.connect(this.ambGain);
+    src.start();
+    this.ambSrc = src;
+    this.ambSrcGain = g;
+  }
+
   setMuted(kind, m) {
     this.muted[kind] = m;
     if (!this.ctx) return;
-    if (kind === 'music' && this.musicGain) this.musicGain.gain.value = m ? 0 : 0.5;
+    if (kind === 'music') {
+      if (this.musicGain) this.musicGain.gain.value = m ? 0 : 0.5;
+      if (this.ambGain) this.ambGain.gain.value = m ? 0 : 0.42;
+    }
     if (kind === 'sfx' && this.sfxGain) this.sfxGain.gain.value = m ? 0 : 1;
   }
 

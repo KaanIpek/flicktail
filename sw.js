@@ -2,7 +2,7 @@
 // else (backdrops, sprites, audio) so the game is fully playable offline
 // after the first visit.
 
-const VERSION = 'flicktail-v5';
+const VERSION = 'flicktail-v6';
 const BACKDROPS = ['waikiki', 'miami', 'cancun', 'rio', 'nice', 'positano',
   'santorini', 'ibiza', 'dubai', 'phuket', 'bali', 'borabora'];
 const SHELL = [
@@ -15,6 +15,7 @@ const SHELL = [
   ...Array.from({ length: 11 }, (_, i) => `assets/drinks/tier${String(i + 1).padStart(2, '0')}.png`),
   ...BACKDROPS.map(b => `assets/backdrops/${b}.webp`),
   ...['morning', 'golden', 'last', 'neon'].map(m => `assets/audio/music_${m}.mp3`),
+  ...['amb_beach_day', 'amb_beach_sunset', 'amb_night'].map(a => `assets/audio/${a}.mp3`),
 ];
 
 self.addEventListener('install', e => {
