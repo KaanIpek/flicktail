@@ -58,6 +58,16 @@ jobs:
         run: |
           npm install
           npx cap add ios
+          # Capacitor 7 defaults the deployment target to iOS 14.0, which trips
+          # ITMS-90068 (Apple requires 15.0+ from Spring 2027). Raise it in both
+          # the Podfile and the app project BEFORE cap sync runs pod install, so
+          # MinimumOSVersion in the built Info.plist reads 15.0.
+          if [ -f ios/App/Podfile ]; then
+            sed -i '' "s/platform :ios, '[0-9.]*'/platform :ios, '15.0'/" ios/App/Podfile
+            grep 'platform :ios' ios/App/Podfile
+          fi
+          sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = [0-9.]*;/IPHONEOS_DEPLOYMENT_TARGET = 15.0;/g' ios/App/App.xcodeproj/project.pbxproj
+          grep -m1 'IPHONEOS_DEPLOYMENT_TARGET' ios/App/App.xcodeproj/project.pbxproj
           npx cap sync ios
 
       # `cap add ios` leaves Capacitor's own placeholder icon in the catalog.
