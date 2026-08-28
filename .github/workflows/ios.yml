@@ -234,30 +234,41 @@ jobs:
           done
           codesign --force --sign - "$APP" 2>/dev/null || true
 
-      - name: Export and sign (manual)
-        working-directory: mobile/ios/App
+      # xcodebuild -exportArchive is bypassed entirely: its cloud path returns
+      # "Unauthenticated" for this account and its manual path refused to see a
+      # profile that was demonstrably installed. Nothing it does here is magic —
+      # embed the profile, sign with the profile's own entitlements, zip.
+      - name: Package and sign the IPA by hand
+        env:
+          PROF_UUID: ${{ secrets.PROFILE_UUID }}
         run: |
-          cat > ExportOptions.plist <<PLIST
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0"><dict>
-            <key>method</key><string>app-store-connect</string>
-            <key>destination</key><string>export</string>
-            <key>signingStyle</key><string>manual</string>
-            <key>signingCertificate</key><string>Apple Distribution</string>
-            <key>teamID</key><string>${{ secrets.APPLE_TEAM_ID }}</string>
-            <key>provisioningProfiles</key>
-            <dict>
-              <key>com.rldgames.flicktail</key><string>${{ secrets.PROFILE_UUID }}</string>
-            </dict>
-            <key>stripSwiftSymbols</key><true/>
-            <key>uploadSymbols</key><false/>
-          </dict></plist>
-          PLIST
-          xcodebuild -exportArchive \
-            -archivePath "$RUNNER_TEMP/Flicktail.xcarchive" \
-            -exportPath "$RUNNER_TEMP/export" \
-            -exportOptionsPlist ExportOptions.plist
+          APP_SRC=$(ls -d "$RUNNER_TEMP"/Flicktail.xcarchive/Products/Applications/*.app | head -1)
+          WORK="$RUNNER_TEMP/pack"; rm -rf "$WORK"; mkdir -p "$WORK/Payload"
+          cp -R "$APP_SRC" "$WORK/Payload/"
+          APP="$WORK/Payload/$(basename "$APP_SRC")"
+          PROF=~/Library/MobileDevice/Provisioning\ Profiles/"$PROF_UUID".mobileprovision
+
+          cp "$PROF" "$APP/embedded.mobileprovision"
+          security cms -D -i "$PROF" > "$WORK/profile.plist"
+          plutil -extract Entitlements xml1 -o "$WORK/ent.plist" "$WORK/profile.plist"
+          echo '--- entitlements from the profile ---'
+          /usr/libexec/PlistBuddy -c "Print" "$WORK/ent.plist"
+
+          IDENT=$(security find-identity -v -p codesigning | grep -oE '"[^"]+"' | head -1 | tr -d '"')
+          echo "signing as: [$IDENT]"
+          test -n "$IDENT"
+
+          for fw in "$APP"/Frameworks/*; do
+            [ -e "$fw" ] || continue
+            codesign --force --sign "$IDENT" "$fw"
+          done
+          codesign --force --sign "$IDENT" --entitlements "$WORK/ent.plist" "$APP"
+          codesign --verify --deep --strict "$APP"
+          echo '--- signed as ---'
+          codesign -dvv "$APP" 2>&1 | grep -E 'Authority|Identifier|TeamIdentifier'
+
+          mkdir -p "$RUNNER_TEMP/export"
+          (cd "$WORK" && zip -qry "$RUNNER_TEMP/export/Flicktail.ipa" Payload)
           ls -l "$RUNNER_TEMP/export"
 
       - uses: actions/upload-artifact@v4
