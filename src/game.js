@@ -27,9 +27,12 @@ export class Game {
     this.onEvent = null;   // (name, data) -> UI hooks
   }
 
-  loadLevel(level, { zen = false, seed = null, restore = null } = {}) {
+  loadLevel(level, { zen = false, seed = null, restore = null, endless = false, daily = false, dayKey = '' } = {}) {
     this.level = level;
     this.zen = zen;
+    this.endless = endless;
+    this.daily = daily;
+    this.dayKey = dayKey;
     this.seed = seed ?? ((Math.random() * 1e9) | 0);
     this.rng = mulberry32(this.seed);
     this.phys.clear();
@@ -46,7 +49,7 @@ export class Game {
 
     this.state = S.AIMING;
     this.score = 0;
-    this.flicksLeft = zen ? Infinity : level.flicks;
+    this.flicksLeft = (zen || endless) ? Infinity : level.flicks;
     this.combo = 0;
     this.comboTimer = 0;
     this.maxTierMade = 0;
@@ -103,7 +106,15 @@ export class Game {
   emit(name, data) { if (this.onEvent) this.onEvent(name, data); }
 
   rollTier() {
-    return this.spawnPool[(this.rng() * this.spawnPool.length) | 0];
+    // Endless widens the spawn pool as the run gets long, so a survivor keeps
+    // being pushed but is handed bigger drinks to keep the board escalating.
+    let pool = this.spawnPool;
+    if (this.endless) {
+      const top = Math.min(7, 3 + Math.floor(this.time / 45));  // grows every 45s, capped at 7
+      pool = [];
+      for (let t = 1; t <= top; t++) pool.push(t);
+    }
+    return pool[(this.rng() * pool.length) | 0];
   }
 
   pushOrder(slot) {
@@ -316,9 +327,13 @@ export class Game {
     nb.vy = 140;                 // little celebratory hop
     nb.born = 0;                 // 0..1 pop-in tween, advanced by renderer
 
+    // lifetime stats (the dead totalMerges/maxCombo fields, now wired)
+    this.save.data.totalMerges = (this.save.data.totalMerges || 0) + 1;
+
     // scoring
     this.combo = this.comboTimer > 0 || this.combo === 0 ? this.combo + 1 : 1;
     this.comboTimer = COMBO.window;
+    if (this.combo > (this.save.data.maxCombo || 0)) this.save.data.maxCombo = this.combo;
     const mult = Math.min(this.combo, COMBO.cap);
     let pts = nt.score * mult;
     if (wasBank) {
@@ -473,6 +488,29 @@ export class Game {
   finish(won, reason = null) {
     if (this.state === S.WON || this.state === S.FAILED) return;
     this.state = won ? S.WON : S.FAILED;
+
+    // Endless / Daily: score-chase runs, no stars, own records. Daily runs on
+    // the endless ruleset (endless:true) too, so check daily FIRST.
+    if (this.endless || this.daily) {
+      let isBest = false, streak = 0;
+      if (this.daily) {
+        const r = this.save.recordDaily(this.dayKey, this.score);
+        isBest = r.isBest; streak = r.streak;
+      } else {
+        isBest = this.save.recordEndless(this.score);
+      }
+      this.audio.play(won ? 'win' : 'lose');
+      this.result = {
+        won, reason, score: this.score, seed: this.seed,
+        mode: this.daily ? 'daily' : 'endless',
+        newBest: isBest, best: this.daily ? this.save.data.dailyBest : this.save.data.endlessBest,
+        streak, maxTier: this.maxTierMade,
+      };
+      this.clearSaved();
+      this.emit('finished', this.result);
+      return;
+    }
+
     // Capture the PRIOR records before recordResult overwrites them, so the
     // result screen can honestly say "NEW BEST" and how far the next star is.
     const prevBest = this.save.data.bestScore[this.level.id] || 0;

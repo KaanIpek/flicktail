@@ -2,6 +2,7 @@
 
 import { TIERS, COMBO_CALLOUTS } from './config.js';
 import { LEVELS } from './levels.js';
+import { todayKey } from './save.js';
 
 export class UI {
   constructor(root, save, audio) {
@@ -31,6 +32,9 @@ export class UI {
   // ---------- screens ----------
 
   showTitle() {
+    const streak = this.save.liveStreak(todayKey());
+    const dailyDone = this.save.data.dailyTodayDone === todayKey();
+    const endlessBest = this.save.data.endlessBest || 0;
     this.root.innerHTML = `
     <div class="screen title-screen">
       <div class="title-block">
@@ -39,6 +43,10 @@ export class UI {
       </div>
       <div class="title-buttons">
         <button class="btn big primary" data-act="play">PLAY</button>
+        <div class="title-row">
+          <button class="btn ghost half" data-act="daily">Daily${streak > 0 ? ` 🔥${streak}` : ''}${dailyDone ? ' ✓' : ''}</button>
+          <button class="btn ghost half" data-act="endless">Endless${endlessBest ? ` · ${endlessBest}` : ''}</button>
+        </div>
         <button class="btn ghost" data-act="collection">Collection</button>
       </div>
       <p class="title-foot">A world tour in 12 drinks 🍹</p>
@@ -117,6 +125,39 @@ export class UI {
     </div>`;
   }
 
+  showModeIntro(mode, opts = {}) {
+    if (mode === 'endless') {
+      this.root.innerHTML = `
+      <div class="screen intro-screen" data-act="start">
+        <div class="intro-card">
+          <div class="intro-place">Bottomless Bar</div>
+          <div class="intro-country">Endless survival</div>
+          <div class="intro-goal">
+            <div class="mode-line">Mix as high as you can. The pours never stop and the drinks keep getting bigger.</div>
+            ${this.save.data.endlessBest ? `<div class="goal-side">Best: ${this.save.data.endlessBest}</div>` : ''}
+          </div>
+          <div class="intro-mech">💡 Don't let the launch line clog — that's the only way out.</div>
+          <button class="btn big primary" data-act="start">POUR!</button>
+        </div>
+      </div>`;
+    } else {
+      const l = opts.level;
+      this.root.innerHTML = `
+      <div class="screen intro-screen" data-act="start">
+        <div class="intro-card">
+          <div class="intro-place">Daily Challenge</div>
+          <div class="intro-country">${l.place} · today's board</div>
+          <div class="intro-goal">
+            <div class="mode-line">Everyone gets the same drinks today. One run for the streak.</div>
+            <div class="goal-side">🔥 ${opts.streak || 0} day streak${opts.done ? ' · played today' : ''}</div>
+          </div>
+          <div class="intro-mech">💡 Score as high as you can before the bar clogs.</div>
+          <button class="btn big primary" data-act="start">${opts.done ? 'PLAY AGAIN' : 'START'}</button>
+        </div>
+      </div>`;
+    }
+  }
+
   showHud(game) {
     const l = game.level;
     this.root.innerHTML = `
@@ -165,10 +206,11 @@ export class UI {
       this.hudScore.classList.add('bump');
       this.lastScore = game.score;
     }
-    const fl = game.zen ? '∞' : game.flicksLeft;
+    const unlimited = game.zen || game.endless;
+    const fl = unlimited ? '∞' : game.flicksLeft;
     if (fl !== this.lastFlicks) {
       this.hudFlicks.textContent = fl;
-      this.hudFlicks.classList.toggle('low', !game.zen && game.flicksLeft <= 5);
+      this.hudFlicks.classList.toggle('low', !unlimited && game.flicksLeft <= 5);
       this.lastFlicks = fl;
     }
     const q = game.queue.slice(0, 2).join(',');
@@ -213,6 +255,29 @@ export class UI {
   showResult(game, result) {
     const l = game.level;
     const next = LEVELS.find(x => x.id === l.id + 1);
+
+    if (result.mode === 'endless' || result.mode === 'daily') {
+      const isDaily = result.mode === 'daily';
+      const title = isDaily ? 'Daily done! 📅' : 'Last call! 🍸';
+      const best = result.newBest ? `<div class="result-best newbest">🎉 NEW BEST</div>`
+        : `<div class="result-best">Best: ${result.best}</div>`;
+      const streak = isDaily ? `<div class="result-next">🔥 ${result.streak} day streak — come back tomorrow</div>` : '';
+      this.root.innerHTML = `
+      <div class="screen result-screen">
+        <div class="result-card ${result.newBest ? 'win' : 'fail'}">
+          <div class="result-title">${title}</div>
+          <div class="result-score">${result.score}</div>
+          ${best}
+          ${streak}
+          <div class="result-buttons">
+            ${isDaily
+              ? `<button class="btn big primary" data-act="title">HOME</button><button class="btn ghost" data-act="daily">Play again</button>`
+              : `<button class="btn big primary" data-act="endlessAgain">POUR AGAIN</button><button class="btn ghost" data-act="title">Home</button>`}
+          </div>
+        </div>
+      </div>`;
+      return;
+    }
     if (result.won) {
       const starLine = result.nextStar
         ? `<div class="result-next">${result.toNextStar} more for ${result.stars + 1}★</div>`

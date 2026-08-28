@@ -11,7 +11,7 @@ import { Backdrop } from './backdrop.js';
 import { Fx } from './fx.js';
 import { AudioMan } from './audio.js';
 import { Assets } from './assets.js';
-import { Save } from './save.js';
+import { Save, todayKey, daySeed } from './save.js';
 import { UI } from './ui.js';
 
 const stage = document.getElementById('stage');
@@ -157,6 +157,34 @@ function startLevel(id, { zen = false, seed = null, restore = null } = {}) {
   audio.ambient(ambientFor(level));
 }
 
+// A clean table for the score-chase modes (Waikiki: no hazards, no orders).
+function startEndless() {
+  const level = levelById(1);
+  currentLevel = level;
+  zenMode = false;
+  screen = 'intro';
+  paused = false;
+  backdrop.set(level.backdrop); backdrop.render(); setBgFill(level.backdrop);
+  renderer.setLevel(level, W, H);
+  game.loadLevel(level, { endless: true });
+  ui.showModeIntro('endless');
+  audio.music(musicFor(level)); audio.ambient(ambientFor(level));
+}
+
+function startDaily() {
+  const key = todayKey();
+  const level = levelById(1 + (daySeed(key) % LEVELS.length));  // the day picks a destination
+  currentLevel = level;
+  zenMode = false;
+  screen = 'intro';
+  paused = false;
+  backdrop.set(level.backdrop); backdrop.render(); setBgFill(level.backdrop);
+  renderer.setLevel(level, W, H);
+  game.loadLevel(level, { endless: true, daily: true, seed: daySeed(key), dayKey: key });
+  ui.showModeIntro('daily', { level, streak: save.liveStreak(key), done: save.data.dailyTodayDone === key });
+  audio.music(musicFor(level)); audio.ambient(ambientFor(level));
+}
+
 function beginPlay() {
   screen = 'game';
   input.enabled = true;
@@ -176,6 +204,9 @@ ui.on('map', () => { game.clearSaved(); showMap(); });
 ui.on('collection', () => { screen = 'collection'; ui.showCollection(); });
 ui.on('level', d => { audio.unlock(); startLevel(+d.id); });
 ui.on('zen', d => { audio.unlock(); startLevel(+d.id, { zen: true }); });
+ui.on('endless', () => { audio.unlock(); startEndless(); });
+ui.on('daily', () => { audio.unlock(); startDaily(); });
+ui.on('endlessAgain', () => startEndless());
 ui.on('start', beginPlay);
 ui.on('replay', () => { ui.closeModal(); paused = false; startLevel(currentLevel.id, { zen: zenMode }); });
 ui.on('retry', () => startLevel(currentLevel.id, { seed: game.result?.seed }));

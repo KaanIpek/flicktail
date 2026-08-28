@@ -85,6 +85,9 @@ h1, h2, h3, .logo, .btn, .hud-score, .combo, .callout, .result-title, .intro-pla
   color: rgba(255,255,255,0.92); text-shadow: 0 2px 6px rgba(0,0,0,0.5);
 }
 .title-buttons { display: flex; flex-direction: column; gap: 12px; align-items: center; }
+.title-row { display: flex; gap: 10px; }
+.btn.half { min-width: 132px; font-size: 15px; padding: 11px 14px; }
+.mode-line { font-size: 14px; text-align: center; line-height: 1.35; opacity: 0.92; max-width: 280px; }
 .title-foot { font-size: 14px; opacity: 0.85; text-shadow: 0 1px 4px rgba(0,0,0,0.6); margin-top: 10px; }
 
 /* ---------- map ---------- */
