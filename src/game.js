@@ -56,6 +56,7 @@ export class Game {
     this.goalDone = false;
     this.bankMerges = 0;
     this.ordersServed = 0;
+    this.runMaxCombo = 0;   // best chain this run, for 'combo' side goals
     this.overcrowdT = 0;
     this.time = 0;
     this.result = null;
@@ -342,9 +343,17 @@ export class Game {
       pts += 5;
       this.bankMerges++;
       const sg = this.level.sideGoal;
-      if (sg && sg.type === 'bank' && sg.bonus && this.bankMerges === sg.count) pts += sg.bonus;
+      if (sg && sg.type === 'bank' && sg.bonus && this.bankMerges === sg.count) {
+        pts += sg.bonus; this.emit('sideGoalDone');
+      }
       this.emit('bankMerge');
     }
+    // 'combo' side goal: pay the bonus once, the first chain to reach the target
+    const cg = this.level.sideGoal;
+    if (cg && cg.type === 'combo' && cg.bonus && this.combo >= cg.count && this.runMaxCombo < cg.count) {
+      pts += cg.bonus; this.emit('sideGoalDone');
+    }
+    if (this.combo > this.runMaxCombo) this.runMaxCombo = this.combo;
     this.addScore(pts, nx, nz);
 
     if (tier + 1 > this.maxTierMade) {
@@ -471,26 +480,30 @@ export class Game {
     if (this.goalDone && this.sideGoalDone()) this.finish(true);
   }
 
+  sideGoalCur() {
+    const sg = this.level.sideGoal;
+    if (!sg) return 0;
+    if (sg.type === 'bank') return this.bankMerges;
+    if (sg.type === 'combo') return this.runMaxCombo;
+    return this.ordersServed;
+  }
+
   sideGoalDone() {
     const sg = this.level.sideGoal;
     if (!sg || !sg.required) return true;
-    if (sg.type === 'bank') return this.bankMerges >= sg.count;
-    if (sg.type === 'orders') return this.ordersServed >= sg.count;
-    return true;
+    return this.sideGoalCur() >= sg.count;
   }
 
   sideGoalHit() {
     const sg = this.level.sideGoal;
     if (!sg) return false;
-    const cur = sg.type === 'bank' ? this.bankMerges : this.ordersServed;
-    return cur >= sg.count;
+    return this.sideGoalCur() >= sg.count;
   }
 
   sideGoalProgress() {
     const sg = this.level.sideGoal;
     if (!sg) return null;
-    const cur = sg.type === 'bank' ? this.bankMerges : this.ordersServed;
-    return { ...sg, cur };
+    return { ...sg, cur: this.sideGoalCur() };
   }
 
   finish(won, reason = null) {
@@ -560,6 +573,7 @@ export class Game {
         flicksLeft: this.flicksLeft, queue: this.queue, bodies,
         maxTierMade: this.maxTierMade, goalDone: this.goalDone,
         bankMerges: this.bankMerges, ordersServed: this.ordersServed,
+        runMaxCombo: this.runMaxCombo,
       }));
     } catch {}
   }
@@ -578,6 +592,7 @@ export class Game {
     this.goalDone = s.goalDone;
     this.bankMerges = s.bankMerges || 0;
     this.ordersServed = s.ordersServed || 0;
+    this.runMaxCombo = s.runMaxCombo || 0;
     this.tee = { tier: this.queue[0], ready: true, t: 1 };
     for (const [tier, x, z] of s.bodies) {
       const b = this.phys.add(makeBody(tier, x, z, TIERS[tier - 1].r));
