@@ -35,6 +35,8 @@ function crescentRails() {
 export const LEVELS = [
   {
     id: 1, place: 'Waikiki', country: 'Hawaii, USA', backdrop: 'waikiki',
+    decor: [{ kind: 'coaster', x: -156, z: 250, c: '#e8dcc0', rot: 0.2 }, { kind: 'shell', x: 154, z: 330, c: '#f7e6d8' }, { kind: 'petal', x: -148, z: 690, c: '#ff7a9c' }, { kind: 'leaf', x: 156, z: 780, c: '#3e8e5e', rot: 0.6 }],
+    barCat: { x: -238, c: '#d98a4a', alt: '#ffe9cf' },
     accent: '#2EC4B6', felt: '#3aa88f', rail: '#8a5a38', time: 'day',
     table: { surface: 'bamboo', c: ['#b8924e', '#c9a55f', '#d8b876'] },
     goalTier: 5, flicks: 24, star2: 30, star3: 65,
@@ -45,6 +47,8 @@ export const LEVELS = [
   },
   {
     id: 2, place: 'South Beach', country: 'Miami, USA', backdrop: 'miami',
+    decor: [{ kind: 'coaster', x: -155, z: 300, c: '#f7a8c8', rot: 0.1 }, { kind: 'napkin', x: 153, z: 430, c: '#ffffff', rot: 0.5 }, { kind: 'star', x: -151, z: 730, c: '#ffd75e' }],
+    barCat: { x: 238, c: '#e8e4ec', alt: '#ffffff' },
     accent: '#F26CA7', felt: '#4a9e8f', rail: '#c8c8d8', time: 'day',
     table: { surface: 'terrazzo', c: ['#cfd8d2', '#dde6e0', '#e8f0ea'], fleck: ['#F26CA7', '#40E0D0', '#ffd75e'] },
     goalTier: 6, flicks: 32, star2: 130, star3: 195,
@@ -55,6 +59,8 @@ export const LEVELS = [
   },
   {
     id: 3, place: 'Cancún', country: 'Mexico', backdrop: 'cancun',
+    decor: [{ kind: 'petal', x: -155, z: 280, c: '#ff8f3c' }, { kind: 'star', x: 154, z: 500, c: '#ffd75e' }, { kind: 'coaster', x: -149, z: 740, c: '#eafcff', rot: 0.3 }],
+    barCat: { x: -238, c: '#5c5148', alt: '#f2e6d8' },
     accent: '#40E0D0', felt: '#38a0b0', rail: '#c9b08c', time: 'day',
     table: { surface: 'tile', c: ['#1f8296', '#2699ad', '#31b0c4'], grout: 'rgba(8,50,58,0.5)', motif: '#eafcff' },
     goalTier: 6, flicks: 42, star2: 160, star3: 235,
@@ -66,6 +72,8 @@ export const LEVELS = [
   },
   {
     id: 4, place: 'Copacabana', country: 'Rio, Brazil', backdrop: 'rio',
+    decor: [{ kind: 'leaf', x: -153, z: 320, c: '#3e8e5e', rot: 0.4 }, { kind: 'coaster', x: 151, z: 560, c: '#ffc65c' }, { kind: 'napkin', x: -149, z: 760, c: '#f4efe4', rot: 0.8 }],
+    barCat: { x: 238, c: '#2f2f36', alt: '#f0f0f0' },
     accent: '#FFC65C', felt: '#2f8f78', rail: '#3c3c3c', time: 'sunset',
     table: { surface: 'wave', c: ['#d8d2c4', '#e6e0d2', '#f0ebdf'], dark: '#33322e' },
     goalTier: 7, flicks: 46, star2: 250, star3: 380,
@@ -77,6 +85,8 @@ export const LEVELS = [
   },
   {
     id: 5, place: 'Promenade', country: 'Nice, France', backdrop: 'nice',
+    decor: [{ kind: 'napkin', x: -154, z: 260, c: '#cfe2f5', rot: 0.3 }, { kind: 'coaster', x: 153, z: 640, c: '#1f6fb2' }, { kind: 'petal', x: -146, z: 800, c: '#ffb3c7' }],
+    barCat: { x: -238, c: '#8c8c96', alt: '#f4f4f7' },
     accent: '#1F6FB2', felt: '#3a8fa8', rail: '#d8cfc0', time: 'day',
     table: { surface: 'marble', c: ['#cfcdc9', '#e0ded9', '#eeece7'], vein: '#9a96a8' },
     goalTier: 7, flicks: 48, star2: 210, star3: 315,
@@ -92,6 +102,8 @@ export const LEVELS = [
   },
   {
     id: 6, place: 'Positano', country: 'Amalfi, Italy', backdrop: 'positano',
+    decor: [{ kind: 'leaf', x: -154, z: 300, c: '#4f8f4f', rot: 0.5 }, { kind: 'petal', x: 153, z: 480, c: '#ffd75e' }, { kind: 'napkin', x: -148, z: 780, c: '#f2dca6', rot: 0.2 }],
+    barCat: { x: 238, c: '#d98a4a', alt: '#ffeeda' },
     accent: '#D96C47', felt: '#4f8f6f', rail: '#b06a4a', time: 'sunset',
     table: { surface: 'tile', c: ['#b86440', '#c9734a', '#d98555'], grout: 'rgba(90,40,20,0.5)', motif: '#f2dca6' },
     goalTier: 7, flicks: 50, star2: 220, star3: 330,
@@ -113,6 +125,8 @@ export const LEVELS = [
   },
   {
     id: 7, place: 'Oia', country: 'Santorini, Greece', backdrop: 'santorini',
+    decor: [{ kind: 'coaster', x: -155, z: 340, c: '#2a5dab' }, { kind: 'napkin', x: 153, z: 520, c: '#ffffff', rot: 0.6 }, { kind: 'shell', x: -149, z: 790, c: '#f7ece0' }],
+    barCat: { x: 238, c: '#f0ece4', alt: '#ffffff' },
     accent: '#2A5DAB', felt: '#3a6f9f', rail: '#f0ece4', time: 'sunset',
     table: { surface: 'plaster', c: ['#d8d2c4', '#e6e0d2', '#f2ede2'] },
     goalTier: 8, flicks: 68, star2: 380, star3: 570,
@@ -128,6 +142,8 @@ export const LEVELS = [
   },
   {
     id: 8, place: 'Ibiza', country: 'Spain', backdrop: 'ibiza',
+    decor: [{ kind: 'chip', x: -154, z: 300, c: '#c77dff' }, { kind: 'star', x: 153, z: 560, c: '#7ff0e0' }, { kind: 'coaster', x: -148, z: 800, c: '#3a2a66' }],
+    barCat: { x: 238, c: '#241a3a', alt: '#c77dff' },
     accent: '#C77DFF', felt: '#2f4470', rail: '#42346a', time: 'night',
     table: { surface: 'glass', c: ['#180f2c', '#221540', '#2c1c50'], glow: '#C77DFF' },
     goalTier: 8, flicks: 72, star2: 370, star3: 560,
@@ -143,6 +159,8 @@ export const LEVELS = [
   },
   {
     id: 9, place: 'Jumeirah', country: 'Dubai, UAE', backdrop: 'dubai',
+    decor: [{ kind: 'coaster', x: -151, z: 320, c: '#f2c14e' }, { kind: 'napkin', x: 150, z: 600, c: '#2a241a', rot: 0.4 }, { kind: 'chip', x: -146, z: 790, c: '#f2c14e' }],
+    barCat: { x: 238, c: '#c9a86a', alt: '#f7ecd2' },
     accent: '#F2C14E', felt: '#7fa8b8', rail: '#d8c8a0', time: 'night',
     table: { surface: 'marble', c: ['#161310', '#221d15', '#302819'], vein: '#F2C14E' },
     goalTier: 8, flicks: 74, star2: 500, star3: 750,
@@ -157,6 +175,8 @@ export const LEVELS = [
   },
   {
     id: 10, place: 'Kata Beach', country: 'Phuket, Thailand', backdrop: 'phuket',
+    decor: [{ kind: 'leaf', x: -155, z: 280, c: '#3e8e5e', rot: 0.7 }, { kind: 'petal', x: 154, z: 520, c: '#ff7a9c' }, { kind: 'shell', x: -149, z: 780, c: '#f7e6d8' }],
+    barCat: { x: 238, c: '#e08a3c', alt: '#ffe9cf' },
     accent: '#23B5A0', felt: '#3aa08a', rail: '#8a5a38', time: 'day',
     table: { surface: 'wood', c: ['#6a4326', '#7d5330', '#8f6238'] },
     goalTier: 9, flicks: 98, star2: 730, star3: 1100,
@@ -169,6 +189,8 @@ export const LEVELS = [
   },
   {
     id: 11, place: 'Tanah Lot', country: 'Bali, Indonesia', backdrop: 'bali',
+    decor: [{ kind: 'leaf', x: -154, z: 300, c: '#4f7f4f', rot: 0.3 }, { kind: 'petal', x: 153, z: 500, c: '#ff8e53' }, { kind: 'star', x: -148, z: 770, c: '#ffd0a0' }],
+    barCat: { x: 238, c: '#6b6b74', alt: '#efeff2' },
     accent: '#FF8E53', felt: '#4f6f5f', rail: '#5a4a3a', time: 'sunset',
     table: { surface: 'stone', c: ['#363c34', '#434a40', '#4f574b'] },
     goalTier: 9, flicks: 105, star2: 620, star3: 1000,
@@ -187,6 +209,8 @@ export const LEVELS = [
   },
   {
     id: 12, place: 'Bora Bora', country: 'French Polynesia', backdrop: 'borabora',
+    decor: [{ kind: 'shell', x: -155, z: 260, c: '#f7f0e4' }, { kind: 'star', x: 154, z: 470, c: '#ffd75e' }, { kind: 'petal', x: -148, z: 700, c: '#ff9ec4' }, { kind: 'leaf', x: 153, z: 810, c: '#3e8e5e', rot: 0.5 }],
+    barCat: { x: -238, c: '#f2ece0', alt: '#ffffff' },
     accent: '#43D9C7', felt: '#2fa8a0', rail: '#b98a5a', time: 'day',
     table: { surface: 'glass', c: ['#137e86', '#1e9aa2', '#2bb6bc'], glow: '#9ff2ea' },
     goalTier: 11, flicks: 175, star2: 450, star3: 750,

@@ -29,6 +29,10 @@ export class Renderer {
 
   setLevel(level, w, h) {
     this.level = level;
+    // table dressing: props react to drinks sliding past, so they live here
+    // (dynamic) rather than baked into the prerendered tabletop
+    this.props = (level.decor || []).map((d, i) => ({ ...d, hitT: -9, seed: i * 1.7 }));
+    this.trail = [];
     this.prerenderTable(w, h);
     this.prerenderVignette(w, h);
     this.prerenderFrond(Math.round(w * 0.46));
@@ -414,7 +418,12 @@ export class Renderer {
         [TABLE.halfW, TABLE.length], [-TABLE.halfW, TABLE.length]);
     }
 
+    this.drawTrails(ctx, game, time);
+    this.drawProps(ctx, game, time);
+
     if (game.level.orders) this.drawDocks(ctx, game, time);
+    // after the docks so the cat is never hidden behind an order card
+    if (game.level.barCat) this.drawBarCat(ctx, game, time);
 
     // overcrowd warning pulse
     if (game.overcrowdT > 0) {
@@ -515,6 +524,152 @@ export class Renderer {
       roundRect(ctx, x - wpx * 0.36, y - ih, wpx * 0.72, ih * 0.92, wpx * 0.18);
       ctx.stroke();
     }
+  }
+
+  // Wet streaks left by sliding drinks — the table remembers the shot for a
+  // moment, which makes the surface feel physical rather than painted.
+  drawTrails(ctx, game, time) {
+    if (!this.trail) this.trail = [];
+    for (const b of game.phys.bodies) {
+      if (b.dead || b.fixed || b.sleeping) continue;
+      if (Math.hypot(b.vx, b.vz) < 130) continue;
+      const t = TIERS[b.tier - 1];
+      this.trail.push({ x: b.x, z: b.z, r: b.r, t: time, c: (t && t.color) || '#ffffff' });
+    }
+    if (this.trail.length > 300) this.trail.splice(0, this.trail.length - 300);
+    const view = this.view;
+    for (let i = this.trail.length - 1; i >= 0; i--) {
+      const s = this.trail[i];
+      const age = time - s.t;
+      if (age > 0.6 || age < 0) { this.trail.splice(i, 1); continue; }
+      const p = view.project(s.x, 0, s.z);
+      ctx.globalAlpha = (1 - age / 0.6) * 0.15;
+      ctx.fillStyle = s.c;
+      ellipse(ctx, p.x, p.y, s.r * p.s * 0.95, s.r * p.s * 0.38);
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  // Table dressing that reacts: a drink sliding past nudges a prop and it
+  // wobbles itself still again.
+  drawProps(ctx, game, time) {
+    if (!this.props || !this.props.length) return;
+    const view = this.view;
+    for (const pr of this.props) {
+      for (const b of game.phys.bodies) {
+        if (b.dead || b.sleeping || b.fixed) continue;
+        if (Math.hypot(b.x - pr.x, b.z - pr.z) < b.r + 52) { pr.hitT = time; break; }
+      }
+      const since = time - pr.hitT;
+      const wob = since >= 0 && since < 1.1 ? Math.sin(since * 24) * (1 - since / 1.1) : 0;
+      const p = view.project(pr.x, 0, pr.z);
+      const k = p.s;
+      ctx.save();
+      ctx.translate(p.x, p.y + wob * 2.5 * k);
+      ctx.rotate((pr.rot || 0) + wob * 0.22);
+      ctx.scale(1, 0.55);                       // lying flat on the table
+      const c = pr.c || '#ffffff';
+      switch (pr.kind) {
+        case 'coaster':
+          ctx.fillStyle = 'rgba(0,0,0,0.18)'; ctx.beginPath(); ctx.arc(2 * k, 2 * k, 26 * k, 0, 7); ctx.fill();
+          ctx.fillStyle = c; ctx.beginPath(); ctx.arc(0, 0, 26 * k, 0, 7); ctx.fill();
+          ctx.strokeStyle = 'rgba(255,255,255,0.55)'; ctx.lineWidth = 2.5 * k;
+          ctx.beginPath(); ctx.arc(0, 0, 18 * k, 0, 7); ctx.stroke();
+          break;
+        case 'napkin':
+          ctx.fillStyle = 'rgba(0,0,0,0.16)'; ctx.fillRect(-22 * k + 2, -22 * k + 2, 44 * k, 44 * k);
+          ctx.fillStyle = c; ctx.fillRect(-22 * k, -22 * k, 44 * k, 44 * k);
+          ctx.strokeStyle = 'rgba(0,0,0,0.15)'; ctx.lineWidth = 1.5 * k;
+          ctx.beginPath(); ctx.moveTo(-22 * k, 0); ctx.lineTo(22 * k, 0); ctx.stroke();
+          break;
+        case 'shell':
+          ctx.fillStyle = c; ctx.beginPath(); ctx.arc(0, 0, 20 * k, Math.PI, 0); ctx.closePath(); ctx.fill();
+          ctx.strokeStyle = 'rgba(160,120,110,0.6)'; ctx.lineWidth = 1.4 * k;
+          for (let i = -2; i <= 2; i++) {
+            ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(i * 8 * k, -19 * k); ctx.stroke();
+          }
+          break;
+        case 'star':                                   // starfish
+          ctx.fillStyle = c; ctx.beginPath();
+          for (let i = 0; i < 10; i++) {
+            const a = (i / 10) * Math.PI * 2 - Math.PI / 2, rr = (i % 2 ? 8 : 21) * k;
+            i ? ctx.lineTo(Math.cos(a) * rr, Math.sin(a) * rr) : ctx.moveTo(Math.cos(a) * rr, Math.sin(a) * rr);
+          }
+          ctx.closePath(); ctx.fill();
+          break;
+        case 'leaf':
+          ctx.fillStyle = c; ctx.beginPath();
+          ctx.ellipse(0, 0, 30 * k, 15 * k, 0.5, 0, 7); ctx.fill();
+          ctx.strokeStyle = 'rgba(0,0,0,0.2)'; ctx.lineWidth = 1.4 * k;
+          ctx.beginPath(); ctx.moveTo(-26 * k, -10 * k); ctx.lineTo(26 * k, 10 * k); ctx.stroke();
+          break;
+        case 'petal':
+          ctx.fillStyle = c;
+          for (let i = 0; i < 5; i++) {
+            const a = (i / 5) * Math.PI * 2;
+            ctx.beginPath(); ctx.ellipse(Math.cos(a) * 11 * k, Math.sin(a) * 11 * k, 10 * k, 7 * k, a, 0, 7); ctx.fill();
+          }
+          ctx.fillStyle = '#ffe07a'; ctx.beginPath(); ctx.arc(0, 0, 5 * k, 0, 7); ctx.fill();
+          break;
+        default:                                        // 'chip' — a simple token
+          ctx.fillStyle = c; ctx.beginPath(); ctx.arc(0, 0, 16 * k, 0, 7); ctx.fill();
+      }
+      ctx.restore();
+    }
+  }
+
+  // A little bar cat perched on the far rail: it swishes its tail, blinks, and
+  // turns its head to follow whichever drink is moving fastest.
+  drawBarCat(ctx, game, time) {
+    const cfg = game.level.barCat;
+    const view = this.view;
+    const p = view.project(cfg.x, RAIL_H, TABLE.length);
+    const k = p.s * 1.5;
+    // watch the liveliest drink
+    let watch = 0, best = 0;
+    for (const b of game.phys.bodies) {
+      if (b.dead || b.sleeping) continue;
+      const sp = Math.hypot(b.vx, b.vz);
+      if (sp > best) { best = sp; watch = Math.max(-1, Math.min(1, (b.x - cfg.x) / 320)); }
+    }
+    const body = cfg.c || '#4a4a55', pale = cfg.alt || '#f6efe6';
+    const ph = time * 1.9;
+    const blink = ((time * 0.5) % 4.2) < 0.14;
+    ctx.save();
+    ctx.translate(p.x, p.y);
+    // tail draped along the rail, swishing
+    ctx.strokeStyle = body; ctx.lineCap = 'round'; ctx.lineWidth = 5 * k;
+    ctx.beginPath();
+    ctx.moveTo(-14 * k, -3 * k);
+    ctx.quadraticCurveTo(-34 * k, 2 * k + Math.sin(ph) * 5 * k, -44 * k, -10 * k + Math.sin(ph) * 9 * k);
+    ctx.stroke();
+    // haunches + body
+    ctx.fillStyle = body;
+    ctx.beginPath(); ctx.ellipse(0, -9 * k, 16 * k, 12 * k, 0, 0, 7); ctx.fill();
+    // head (turns toward the action)
+    const hx = watch * 3.5 * k;
+    ctx.beginPath(); ctx.arc(hx, -25 * k, 10.5 * k, 0, 7); ctx.fill();
+    for (const side of [-1, 1]) {                       // ears
+      ctx.beginPath();
+      ctx.moveTo(hx + side * 9 * k, -30 * k);
+      ctx.lineTo(hx + side * 4 * k, -40 * k);
+      ctx.lineTo(hx + side * 1 * k, -30 * k);
+      ctx.closePath(); ctx.fill();
+    }
+    ctx.fillStyle = pale;                                // chest + muzzle
+    ctx.beginPath(); ctx.ellipse(hx * 0.5, -8 * k, 7 * k, 8 * k, 0, 0, 7); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(hx, -22 * k, 6 * k, 4 * k, 0, 0, 7); ctx.fill();
+    ctx.fillStyle = 'rgba(20,16,20,0.9)';               // eyes
+    ctx.strokeStyle = 'rgba(20,16,20,0.9)'; ctx.lineWidth = 1.6 * k;
+    for (const side of [-1, 1]) {
+      const ex = hx + side * 4.2 * k, ey = -27 * k;
+      ctx.beginPath();
+      if (blink) { ctx.moveTo(ex - 2 * k, ey); ctx.lineTo(ex + 2 * k, ey); ctx.stroke(); }
+      else { ctx.arc(ex, ey, 1.9 * k, 0, 7); ctx.fill(); }
+    }
+    ctx.fillStyle = '#ff9db5';                           // nose
+    ctx.beginPath(); ctx.arc(hx, -22.5 * k, 1.5 * k, 0, 7); ctx.fill();
+    ctx.restore();
   }
 
   // A tail curling out from behind the glass, swishing on its own rhythm.
