@@ -389,9 +389,11 @@ export class Game {
       this.emit('goalDone');
     }
 
-    // juice
+    // juice — droplets, a shockwave ring, and a cute sparkle pop that grows
+    // with the tier so bigger mixes twinkle more
     this.fx.burst(nx, nz, [t.color, t.alt], 12 + tier * 2, 70 + tier * 8);
     this.fx.ring(nx, nz, nt.color, nt.r * 1.8);
+    this.fx.sparkle(nx, nz, 5 + tier * 2);
     if (mult >= 2) this.emit('combo', { mult, callout: COMBO_CALLOUTS[Math.min(mult, 5)] });
     if (tier + 1 >= 8) {
       this.fx.addShake(0.5 + (tier - 7) * 0.2);

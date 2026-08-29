@@ -6,11 +6,26 @@ export class Fx {
     this.parts = [];
     this.texts = [];
     this.rings = [];
+    this.conf = [];          // screen-space celebration confetti
     this.shake = 0;
     this.shakeX = 0;
     this.shakeY = 0;
     this.flash = 0;
     this.flashColor = '#ffffff';
+  }
+
+  // Screen-space confetti rain for a win — bright ribbons tumbling down.
+  confetti(w, h, n = 110) {
+    const cols = ['#ff5a7a', '#ffd75e', '#2ec4b6', '#c77dff', '#ff9d2e', '#40e0d0', '#ffffff'];
+    for (let i = 0; i < n; i++) {
+      this.conf.push({
+        x: Math.random() * w, y: -20 - Math.random() * h * 0.6,
+        vx: (Math.random() - 0.5) * 90, vy: 150 + Math.random() * 220,
+        rot: Math.random() * 6.28, vr: (Math.random() - 0.5) * 12,
+        w: 5 + Math.random() * 7, h: 9 + Math.random() * 12,
+        color: cols[(Math.random() * cols.length) | 0], life: 1, sway: Math.random() * 6.28,
+      });
+    }
   }
 
   // Juice droplets bursting out of a merge, in world space on the table.
@@ -77,6 +92,15 @@ export class Fx {
       r.life -= 2.4 * dt;
       if (r.life <= 0) this.rings.splice(i, 1);
     }
+    for (let i = this.conf.length - 1; i >= 0; i--) {
+      const c = this.conf[i];
+      c.sway += dt * 6;
+      c.x += (c.vx + Math.sin(c.sway) * 40) * dt;
+      c.y += c.vy * dt;
+      c.rot += c.vr * dt;
+      c.life -= 0.34 * dt;
+      if (c.life <= 0) this.conf.splice(i, 1);
+    }
     if (this.shake > 0) {
       this.shake = Math.max(0, this.shake - 4.5 * dt);
       const a = this.shake * this.shake * 9;
@@ -113,6 +137,16 @@ export class Fx {
         ctx.arc(pr.x, pr.y, p.r * pr.s, 0, Math.PI * 2);
         ctx.fill();
       }
+    }
+    // confetti (screen space — no projection)
+    for (const c of this.conf) {
+      ctx.globalAlpha = Math.min(1, c.life * 1.6);
+      ctx.fillStyle = c.color;
+      ctx.save();
+      ctx.translate(c.x, c.y);
+      ctx.rotate(c.rot);
+      ctx.fillRect(-c.w / 2, -c.h / 2, c.w, c.h * (0.5 + 0.5 * Math.abs(Math.cos(c.sway))));
+      ctx.restore();
     }
     ctx.globalAlpha = 1;
   }

@@ -464,7 +464,10 @@ export class Renderer {
     const img = this.assets.image('tier' + String(b.tier).padStart(2, '0'));
     const born = b.born === undefined ? 1 : b.born;
     const pop = born < 1 ? 0.7 + 0.38 * easeOutBack(born) : 1;
-    const bob = b.sleeping ? Math.sin(time * 2 + b.id) * 0.01 : 0;
+    // the queued tee drink "breathes" to feel alive and invite the flick;
+    // parked drinks bob almost imperceptibly
+    const bob = b.tee ? Math.sin(time * 3.2) * 0.045
+      : (b.sleeping ? Math.sin(time * 2 + b.id) * 0.012 : 0);
     const squash = b.justHit > 0 ? 1 - b.justHit * 0.6 : 1;
     // oversized silhouettes for small tiers; physics footprint stays honest
     const vis = 1.62 - 0.034 * (b.tier - 1);
@@ -527,7 +530,7 @@ export class Renderer {
   }
 
   drawTee(ctx, game, time) {
-    const b = { tier: game.tee.tier, x: 0, z: TABLE.launchZ, r: TIERS[game.tee.tier - 1].r, y: 0, sleeping: true, id: 0, justHit: 0 };
+    const b = { tier: game.tee.tier, x: 0, z: TABLE.launchZ, r: TIERS[game.tee.tier - 1].r, y: 0, sleeping: true, id: 0, justHit: 0, tee: true };
     const p = this.view.project(0, 0, TABLE.launchZ);
     ctx.strokeStyle = `rgba(255,255,255,${0.35 + 0.2 * Math.sin(time * 4)})`;
     ctx.lineWidth = 2.5;

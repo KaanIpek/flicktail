@@ -300,6 +300,7 @@ game.onEvent = (name, data) => {
     case 'flick': if (game.flicksLeft === 8 && !game.zen) ui.toast('8 drinks left in the cooler!'); break;
     case 'finished':
       input.enabled = false;
+      if (data.won && !game.reducedMotion) { fx.confetti(W, H); setTimeout(() => fx.confetti(W, H, 70), 260); }
       setTimeout(() => { screen = 'result'; ui.showResult(game, data); }, data.won ? 1300 : 900);
       break;
   }
