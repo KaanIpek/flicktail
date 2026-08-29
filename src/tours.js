@@ -47,6 +47,8 @@ const SIDE_GOALS = [
   { type: 'combo', count: 3, label: 'Land a ×3 combo', required: false, bonus: 40 },
   { type: 'orders', count: 2, label: 'Serve 2 orders', required: false, bonus: 45 },
   { type: 'combo', count: 4, label: 'Land a ×4 combo', required: false, bonus: 60 },
+  { type: 'bank', count: 3, label: 'Land 3 bank-shots', required: false, bonus: 55 },
+  { type: 'combo', count: 5, label: 'Land a ×5 combo', required: false, bonus: 90 },
 ];
 
 // Each country: where it is, who lives there, what it pours, how it looks.
@@ -58,7 +60,7 @@ export const COUNTRIES = [
     special: 'Golden Agave',
     cast: ['frog', 'axolotl', 'iguana', 'turtle', 'coati', 'armadillo',
       'toucan', 'jaguar', 'crab', 'octopus', 'axolotl'],
-    stops: ['Playa Norte', 'Tulum', 'Cozumel', 'Isla Mujeres', 'Akumal'],
+    stops: ['Playa Norte', 'Tulum', 'Cozumel', 'Isla Mujeres', 'Akumal', 'Holbox', 'Bacalar'],
     tables: [
       { surface: 'tile', c: ['#1f8296', '#2699ad', '#31b0c4'], grout: 'rgba(8,50,58,0.5)', motif: '#eafcff' },
       { surface: 'terrazzo', c: ['#e2d6bd', '#eee3cd', '#f6eeda'], fleck: ['#40E0D0', '#ff8f3c', '#ffd75e'] },
@@ -74,7 +76,7 @@ export const COUNTRIES = [
     special: 'Carnival Punch',
     cast: ['frog', 'capybara', 'sloth', 'turtle', 'monkey', 'tapir',
       'macaw', 'jaguar', 'crab', 'octopus', 'macaw'],
-    stops: ['Ipanema', 'Leblon', 'Búzios', 'Paraty', 'Ilha Grande'],
+    stops: ['Ipanema', 'Leblon', 'Búzios', 'Paraty', 'Ilha Grande', 'Jericoacoara', 'Fernando de Noronha'],
     tables: [
       { surface: 'wave', c: ['#d8d2c4', '#e6e0d2', '#f0ebdf'], dark: '#33322e' },
       { surface: 'wood', c: ['#6a4326', '#7d5330', '#8f6238'] },
@@ -90,7 +92,7 @@ export const COUNTRIES = [
     special: 'Limoncello Sole',
     cast: ['frog', 'cat', 'songbird', 'turtle', 'hedgehog', 'fox',
       'gecko', 'goat', 'crab', 'octopus', 'cat'],
-    stops: ['Amalfi', 'Capri', 'Cinque Terre', 'Portofino', 'Taormina'],
+    stops: ['Amalfi', 'Capri', 'Cinque Terre', 'Portofino', 'Taormina', 'Sorrento', 'Procida'],
     tables: [
       { surface: 'tile', c: ['#b86440', '#c9734a', '#d98555'], grout: 'rgba(90,40,20,0.5)', motif: '#f2dca6' },
       { surface: 'marble', c: ['#cfcdc9', '#e0ded9', '#eeece7'], vein: '#9a96a8' },
@@ -106,7 +108,7 @@ export const COUNTRIES = [
     special: 'Aegean Mythos',
     cast: ['frog', 'cat', 'songbird', 'turtle', 'goat', 'fox',
       'octopus', 'pelican', 'crab', 'dolphin', 'octopus'],
-    stops: ['Oia', 'Mykonos', 'Naxos', 'Milos', 'Paros'],
+    stops: ['Oia', 'Mykonos', 'Naxos', 'Milos', 'Paros', 'Rhodes', 'Zakynthos'],
     tables: [
       { surface: 'plaster', c: ['#d8d2c4', '#e6e0d2', '#f2ede2'] },
       { surface: 'marble', c: ['#cfd4d8', '#e2e6ea', '#f0f3f6'], vein: '#7f93a8' },
@@ -122,7 +124,7 @@ export const COUNTRIES = [
     special: 'Riviera Royale',
     cast: ['frog', 'songbird', 'snail', 'turtle', 'poodle', 'fox',
       'octopus', 'seabird', 'crab', 'seal', 'poodle'],
-    stops: ['Promenade', 'Cannes', 'Antibes', 'Saint-Tropez', 'Menton'],
+    stops: ['Promenade', 'Cannes', 'Antibes', 'Saint-Tropez', 'Menton', 'Villefranche', 'Porquerolles'],
     tables: [
       { surface: 'marble', c: ['#cfcdc9', '#e0ded9', '#eeece7'], vein: '#9a96a8' },
       { surface: 'terrazzo', c: ['#d6dbe2', '#e6eaf0', '#f2f5f8'], fleck: ['#1F6FB2', '#ff6d7f', '#ffd75e'] },
@@ -138,7 +140,7 @@ export const COUNTRIES = [
     special: 'Medianoche',
     cast: ['frog', 'gecko', 'songbird', 'turtle', 'lynx', 'fox',
       'owl', 'flamingo', 'crab', 'bull', 'owl'],
-    stops: ['Ibiza Town', 'Formentera', 'Sitges', 'Marbella', 'San Antonio'],
+    stops: ['Ibiza Town', 'Formentera', 'Sitges', 'Marbella', 'San Antonio', 'Menorca', 'Tarifa'],
     tables: [
       { surface: 'glass', c: ['#180f2c', '#221540', '#2c1c50'], glow: '#C77DFF' },
       { surface: 'tile', c: ['#8a3f5a', '#a04c6c', '#b65a7e'], grout: 'rgba(40,12,26,0.5)', motif: '#ffd9ea' },
@@ -154,7 +156,7 @@ export const COUNTRIES = [
     special: 'Aloha Comet',
     cast: ['frog', 'crab', 'duckling', 'turtle', 'seal', 'fox',
       'octopus', 'pelican', 'dolphin', 'shark', 'dolphin'],
-    stops: ['Waikiki', 'Maui', 'Key West', 'Malibu', 'Kauai'],
+    stops: ['Waikiki', 'Maui', 'Key West', 'Malibu', 'Kauai', 'Big Sur', 'Outer Banks'],
     tables: [
       { surface: 'bamboo', c: ['#b8924e', '#c9a55f', '#d8b876'] },
       { surface: 'wood', c: ['#6a4326', '#7d5330', '#8f6238'] },
@@ -170,7 +172,7 @@ export const COUNTRIES = [
     special: 'Desert Pearl',
     cast: ['frog', 'fennec', 'gecko', 'turtle', 'oryx', 'gazelle',
       'falcon', 'camel', 'scorpion', 'shark', 'falcon'],
-    stops: ['Jumeirah', 'Palm', 'Abu Dhabi', 'Fujairah', 'Ras Al Khaimah'],
+    stops: ['Jumeirah', 'Palm', 'Abu Dhabi', 'Fujairah', 'Ras Al Khaimah', 'Khor Fakkan', 'Sir Bani Yas'],
     tables: [
       { surface: 'marble', c: ['#161310', '#221d15', '#302819'], vein: '#F2C14E' },
       { surface: 'glass', c: ['#1a1408', '#261d0e', '#332816'], glow: '#F2C14E' },
@@ -186,7 +188,7 @@ export const COUNTRIES = [
     special: 'Siam Sunrise',
     cast: ['frog', 'clownfish', 'gecko', 'turtle', 'gibbon', 'hornbill',
       'monkey', 'tiger', 'crab', 'elephant', 'elephant'],
-    stops: ['Kata Beach', 'Krabi', 'Phi Phi', 'Koh Samui', 'Railay'],
+    stops: ['Kata Beach', 'Krabi', 'Phi Phi', 'Koh Samui', 'Railay', 'Hua Hin', 'Con Dao'],
     tables: [
       { surface: 'wood', c: ['#6a4326', '#7d5330', '#8f6238'] },
       { surface: 'bamboo', c: ['#a8843e', '#bb974f', '#cdaa66'] },
@@ -202,7 +204,7 @@ export const COUNTRIES = [
     special: 'Volcano Bloom',
     cast: ['frog', 'gecko', 'clownfish', 'turtle', 'monkey', 'komodo',
       'hornbill', 'orangutan', 'ray', 'tiger', 'komodo'],
-    stops: ['Tanah Lot', 'Uluwatu', 'Nusa Penida', 'Gili', 'Lombok'],
+    stops: ['Tanah Lot', 'Uluwatu', 'Nusa Penida', 'Gili', 'Lombok', 'Raja Ampat', 'Flores'],
     tables: [
       { surface: 'stone', c: ['#363c34', '#434a40', '#4f574b'] },
       { surface: 'wood', c: ['#5e3d24', '#6f4b2e', '#805938'] },
@@ -218,7 +220,7 @@ export const COUNTRIES = [
     special: 'Lagoon Crown',
     cast: ['frog', 'parrotfish', 'clownfish', 'turtle', 'seal', 'seabird',
       'octopus', 'ray', 'dolphin', 'shark', 'ray'],
-    stops: ['Matira', 'Moorea', 'Taha’a', 'Rangiroa', 'Huahine'],
+    stops: ['Matira', 'Moorea', 'Taha’a', 'Rangiroa', 'Huahine', 'Bora Lagoon', 'Tetiaroa'],
     tables: [
       { surface: 'glass', c: ['#137e86', '#1e9aa2', '#2bb6bc'], glow: '#9ff2ea' },
       { surface: 'bamboo', c: ['#b8924e', '#c9a55f', '#d8b876'] },
@@ -234,7 +236,7 @@ export const COUNTRIES = [
     special: 'Torii Sunrise',
     cast: ['frog', 'cat', 'songbird', 'turtle', 'bunny', 'fox',
       'octopus', 'crab', 'seal', 'dolphin', 'fox'],
-    stops: ['Naha', 'Kabira Bay', 'Miyako', 'Zamami', 'Iriomote'],
+    stops: ['Naha', 'Kabira Bay', 'Miyako', 'Zamami', 'Iriomote', 'Ishigaki', 'Amami'],
     tables: [
       { surface: 'wood', c: ['#7a4a2e', '#8c5a38', '#9e6a44'] },
       { surface: 'plaster', c: ['#e0d8c8', '#eee7d8', '#f6f1e6'] },
@@ -250,7 +252,7 @@ export const COUNTRIES = [
     special: 'Algarve Gold',
     cast: ['frog', 'songbird', 'gecko', 'turtle', 'hedgehog', 'fox',
       'octopus', 'seabird', 'crab', 'dolphin', 'seabird'],
-    stops: ['Lagos', 'Benagil', 'Sagres', 'Albufeira', 'Faro'],
+    stops: ['Lagos', 'Benagil', 'Sagres', 'Albufeira', 'Faro', 'Nazare', 'Madeira'],
     tables: [
       { surface: 'tile', c: ['#2a5f8a', '#33719e', '#3d84b2'], grout: 'rgba(8,30,50,0.5)', motif: '#eaf4ff' },
       { surface: 'stone', c: ['#a8895e', '#b89a6e', '#c8ab7e'] },
@@ -266,7 +268,7 @@ export const COUNTRIES = [
     special: 'Southern Cross',
     cast: ['frog', 'quokka', 'gecko', 'turtle', 'koalaish', 'fox',
       'octopus', 'parrotfish', 'crab', 'ray', 'quokka'],
-    stops: ['Whitehaven', 'Hamilton', 'Airlie', 'Hayman', 'Daydream'],
+    stops: ['Whitehaven', 'Hamilton', 'Airlie', 'Hayman', 'Daydream', 'Byron Bay', 'Cape Tribulation'],
     tables: [
       { surface: 'bamboo', c: ['#c2a05a', '#d2b06a', '#e0c07e'] },
       { surface: 'glass', c: ['#0f6f78', '#178a92', '#22a5ad'], glow: '#9ff2ea' },
@@ -282,7 +284,7 @@ export const COUNTRIES = [
     special: 'Karst Mist',
     cast: ['frog', 'gecko', 'songbird', 'turtle', 'monkey', 'hornbill',
       'octopus', 'crab', 'clownfish', 'tiger', 'hornbill'],
-    stops: ['Ha Long', 'Cat Ba', 'Lan Ha', 'Bai Tu Long', 'Ninh Binh'],
+    stops: ['Ha Long', 'Cat Ba', 'Lan Ha', 'Bai Tu Long', 'Ninh Binh', 'Phu Quoc', 'Nha Trang'],
     tables: [
       { surface: 'wood', c: ['#6a4a2e', '#7c5a38', '#8e6a44'] },
       { surface: 'stone', c: ['#3e4a44', '#4a5850', '#56655c'] },
@@ -293,10 +295,13 @@ export const COUNTRIES = [
   },
 ];
 
-const GOALS = [4, 5, 6, 7, 8];
-const FLICKS = [18, 23, 28, 35, 44];
+// Seven stops per country: a real trip, not a taster.
+const STOPS_PER_TOUR = 7;
+const GOALS = [4, 5, 6, 7, 8, 8, 9];
+const FLICKS = [18, 23, 28, 35, 46, 56, 62];
 const POOLS = [
   [1, 2, 3], [1, 2, 3, 4], [1, 2, 3, 4, 5], [1, 2, 3, 4, 5, 6], [2, 3, 4, 5, 6],
+  [2, 3, 4, 5, 6], [3, 4, 5, 6, 7],
 ];
 // placeholder star lines; the real ones are measured with the auto-player and
 // written back into STAR_LINES below
@@ -305,83 +310,113 @@ const STAR_LINES = {
   101: { star2: 20, star3: 35 },
   102: { star2: 120, star3: 195 },
   103: { star2: 245, star3: 395 },
-  104: { star2: 320, star3: 520 },
+  104: { star2: 350, star3: 565 },
+  105: { star2: 470, star3: 760 },
+  106: { star2: 250, star3: 405 },
   110: { star2: 35, star3: 60 },
   111: { star2: 100, star3: 160 },
   112: { star2: 120, star3: 190 },
   113: { star2: 245, star3: 395 },
-  114: { star2: 290, star3: 470 },
+  114: { star2: 295, star3: 475 },
+  115: { star2: 470, star3: 760 },
+  116: { star2: 635, star3: 1025 },
   120: { star2: 35, star3: 60 },
   121: { star2: 100, star3: 160 },
   122: { star2: 100, star3: 160 },
   123: { star2: 245, star3: 395 },
-  124: { star2: 310, star3: 500 },
+  124: { star2: 320, star3: 520 },
+  125: { star2: 420, star3: 675 },
+  126: { star2: 710, star3: 1145 },
   130: { star2: 35, star3: 60 },
   131: { star2: 100, star3: 160 },
   132: { star2: 100, star3: 160 },
   133: { star2: 145, star3: 230 },
-  134: { star2: 310, star3: 500 },
+  134: { star2: 320, star3: 520 },
+  135: { star2: 465, star3: 750 },
+  136: { star2: 710, star3: 1145 },
   140: { star2: 35, star3: 60 },
   141: { star2: 100, star3: 160 },
   142: { star2: 120, star3: 190 },
   143: { star2: 245, star3: 395 },
-  144: { star2: 290, star3: 470 },
+  144: { star2: 295, star3: 475 },
+  145: { star2: 575, star3: 925 },
+  146: { star2: 710, star3: 1145 },
   150: { star2: 45, star3: 70 },
   151: { star2: 100, star3: 160 },
   152: { star2: 120, star3: 195 },
   153: { star2: 185, star3: 295 },
-  154: { star2: 335, star3: 540 },
+  154: { star2: 365, star3: 585 },
+  155: { star2: 395, star3: 640 },
+  156: { star2: 635, star3: 1025 },
   160: { star2: 20, star3: 30 },
   161: { star2: 100, star3: 160 },
   162: { star2: 120, star3: 190 },
   163: { star2: 145, star3: 230 },
-  164: { star2: 335, star3: 540 },
+  164: { star2: 365, star3: 585 },
+  165: { star2: 230, star3: 375 },
+  166: { star2: 710, star3: 1145 },
   170: { star2: 35, star3: 60 },
   171: { star2: 100, star3: 160 },
   172: { star2: 120, star3: 195 },
   173: { star2: 210, star3: 340 },
-  174: { star2: 320, star3: 520 },
+  174: { star2: 350, star3: 565 },
+  175: { star2: 575, star3: 925 },
+  176: { star2: 710, star3: 1145 },
   180: { star2: 35, star3: 60 },
   181: { star2: 100, star3: 160 },
   182: { star2: 75, star3: 120 },
   183: { star2: 175, star3: 280 },
-  184: { star2: 320, star3: 520 },
+  184: { star2: 350, star3: 565 },
+  185: { star2: 470, star3: 760 },
+  186: { star2: 710, star3: 1145 },
   190: { star2: 35, star3: 60 },
   191: { star2: 100, star3: 160 },
   192: { star2: 110, star3: 180 },
   193: { star2: 245, star3: 395 },
-  194: { star2: 320, star3: 520 },
+  194: { star2: 350, star3: 565 },
+  195: { star2: 470, star3: 760 },
+  196: { star2: 710, star3: 1145 },
   200: { star2: 20, star3: 30 },
   201: { star2: 100, star3: 160 },
   202: { star2: 85, star3: 140 },
   203: { star2: 185, star3: 295 },
-  204: { star2: 260, star3: 420 },
+  204: { star2: 280, star3: 455 },
+  205: { star2: 430, star3: 690 },
+  206: { star2: 710, star3: 1145 },
   210: { star2: 35, star3: 60 },
   211: { star2: 95, star3: 150 },
   212: { star2: 100, star3: 160 },
   213: { star2: 155, star3: 250 },
-  214: { star2: 340, star3: 545 },
+  214: { star2: 355, star3: 575 },
+  215: { star2: 470, star3: 760 },
+  216: { star2: 695, star3: 1120 },
   220: { star2: 35, star3: 60 },
   221: { star2: 70, star3: 115 },
   222: { star2: 120, star3: 195 },
   223: { star2: 245, star3: 395 },
-  224: { star2: 200, star3: 325 },
+  224: { star2: 210, star3: 335 },
+  225: { star2: 460, star3: 745 },
+  226: { star2: 435, star3: 700 },
   230: { star2: 20, star3: 30 },
   231: { star2: 100, star3: 160 },
   232: { star2: 120, star3: 190 },
   233: { star2: 185, star3: 295 },
-  234: { star2: 275, star3: 440 },
+  234: { star2: 290, star3: 470 },
+  235: { star2: 430, star3: 690 },
+  236: { star2: 710, star3: 1145 },
   240: { star2: 35, star3: 60 },
   241: { star2: 100, star3: 160 },
   242: { star2: 75, star3: 120 },
   243: { star2: 245, star3: 395 },
-  244: { star2: 320, star3: 520 },
+  244: { star2: 350, star3: 565 },
+  245: { star2: 470, star3: 760 },
+  246: { star2: 710, star3: 1145 },
 };
 
 export function buildCountryLevels() {
   const out = [];
   COUNTRIES.forEach((c, ci) => {
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < STOPS_PER_TOUR; i++) {
       const id = 100 + ci * 10 + i;
       const hz = HAZARDS[c.hazards[i % c.hazards.length]] || {};
       const table = c.tables[i % c.tables.length];
@@ -417,7 +452,7 @@ export function buildCountryLevels() {
         orders: i >= 2 ? { minTier: 2, maxTier: Math.min(6, GOALS[i] - 1) } : undefined,
         // the last stop of a tour gets a small head start so the run is a
         // finish, not a grind (measured: without it the bot wins 1/5)
-        preplace: i === 4 ? [
+        preplace: i >= STOPS_PER_TOUR - 3 ? [
           { tier: GOALS[i] - 3, x: -96, z: 520 }, { tier: GOALS[i] - 3, x: 92, z: 520 },
         ] : undefined,
         sideGoal: SIDE_GOALS[i],
@@ -448,7 +483,7 @@ export function buildTours(worldLevelIds) {
       id: c.id, name: c.name, flag: c.flag, backdrop: c.backdrop,
       blurb: `${c.stops.length} stops · ${c.special}`,
       special: c.special,
-      levels: Array.from({ length: 5 }, (_, i) => 100 + ci * 10 + i),
+      levels: Array.from({ length: STOPS_PER_TOUR }, (_, i) => 100 + ci * 10 + i),
     })),
   ];
 }
