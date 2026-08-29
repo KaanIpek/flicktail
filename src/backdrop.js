@@ -19,6 +19,7 @@ const SCENES = {
   okinawa:   { mover: 'boat',     band: [0.46, 0.54], boatColor: '#f4f0e8', birds: true, critters: [{ t:'gull', y:0.12, period:25 }, { t:'butterfly', y:0.21, period:19, dir:-1 }, { t:'fish', y:0.36, period:24 }] },
   algarve:   { mover: 'boat',     band: [0.50, 0.58], boatColor: '#ffffff', birds: true, critters: [{ t:'gull', y:0.13, period:23, dir:-1 }, { t:'dolphin', y:0.35, period:30 }, { t:'butterfly', y:0.22, period:20 }] },
   whitsundays:{ mover: 'ray',     band: [0.52, 0.64], birds: true, critters: [{ t:'turtle', y:0.36, period:34 }, { t:'pelican', y:0.12, period:26, dir:-1 }, { t:'fish', y:0.34, period:22 }] },
+  halong:    { mover: 'boat',     band: [0.48, 0.58], boatColor: '#c8442e', birds: true, critters: [{ t:'gull', y:0.12, period:24 }, { t:'butterfly', y:0.22, period:19, dir:-1 }, { t:'fish', y:0.35, period:23 }] },
 };
 
 export class Backdrop {

@@ -275,6 +275,22 @@ export const COUNTRIES = [
     hazards: ['reef', 'calm', 'ball', 'ice', 'reef'],
     times: ['day', 'day', 'sunset', 'day', 'night'],
   },
+  {
+    id: 'vietnam', name: 'Vietnam', flag: '🇻🇳', backdrop: 'halong',
+    accent: '#3FBF8F', rail: '#7a5a3a',
+    drinks: ['Ha Long Jade', 'Che Cloud', 'Pho Ember', 'Lotus Prism', 'Golden Junk'],
+    special: 'Karst Mist',
+    cast: ['frog', 'gecko', 'songbird', 'turtle', 'monkey', 'hornbill',
+      'octopus', 'crab', 'clownfish', 'tiger', 'hornbill'],
+    stops: ['Ha Long', 'Cat Ba', 'Lan Ha', 'Bai Tu Long', 'Ninh Binh'],
+    tables: [
+      { surface: 'wood', c: ['#6a4a2e', '#7c5a38', '#8e6a44'] },
+      { surface: 'stone', c: ['#3e4a44', '#4a5850', '#56655c'] },
+      { surface: 'tile', c: ['#1f7a5e', '#268f70', '#31a682'], grout: 'rgba(8,40,30,0.5)', motif: '#e6fff2' },
+    ],
+    hazards: ['calm', 'monsoon', 'reef', 'wind', 'monsoon'],
+    times: ['day', 'sunset', 'day', 'night', 'sunset'],
+  },
 ];
 
 const GOALS = [4, 5, 6, 7, 8];
@@ -355,6 +371,11 @@ const STAR_LINES = {
   232: { star2: 120, star3: 190 },
   233: { star2: 185, star3: 295 },
   234: { star2: 275, star3: 440 },
+  240: { star2: 35, star3: 60 },
+  241: { star2: 100, star3: 160 },
+  242: { star2: 75, star3: 120 },
+  243: { star2: 245, star3: 395 },
+  244: { star2: 320, star3: 520 },
 };
 
 export function buildCountryLevels() {
