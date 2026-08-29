@@ -9,7 +9,10 @@ const root = path.resolve(here, '..');
 const out = path.join(here, 'www');
 
 const INCLUDE = ['index.html', 'manifest.webmanifest', 'sw.js', 'css', 'src'];
-const ASSET_EXCLUDE = new Set(['raw']);
+// Source art never runs: raw/ (44 MB AI originals), raw3d/ (17 MB sprite
+// sources) and raw_backdrops/ (9 MB generated plates) all have shipped
+// derivatives already. Excluding every raw* folder, not just 'raw'.
+const isSourceArt = (name) => name === 'raw' || name.startsWith('raw');
 
 fs.rmSync(out, { recursive: true, force: true });
 fs.mkdirSync(out, { recursive: true });
@@ -30,7 +33,7 @@ const assetsSrc = path.join(root, 'assets');
 const assetsDst = path.join(out, 'assets');
 fs.mkdirSync(assetsDst, { recursive: true });
 for (const e of fs.readdirSync(assetsSrc)) {
-  if (ASSET_EXCLUDE.has(e)) continue;
+  if (isSourceArt(e)) continue;
   copy(path.join(assetsSrc, e), path.join(assetsDst, e));
 }
 
