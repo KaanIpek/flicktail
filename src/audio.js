@@ -93,6 +93,16 @@ export class AudioMan {
     } catch {}
   }
 
+  // Tracks are fetched the first time they're actually needed. Eight music
+  // loops and three ambient beds is ~6 MB, and a player only ever hears one of
+  // each at a time — pulling them all at boot delayed the first flick for
+  // audio most sessions never reach. `urlFor` is supplied by main.
+  async ensure(name) {
+    if (this.buffers.has(name) || !this.urlFor) return;
+    const url = this.urlFor(name);
+    if (url) await this.load(name, url);
+  }
+
   async buffer(name) {
     const ent = this.buffers.get(name);
     if (!ent || !this.ctx) return null;
@@ -292,6 +302,7 @@ export class AudioMan {
     if (!this.unlocked) { this.pendingMusic = name; return; }
     if (this.currentMusic === name) return;
     this.currentMusic = name;
+    await this.ensure(name);
     const buf = await this.buffer(name);
     const fade = 1.2;
     const t = this.ctx.currentTime;
@@ -320,6 +331,7 @@ export class AudioMan {
     if (!this.unlocked) { this.pendingAmb = name; return; }
     if (this.currentAmb === name) return;
     this.currentAmb = name;
+    await this.ensure(name);
     const buf = await this.buffer(name);
     const fade = 2.0;
     const t = this.ctx.currentTime;

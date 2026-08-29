@@ -94,15 +94,18 @@ function preload() {
     if (screen === 'title' || screen === 'map') { /* backgrounds refresh next frame */ }
     backdrop.render();
   });
-  for (const m of ['music_morning', 'music_golden', 'music_last', 'music_neon',
-    'music_latin', 'music_riviera', 'music_desert', 'music_lagoon']) {
-    audio.load(m, 'assets/audio/' + m + '.mp3');
-  }
-  for (const a of ['amb_beach_day', 'amb_beach_sunset', 'amb_night']) {
-    audio.load(a, 'assets/audio/' + a + '.mp3');
-  }
+  // Only what the player hears on the way in. The other seven tracks and two
+  // ambient beds stream in via audio.ensure() when their destination opens —
+  // pulling all ~6 MB up front delayed the first flick for audio most
+  // sessions never reach.
+  audio.load('music_morning', 'assets/audio/music_morning.mp3');
+  audio.load('amb_beach_day', 'assets/audio/amb_beach_day.mp3');
   for (const s of SFX) audio.load('sfx_' + s, 'assets/audio/sfx/' + s + '.mp3');
 }
+
+audio.urlFor = n => n.startsWith('sfx_')
+  ? `assets/audio/sfx/${n.slice(4)}.mp3`
+  : `assets/audio/${n}.mp3`;
 
 // sampled one-shots; audio.play falls back to the procedural voice per sound
 // until (or unless) its sample has arrived
