@@ -36,6 +36,7 @@ export const LEVELS = [
   {
     id: 1, place: 'Waikiki', country: 'Hawaii, USA', backdrop: 'waikiki',
     accent: '#2EC4B6', felt: '#3aa88f', rail: '#8a5a38', time: 'day',
+    table: { surface: 'bamboo', c: ['#b8924e', '#c9a55f', '#d8b876'] },
     goalTier: 5, flicks: 24, star2: 30, star3: 70,
     friction: FRICTION.sand, rails: rectRails(), spawnTiers: [2, 3],
     preplace: [{ tier: 3, x: -70, z: 430 }, { tier: 3, x: 66, z: 430 }],
@@ -45,6 +46,7 @@ export const LEVELS = [
   {
     id: 2, place: 'South Beach', country: 'Miami, USA', backdrop: 'miami',
     accent: '#F26CA7', felt: '#4a9e8f', rail: '#c8c8d8', time: 'day',
+    table: { surface: 'terrazzo', c: ['#cfd8d2', '#dde6e0', '#e8f0ea'], fleck: ['#F26CA7', '#40E0D0', '#ffd75e'] },
     goalTier: 6, flicks: 32, star2: 140, star3: 220,
     friction: FRICTION.wood, rails: rectRails(), railBounce: 0.85, spawnTiers: [1, 2, 3, 4],
     sideGoal: { type: 'bank', count: 1, label: 'Bank-shot merge', required: false, bonus: 25 },
@@ -54,6 +56,7 @@ export const LEVELS = [
   {
     id: 3, place: 'Cancún', country: 'Mexico', backdrop: 'cancun',
     accent: '#40E0D0', felt: '#38a0b0', rail: '#c9b08c', time: 'day',
+    table: { surface: 'tile', c: ['#1f8296', '#2699ad', '#31b0c4'], grout: 'rgba(8,50,58,0.5)', motif: '#eafcff' },
     goalTier: 6, flicks: 42, star2: 180, star3: 275,
     friction: FRICTION.wood, rails: rectRails(), spawnTiers: [1, 2, 3, 4],
     orders: { count: 3, minTier: 2, maxTier: 4 },
@@ -64,6 +67,7 @@ export const LEVELS = [
   {
     id: 4, place: 'Copacabana', country: 'Rio, Brazil', backdrop: 'rio',
     accent: '#FFC65C', felt: '#2f8f78', rail: '#3c3c3c', time: 'sunset',
+    table: { surface: 'wave', c: ['#d8d2c4', '#e6e0d2', '#f0ebdf'], dark: '#33322e' },
     goalTier: 7, flicks: 46, star2: 290, star3: 435,
     friction: FRICTION.wood, rails: crescentRails(),
     orders: { minTier: 2, maxTier: 5 },
@@ -74,6 +78,7 @@ export const LEVELS = [
   {
     id: 5, place: 'Promenade', country: 'Nice, France', backdrop: 'nice',
     accent: '#1F6FB2', felt: '#3a8fa8', rail: '#d8cfc0', time: 'day',
+    table: { surface: 'marble', c: ['#cfcdc9', '#e0ded9', '#eeece7'], vein: '#9a96a8' },
     goalTier: 7, flicks: 48, star2: 240, star3: 410,
     friction: FRICTION.wood, rails: rectRails(),
     orders: { minTier: 2, maxTier: 5 },
@@ -88,6 +93,7 @@ export const LEVELS = [
   {
     id: 6, place: 'Positano', country: 'Amalfi, Italy', backdrop: 'positano',
     accent: '#D96C47', felt: '#4f8f6f', rail: '#b06a4a', time: 'sunset',
+    table: { surface: 'tile', c: ['#b86440', '#c9734a', '#d98555'], grout: 'rgba(90,40,20,0.5)', motif: '#f2dca6' },
     goalTier: 7, flicks: 50, star2: 260, star3: 420,
     friction: FRICTION.wood, rails: rectRails(),
     orders: { minTier: 2, maxTier: 5 },
@@ -108,6 +114,7 @@ export const LEVELS = [
   {
     id: 7, place: 'Oia', country: 'Santorini, Greece', backdrop: 'santorini',
     accent: '#2A5DAB', felt: '#3a6f9f', rail: '#f0ece4', time: 'sunset',
+    table: { surface: 'plaster', c: ['#d8d2c4', '#e6e0d2', '#f2ede2'] },
     goalTier: 8, flicks: 68, star2: 440, star3: 820,
     friction: FRICTION.wood, rails: rectRails(),
     orders: { minTier: 3, maxTier: 6 },
@@ -122,6 +129,7 @@ export const LEVELS = [
   {
     id: 8, place: 'Ibiza', country: 'Spain', backdrop: 'ibiza',
     accent: '#C77DFF', felt: '#2f4470', rail: '#42346a', time: 'night',
+    table: { surface: 'glass', c: ['#180f2c', '#221540', '#2c1c50'], glow: '#C77DFF' },
     goalTier: 8, flicks: 72, star2: 430, star3: 720,
     friction: FRICTION.wood, rails: rectRails(),
     orders: { minTier: 3, maxTier: 6 },
@@ -136,6 +144,7 @@ export const LEVELS = [
   {
     id: 9, place: 'Jumeirah', country: 'Dubai, UAE', backdrop: 'dubai',
     accent: '#F2C14E', felt: '#7fa8b8', rail: '#d8c8a0', time: 'night',
+    table: { surface: 'marble', c: ['#161310', '#221d15', '#302819'], vein: '#F2C14E' },
     goalTier: 8, flicks: 74, star2: 530, star3: 940,
     friction: FRICTION.marble, rails: rectRails(halfW * 0.85, length * 0.92),
     orders: { minTier: 3, maxTier: 6 },
@@ -149,6 +158,7 @@ export const LEVELS = [
   {
     id: 10, place: 'Kata Beach', country: 'Phuket, Thailand', backdrop: 'phuket',
     accent: '#23B5A0', felt: '#3aa08a', rail: '#8a5a38', time: 'day',
+    table: { surface: 'wood', c: ['#6a4326', '#7d5330', '#8f6238'] },
     goalTier: 9, flicks: 98, star2: 850, star3: 1330,
     friction: FRICTION.wood, rails: rectRails(),
     orders: { minTier: 3, maxTier: 6 },
@@ -160,6 +170,7 @@ export const LEVELS = [
   {
     id: 11, place: 'Tanah Lot', country: 'Bali, Indonesia', backdrop: 'bali',
     accent: '#FF8E53', felt: '#4f6f5f', rail: '#5a4a3a', time: 'sunset',
+    table: { surface: 'stone', c: ['#363c34', '#434a40', '#4f574b'] },
     goalTier: 9, flicks: 105, star2: 670, star3: 1080,
     friction: FRICTION.wood, rails: rectRails(), spawnTiers: [2, 3, 4, 5, 6],
     orders: { minTier: 3, maxTier: 7 },
@@ -177,6 +188,7 @@ export const LEVELS = [
   {
     id: 12, place: 'Bora Bora', country: 'French Polynesia', backdrop: 'borabora',
     accent: '#43D9C7', felt: '#2fa8a0', rail: '#b98a5a', time: 'day',
+    table: { surface: 'glass', c: ['#137e86', '#1e9aa2', '#2bb6bc'], glow: '#9ff2ea' },
     goalTier: 11, flicks: 175, star2: 700, star3: 1250,
     friction: FRICTION.wood, rails: rectRails(), spawnTiers: [3, 4, 5, 6, 7],
     orders: { minTier: 4, maxTier: 6 },

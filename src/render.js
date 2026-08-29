@@ -117,53 +117,21 @@ export class Renderer {
     top.forEach((p, i) => i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y));
     ctx.closePath();
 
-    // base wood gradient (darker far away = distance haze)
+    // Per-destination surface palette (far, mid, near). Each level's table is a
+    // real material — bamboo bar, talavera tile, marble, neon glass, lagoon —
+    // so the world genuinely changes underfoot, not just a colour tint.
+    const tbl = level.table || { surface: 'wood', c: ['#9a6540', '#ad7449', '#c08454'] };
     const farY = view.project(0, 0, TABLE.length).y;
     const nearY = view.project(0, 0, TABLE.foulLine).y;
     const g = ctx.createLinearGradient(0, farY, 0, nearY);
-    g.addColorStop(0, shade('#9a6540', -0.30));
-    g.addColorStop(0.5, shade('#ad7449', -0.04));
-    g.addColorStop(1, shade('#c08454', 0.10));
+    g.addColorStop(0, shade(tbl.c[0], -0.22));
+    g.addColorStop(0.5, tbl.c[1] || tbl.c[0]);
+    g.addColorStop(1, shade(tbl.c[2] || tbl.c[1] || tbl.c[0], 0.08));
     ctx.fillStyle = g;
     ctx.fill();
     ctx.clip();
 
-    // planks with per-plank jitter + grain
-    let seed = 7;
-    const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
-    const plankW = 64;
-    for (let x = -TABLE.halfW; x < TABLE.halfW; x += plankW) {
-      const tone = (rnd() - 0.5) * 0.14;
-      const p0 = view.project(x, 0, TABLE.foulLine);
-      const p1 = view.project(x, 0, TABLE.length);
-      const q0 = view.project(Math.min(x + plankW, TABLE.halfW), 0, TABLE.foulLine);
-      const q1 = view.project(Math.min(x + plankW, TABLE.halfW), 0, TABLE.length);
-      ctx.fillStyle = tone >= 0 ? `rgba(255,225,190,${tone})` : `rgba(30,10,0,${-tone})`;
-      ctx.beginPath();
-      ctx.moveTo(p0.x, p0.y); ctx.lineTo(p1.x, p1.y);
-      ctx.lineTo(q1.x, q1.y); ctx.lineTo(q0.x, q0.y);
-      ctx.closePath(); ctx.fill();
-      // plank gap
-      ctx.strokeStyle = 'rgba(20,8,2,0.35)';
-      ctx.lineWidth = 1.4;
-      ctx.beginPath(); ctx.moveTo(p0.x, p0.y); ctx.lineTo(p1.x, p1.y); ctx.stroke();
-      // grain streaks
-      for (let i = 0; i < 3; i++) {
-        const gx = x + rnd() * plankW;
-        const a0 = view.project(gx, 0, TABLE.foulLine + rnd() * 300);
-        const a1 = view.project(gx + (rnd() - 0.5) * 14, 0, TABLE.foulLine + 300 + rnd() * 540);
-        ctx.strokeStyle = `rgba(40,18,6,${0.05 + rnd() * 0.08})`;
-        ctx.lineWidth = 1 + rnd() * 1.6;
-        ctx.beginPath(); ctx.moveTo(a0.x, a0.y);
-        ctx.quadraticCurveTo((a0.x + a1.x) / 2 + (rnd() - 0.5) * 20, (a0.y + a1.y) / 2, a1.x, a1.y);
-        ctx.stroke();
-      }
-    }
-
-    // scene stain: the level's felt color as a gentle wash (the wood should
-    // stay warm and recognizable; the scene only kisses it)
-    ctx.fillStyle = hexToRgba(level.felt, 0.14);
-    ctx.fillRect(0, 0, w, h);
+    this.drawSurface(ctx, tbl, w, h, farY, nearY);
 
     // sun sheen: diagonal light band
     const sheen = ctx.createLinearGradient(w * 0.15, farY, w * 0.75, nearY);
@@ -232,6 +200,137 @@ export class Renderer {
     }
 
     this.tableCanvas = c;
+  }
+
+  // ---- surface materials (drawn inside the clipped, gradient-filled tabletop) ----
+
+  drawSurface(ctx, tbl, w, h, farY, nearY) {
+    const view = this.view;
+    const P = (x, z) => view.project(x, 0, z);
+    const HW = TABLE.halfW, Z0 = TABLE.foulLine, Z1 = TABLE.length;
+    let seed = 7;
+    const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+    // perspective row lines (constant z) and column lines (constant x)
+    const row = (z, style, lw) => { const a = P(-HW, z), b = P(HW, z); ctx.strokeStyle = style; ctx.lineWidth = lw; ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke(); };
+    const col = (x, style, lw) => { const a = P(x, Z0), b = P(x, Z1); ctx.strokeStyle = style; ctx.lineWidth = lw; ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke(); };
+
+    switch (tbl.surface) {
+      case 'bamboo': {
+        // vertical light slats with darker node bands
+        for (let x = -HW; x <= HW; x += 30) col(x, 'rgba(90,60,25,0.32)', 1.4);
+        for (let x = -HW + 15; x < HW; x += 30) col(x, 'rgba(255,240,200,0.14)', 3);
+        for (let z = Z0 + 120; z < Z1; z += 170) row(z, 'rgba(80,52,20,0.28)', 2.4);
+        break;
+      }
+      case 'tile': {
+        const grout = tbl.grout || 'rgba(0,0,0,0.4)';
+        const step = 88;
+        for (let z = Z0; z <= Z1; z += step) row(z, grout, 3);
+        for (let x = -HW; x <= HW; x += step) col(x, grout, 3);
+        // per-tile tone + a painted motif dot
+        for (let z = Z0; z < Z1; z += step) for (let x = -HW; x < HW; x += step) {
+          const t = (rnd() - 0.5) * 0.12;
+          const p = P(x + step / 2, z + step / 2);
+          ctx.fillStyle = t >= 0 ? `rgba(255,255,255,${t})` : `rgba(0,0,0,${-t})`;
+          const rr = (P(x, z).y - P(x, z + step).y) * 0.42;
+          ctx.beginPath(); ctx.ellipse(p.x, p.y, Math.abs(rr) * 1.15, Math.abs(rr) * 0.62, 0, 0, 7); ctx.fill();
+          if (tbl.motif && rnd() > 0.5) { ctx.fillStyle = hexToRgba(tbl.motif, 0.5); ctx.beginPath(); ctx.arc(p.x, p.y, Math.max(2, Math.abs(rr) * 0.32), 0, 7); ctx.fill(); }
+        }
+        break;
+      }
+      case 'marble': {
+        const vein = tbl.vein || '#ffffff';
+        for (let i = 0; i < 22; i++) {
+          const zx = -HW + rnd() * (HW * 2);
+          const a = P(zx, Z0 + rnd() * 200), b = P(zx + (rnd() - 0.5) * 260, Z1 - rnd() * 200);
+          ctx.strokeStyle = hexToRgba(vein, 0.06 + rnd() * 0.14);
+          ctx.lineWidth = 0.6 + rnd() * 2.4;
+          ctx.beginPath(); ctx.moveTo(a.x, a.y);
+          ctx.bezierCurveTo((a.x + b.x) / 2 + (rnd() - 0.5) * 120, (a.y + b.y) / 2, (a.x + b.x) / 2 - (rnd() - 0.5) * 90, (a.y + b.y) / 2 + 30, b.x, b.y);
+          ctx.stroke();
+        }
+        // polished sheen band
+        const sh = ctx.createLinearGradient(w * 0.2, farY, w * 0.8, nearY);
+        sh.addColorStop(0.35, 'rgba(255,255,255,0)'); sh.addColorStop(0.55, 'rgba(255,255,255,0.12)'); sh.addColorStop(0.7, 'rgba(255,255,255,0)');
+        ctx.fillStyle = sh; ctx.fillRect(0, 0, w, h);
+        break;
+      }
+      case 'terrazzo': {
+        const flecks = tbl.fleck || ['#F26CA7', '#40E0D0', '#ffd75e'];
+        for (let i = 0; i < 520; i++) {
+          const x = -HW + rnd() * (HW * 2), z = Z0 + rnd() * (Z1 - Z0);
+          const p = P(x, z);
+          const scale = 1 - (z - Z0) / (Z1 - Z0) * 0.55;
+          ctx.fillStyle = hexToRgba(flecks[(rnd() * flecks.length) | 0], 0.5);
+          ctx.beginPath(); ctx.ellipse(p.x, p.y, (2 + rnd() * 4) * scale, (1.4 + rnd() * 2.6) * scale, rnd() * 3, 0, 7); ctx.fill();
+        }
+        break;
+      }
+      case 'wave': {
+        // Copacabana promenade: chevron bands of light stone and dark
+        const dark = tbl.dark || '#2a2a2a';
+        let k = 0;
+        for (let z = Z0; z < Z1; z += 64) {
+          if ((k++ % 2) === 0) continue;
+          ctx.fillStyle = hexToRgba(dark, 0.5);
+          quad(ctx, view, [-HW, z], [0, z + 28], [0, z + 92], [-HW, z + 64]);
+          quad(ctx, view, [0, z + 28], [HW, z], [HW, z + 64], [0, z + 92]);
+        }
+        break;
+      }
+      case 'glass': {
+        // translucent surface with reflection streaks + an inner edge glow
+        const glow = tbl.glow || '#8ff0e8';
+        for (let i = 0; i < 7; i++) {
+          const x = -HW + rnd() * (HW * 2);
+          ctx.strokeStyle = `rgba(255,255,255,${0.05 + rnd() * 0.08})`;
+          ctx.lineWidth = 6 + rnd() * 22;
+          const a = P(x, Z0), b = P(x + (rnd() - 0.5) * 120, Z1);
+          ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+        }
+        const gl = ctx.createLinearGradient(0, farY, 0, nearY);
+        gl.addColorStop(0, hexToRgba(glow, 0.16)); gl.addColorStop(0.5, hexToRgba(glow, 0)); gl.addColorStop(1, hexToRgba(glow, 0.10));
+        ctx.fillStyle = gl; ctx.fillRect(0, 0, w, h);
+        break;
+      }
+      case 'plaster': {
+        // whitewashed matte with soft mottling
+        for (let i = 0; i < 120; i++) {
+          const x = -HW + rnd() * (HW * 2), z = Z0 + rnd() * (Z1 - Z0), p = P(x, z);
+          ctx.fillStyle = `rgba(120,110,95,${0.02 + rnd() * 0.04})`;
+          ctx.beginPath(); ctx.arc(p.x, p.y, 8 + rnd() * 26, 0, 7); ctx.fill();
+        }
+        break;
+      }
+      case 'stone': {
+        // volcanic stone: dark mottle + hairline cracks
+        for (let i = 0; i < 260; i++) {
+          const x = -HW + rnd() * (HW * 2), z = Z0 + rnd() * (Z1 - Z0), p = P(x, z);
+          const d = (rnd() - 0.5) * 0.2;
+          ctx.fillStyle = d >= 0 ? `rgba(255,255,255,${d * 0.4})` : `rgba(0,0,0,${-d})`;
+          ctx.beginPath(); ctx.arc(p.x, p.y, 3 + rnd() * 9, 0, 7); ctx.fill();
+        }
+        break;
+      }
+      default: {  // wood planks + grain (Waikiki, Rio, Phuket teak…)
+        const plankW = 64;
+        for (let x = -HW; x < HW; x += plankW) {
+          const tone = (rnd() - 0.5) * 0.14;
+          const p0 = P(x, Z0), p1 = P(x, Z1), q0 = P(Math.min(x + plankW, HW), Z0), q1 = P(Math.min(x + plankW, HW), Z1);
+          ctx.fillStyle = tone >= 0 ? `rgba(255,225,190,${tone})` : `rgba(30,10,0,${-tone})`;
+          ctx.beginPath(); ctx.moveTo(p0.x, p0.y); ctx.lineTo(p1.x, p1.y); ctx.lineTo(q1.x, q1.y); ctx.lineTo(q0.x, q0.y); ctx.closePath(); ctx.fill();
+          ctx.strokeStyle = 'rgba(20,8,2,0.35)'; ctx.lineWidth = 1.4;
+          ctx.beginPath(); ctx.moveTo(p0.x, p0.y); ctx.lineTo(p1.x, p1.y); ctx.stroke();
+          for (let i = 0; i < 3; i++) {
+            const gx = x + rnd() * plankW;
+            const a0 = P(gx, Z0 + rnd() * 300), a1 = P(gx + (rnd() - 0.5) * 14, Z0 + 300 + rnd() * 540);
+            ctx.strokeStyle = `rgba(40,18,6,${0.05 + rnd() * 0.08})`; ctx.lineWidth = 1 + rnd() * 1.6;
+            ctx.beginPath(); ctx.moveTo(a0.x, a0.y); ctx.quadraticCurveTo((a0.x + a1.x) / 2 + (rnd() - 0.5) * 20, (a0.y + a1.y) / 2, a1.x, a1.y); ctx.stroke();
+          }
+        }
+        break;
+      }
+    }
   }
 
   drawRail3D(ctx, pts, level, scale = 1) {
