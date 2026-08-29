@@ -76,6 +76,7 @@ export const SPECIES = {
   orangutan:{ ears: 'round',  tail: 'none',  extra: 'muzzle' },
   tapir:    { ears: 'round',  tail: 'stub',  extra: 'trunk' },
   quokka:   { ears: 'round',  tail: 'long',  extra: 'muzzle' },
+  koalaish: { ears: 'fan',    tail: 'stub',  extra: 'muzzle' },
 };
 
 // The default cast — the World Tour line-up, tiers 1..10.

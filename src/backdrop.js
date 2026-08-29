@@ -16,6 +16,9 @@ const SCENES = {
   phuket:    { mover: 'longtail', band: [0.48, 0.58], boatColor: '#d14b3c', birds: true, critters: [{ t:'butterfly', y:0.20, period:18 }, { t:'dolphin', y:0.35, period:29, dir:-1 }] },
   bali:      { mover: 'kite',     band: [0.10, 0.28], sparkleColor: '#ffb25e', critters: [{ t:'butterfly', y:0.19, period:17, dir:-1 }, { t:'fish', y:0.35, period:25 }] },
   borabora:  { mover: 'ray',      band: [0.55, 0.68], birds: true, critters: [{ t:'dolphin', y:0.34, period:27 }, { t:'turtle', y:0.37, period:36, dir:-1 }, { t:'butterfly', y:0.18, period:19 }] },
+  okinawa:   { mover: 'boat',     band: [0.46, 0.54], boatColor: '#f4f0e8', birds: true, critters: [{ t:'gull', y:0.12, period:25 }, { t:'butterfly', y:0.21, period:19, dir:-1 }, { t:'fish', y:0.36, period:24 }] },
+  algarve:   { mover: 'boat',     band: [0.50, 0.58], boatColor: '#ffffff', birds: true, critters: [{ t:'gull', y:0.13, period:23, dir:-1 }, { t:'dolphin', y:0.35, period:30 }, { t:'butterfly', y:0.22, period:20 }] },
+  whitsundays:{ mover: 'ray',     band: [0.52, 0.64], birds: true, critters: [{ t:'turtle', y:0.36, period:34 }, { t:'pelican', y:0.12, period:26, dir:-1 }, { t:'fish', y:0.34, period:22 }] },
 };
 
 export class Backdrop {
