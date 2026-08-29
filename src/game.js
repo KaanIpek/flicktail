@@ -70,6 +70,11 @@ export class Game {
     // hazards
     this.wind = level.wind ? { ...level.wind, t: level.wind.period * 0.55, dir: 1, active: 0 } : null;
     this.tide = level.tide ? { ...level.tide, t: 0, active: 0 } : null;
+    // country hazards
+    this.cenote = level.cenote ? { ...level.cenote } : null;          // a hole in the table
+    this.sandstorm = level.sandstorm ? { ...level.sandstorm, t: 0, active: 0 } : null;
+    this.lava = level.lava ? { ...level.lava, t: 0 } : null;          // a scorching strip
+    this.monsoon = level.monsoon ? { ...level.monsoon, t: 0, active: 0 } : null;
     this.ball = null;
 
     // obstacles
@@ -290,6 +295,73 @@ export class Game {
         }
       }
     }
+    // Mexico: a cenote swallows any drink that slides over it.
+    const cn = this.cenote;
+    if (cn) {
+      for (const b of this.phys.bodies) {
+        if (b.dead || b.fixed || b.kind === 'ball') continue;
+        if (Math.hypot(b.x - cn.x, b.z - cn.z) < cn.r * 0.72) {
+          b.dead = true;
+          this.fx.burst(b.x, b.z, ['#2a6f8f', '#7fd8ef', '#ffffff'], 14, 70);
+          this.audio.play('splash', { volume: 0.55 });
+          this.emit('sank', b);
+        }
+      }
+    }
+
+    // UAE: a sandstorm shoves everything one way and gums the table up.
+    const ss = this.sandstorm;
+    if (ss) {
+      ss.t += dt;
+      const cycle = ss.period + ss.len;
+      if (ss.t >= cycle) { ss.t -= cycle; ss.dir = -(ss.dir || 1); }
+      ss.warning = ss.t > ss.period - ss.warn && ss.t < ss.period;
+      const was = ss.active;
+      ss.active = ss.t >= ss.period ? 1 : 0;
+      if (ss.active && !was) this.audio.play('gust', { volume: 0.6 });
+      if (ss.active) {
+        for (const b of this.phys.bodies) {
+          if (b.dead || b.fixed) continue;
+          b.vx += ss.accel * (ss.dir || 1) * dt;
+          if (b.sleeping && Math.abs(b.vx) > 40) b.sleeping = false;
+        }
+      }
+      // the sand itself drags: friction rises while it blows
+      this.phys.frictionK = this.level.friction * (ss.active ? 1.5 : 1);
+    }
+
+    // Indonesia: a lava seam bakes anything parked on it.
+    const lv = this.lava;
+    if (lv) {
+      lv.t += dt;
+      for (const b of this.phys.bodies) {
+        if (b.dead || b.fixed || b.kind === 'ball') continue;
+        const on = b.sleeping && b.z > lv.zMin && b.z < lv.zMax;
+        b.heat = on ? (b.heat || 0) + dt : Math.max(0, (b.heat || 0) - dt * 1.6);
+        if (b.heat > lv.dwell) {
+          b.dead = true;
+          this.fx.burst(b.x, b.z, ['#ff5a2a', '#ffb02e', '#5a2a10'], 18, 95);
+          this.audio.play('splash', { volume: 0.5, rate: 0.7 });
+          this.emit('scorched', b);
+        }
+      }
+    }
+
+    // Thailand: a monsoon squall makes the whole table slick for a moment.
+    const mo = this.monsoon;
+    if (mo) {
+      mo.t += dt;
+      const cycle = mo.period + mo.len;
+      if (mo.t >= cycle) mo.t -= cycle;
+      mo.warning = mo.t > mo.period - mo.warn && mo.t < mo.period;
+      const was = mo.active;
+      mo.active = mo.t >= mo.period ? 1 : 0;
+      if (mo.active && !was) this.audio.play('splash', { volume: 0.45, rate: 1.3 });
+      if (!this.sandstorm) {
+        this.phys.frictionK = this.level.friction * (mo.active ? 0.45 : 1);
+      }
+    }
+
     if (this.ball) {
       this.ballWanderT -= dt;
       if (this.ballWanderT <= 0) {

@@ -154,9 +154,34 @@ export class UI {
         <button class="btn icon" data-act="title">‹</button>
         <h2>Collection</h2><div></div>
       </div>
-      <div class="col-grid">${rows}</div>
-      <p class="col-foot">Highest mix: ${best >= 1 ? TIERS[best - 1].name : '—'}</p>
+      <div class="col-scroll">
+        <div class="col-grid">${rows}</div>
+        <p class="col-foot">Highest mix: ${best >= 1 ? TIERS[best - 1].name : '—'}</p>
+        <div class="col-sec">Signature pours</div>
+        <p class="col-hint">Finish every stop on a country tour to earn its bottle.</p>
+        <div class="col-grid">${this.signatureCards()}</div>
+      </div>
     </div>`;
+  }
+
+  // One trophy per country: earned by taking a star at every stop on its tour.
+  signatureCards() {
+    const s = this.save.data;
+    return TOURS.filter(t => t.id !== 'world').map(t => {
+      const levels = levelsOfTour(t.id);
+      const done = levels.length > 0 && levels.every(l => (s.stars[l.id] || 0) >= 1);
+      // the country's signature creature is the top of its own cast
+      const icon = done && levels[0]
+        ? creatureIcon(11, 128, levels[0])
+        : null;
+      return `
+      <div class="col-card sig-card ${done ? '' : 'undiscovered'}">
+        ${icon ? `<img class="drink-icon" src="${icon}" alt="${t.special}">`
+               : '<div class="sig-lock">🔒</div>'}
+        <div class="col-name">${done ? t.special : '???'}</div>
+        <div class="col-tier">${t.flag} ${t.name}</div>
+      </div>`;
+    }).join('');
   }
 
   showPassport() {

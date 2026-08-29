@@ -86,6 +86,14 @@ const BELLY = ['#eafbc8', '#ffe6c2', '#ffdfe4', '#d8f4ff', '#fffaf0',
   '#ffe0bd', '#e8d4ff', '#fff2c2', '#eafcfa', '#ffd9e2', '#fff0d0'];
 
 // Resolve which animal a tier is on a given level.
+// A level can recolour a tier — each country's signature pour wears its own
+// colours rather than the global chain's.
+export function tierStyle(level, tierId, tiers) {
+  const base = tiers[tierId - 1];
+  const o = level && level.colors && level.colors[tierId];
+  return o ? { ...base, color: o[0], alt: o[1] || base.alt } : base;
+}
+
 export function creatureFor(level, tierId) {
   const cast = (level && level.cast) || DEFAULT_CAST;
   const name = cast[tierId - 1];
@@ -499,6 +507,35 @@ export class Renderer {
     this.drawTrails(ctx, game, time);
     this.drawProps(ctx, game, time);
 
+    // ---- country hazards ----
+    if (game.lava) {                                   // Indonesia: a hot seam
+      const lv = game.lava, pulse = 0.55 + 0.25 * Math.sin(time * 3);
+      const g2 = ctx.createLinearGradient(0, view.project(0, 0, lv.zMax).y, 0, view.project(0, 0, lv.zMin).y);
+      g2.addColorStop(0, `rgba(255,90,30,${0.5 * pulse})`);
+      g2.addColorStop(1, `rgba(255,180,40,${0.18 * pulse})`);
+      ctx.fillStyle = g2;
+      quad(ctx, view, [-TABLE.halfW, lv.zMin], [TABLE.halfW, lv.zMin],
+        [TABLE.halfW, lv.zMax], [-TABLE.halfW, lv.zMax]);
+      ctx.strokeStyle = `rgba(255,220,120,${0.5 * pulse})`;
+      ctx.lineWidth = 2.5;
+      for (const z of [lv.zMin, lv.zMax]) {
+        const a = view.project(-TABLE.halfW, 0, z), b2 = view.project(TABLE.halfW, 0, z);
+        ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b2.x, b2.y); ctx.stroke();
+      }
+    }
+    if (game.cenote) {                                 // Mexico: a hole to fall into
+      const cn = game.cenote, p2 = view.project(cn.x, 0, cn.z), rr = cn.r * p2.s;
+      const g3 = ctx.createRadialGradient(p2.x, p2.y, rr * 0.15, p2.x, p2.y, rr);
+      g3.addColorStop(0, 'rgba(4,20,32,0.95)');
+      g3.addColorStop(0.7, 'rgba(14,70,104,0.85)');
+      g3.addColorStop(1, 'rgba(60,170,200,0.35)');
+      ctx.fillStyle = g3;
+      ellipse(ctx, p2.x, p2.y, rr, rr * 0.5);
+      ctx.strokeStyle = `rgba(160,240,255,${0.35 + 0.2 * Math.sin(time * 2.2)})`;
+      ctx.lineWidth = 2.5;
+      ellipseStroke(ctx, p2.x, p2.y, rr * (0.72 + 0.06 * Math.sin(time * 2.2)), rr * 0.36);
+    }
+
     if (game.level.orders) this.drawDocks(ctx, game, time);
     // after the docks so the cat is never hidden behind an order card
     if (game.level.barCat) this.drawBarCat(ctx, game, time);
@@ -527,6 +564,34 @@ export class Renderer {
     if (game.wind && (game.wind.warning || game.wind.active)) this.drawWind(ctx, game, time);
 
     // foreground framing + scene grade + vignette over everything
+    if (game.sandstorm && (game.sandstorm.active || game.sandstorm.warning)) {
+      const ss = game.sandstorm, a = ss.active ? 0.34 : 0.1 + 0.06 * Math.sin(time * 8);
+      ctx.save();
+      ctx.fillStyle = `rgba(214,178,110,${a})`;
+      ctx.fillRect(0, 0, view.w, view.h);
+      ctx.strokeStyle = `rgba(255,232,190,${a * 0.7})`;
+      ctx.lineWidth = 1.6;
+      const dir = ss.dir || 1;
+      for (let i = 0; i < 26; i++) {
+        const y = ((i * 97 + time * 240) % view.h);
+        const x = ((i * 173 + time * 900 * dir) % (view.w + 200)) - 100;
+        ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + 46 * dir, y + 5); ctx.stroke();
+      }
+      ctx.restore();
+    }
+    if (game.monsoon && (game.monsoon.active || game.monsoon.warning)) {
+      const mo = game.monsoon, a = mo.active ? 0.5 : 0.18;
+      ctx.save();
+      ctx.strokeStyle = `rgba(190,225,245,${a})`;
+      ctx.lineWidth = 1.4;
+      for (let i = 0; i < 60; i++) {
+        const x = (i * 131 + time * 60) % view.w;
+        const y = ((i * 211 + time * 1500) % (view.h + 120)) - 60;
+        ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - 5, y + 22); ctx.stroke();
+      }
+      if (mo.active) { ctx.fillStyle = 'rgba(120,160,190,0.12)'; ctx.fillRect(0, 0, view.w, view.h); }
+      ctx.restore();
+    }
     this.drawFronds(ctx, time);
     if (this.vignette) ctx.drawImage(this.vignette, 0, 0);
   }
@@ -555,7 +620,7 @@ export class Renderer {
 
     if (b.kind === 'ball') { this.drawBall(ctx, b, p, time); return; }
 
-    const tier = TIERS[b.tier - 1];
+    const tier = tierStyle(this.level, b.tier, TIERS);
     const img = this.assets.image('tier' + String(b.tier).padStart(2, '0'));
     const born = b.born === undefined ? 1 : b.born;
     const pop = born < 1 ? 0.7 + 0.38 * easeOutBack(born) : 1;
@@ -1701,7 +1766,7 @@ export function creatureIcon(tierId, px = 128, level = null) {
   const c = document.createElement('canvas');
   c.width = px; c.height = px;
   const ctx = c.getContext('2d');
-  const tier = TIERS[tierId - 1];
+  const tier = tierStyle(level, tierId, TIERS);
   const W = px * 0.62, H = W * 1.22;
   ctx.translate(px / 2, px * 0.93);
   // t=1.1 so nobody is mid-blink in a still icon

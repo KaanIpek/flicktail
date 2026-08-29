@@ -32,6 +32,11 @@ const HAZARDS = {
     obstacles: [{ x: -150, z: 600, r: 42, kind: 'motu' }, { x: 160, z: 720, r: 36, kind: 'motu' }],
   },
   bouncy: { railBounce: 0.88 },
+  // signature hazards — one per country, so a place plays like nowhere else
+  cenote: { cenote: { x: -70, z: 560, r: 76 } },                                  // Mexico
+  sandstorm: { sandstorm: { period: 15, warn: 2.4, len: 2.2, accel: 430, dir: 1 } }, // UAE
+  lava: { lava: { zMin: 690, zMax: 810, dwell: 2.6 } },                           // Indonesia
+  monsoon: { monsoon: { period: 17, warn: 2.2, len: 3.2 } },                      // Thailand
 };
 
 const SIDE_GOALS = [
@@ -57,7 +62,7 @@ export const COUNTRIES = [
       { surface: 'terrazzo', c: ['#e2d6bd', '#eee3cd', '#f6eeda'], fleck: ['#40E0D0', '#ff8f3c', '#ffd75e'] },
       { surface: 'stone', c: ['#5a5148', '#6b6055', '#7a6d60'] },
     ],
-    hazards: ['calm', 'sand', 'wind', 'reef', 'tide'],
+    hazards: ['calm', 'sand', 'cenote', 'wind', 'cenote'],
     times: ['day', 'day', 'sunset', 'night', 'day'],
   },
   {
@@ -169,7 +174,7 @@ export const COUNTRIES = [
       { surface: 'glass', c: ['#1a1408', '#261d0e', '#332816'], glow: '#F2C14E' },
       { surface: 'stone', c: ['#6b5c44', '#7a6a50', '#8a795c'] },
     ],
-    hazards: ['ice', 'calm', 'wind', 'bouncy', 'reef'],
+    hazards: ['ice', 'calm', 'sandstorm', 'bouncy', 'sandstorm'],
     times: ['night', 'day', 'night', 'sunset', 'night'],
   },
   {
@@ -185,7 +190,7 @@ export const COUNTRIES = [
       { surface: 'bamboo', c: ['#a8843e', '#bb974f', '#cdaa66'] },
       { surface: 'tile', c: ['#1f7a6a', '#268f7c', '#31a68f'], grout: 'rgba(8,44,38,0.5)', motif: '#e6fff8' },
     ],
-    hazards: ['calm', 'tide', 'reef', 'ball', 'wind'],
+    hazards: ['calm', 'monsoon', 'reef', 'ball', 'monsoon'],
     times: ['day', 'sunset', 'day', 'night', 'day'],
   },
   {
@@ -201,7 +206,7 @@ export const COUNTRIES = [
       { surface: 'wood', c: ['#5e3d24', '#6f4b2e', '#805938'] },
       { surface: 'tile', c: ['#7a4030', '#8d4d3a', '#a05a45'], grout: 'rgba(40,16,10,0.5)', motif: '#ffd9b8' },
     ],
-    hazards: ['tide', 'calm', 'terrace', 'wind', 'reef'],
+    hazards: ['lava', 'calm', 'terrace', 'wind', 'lava'],
     times: ['sunset', 'day', 'sunset', 'night', 'day'],
   },
   {
@@ -309,6 +314,7 @@ export function buildCountryLevels() {
         cast: c.cast,
         names: { 4: c.drinks[0], 5: c.drinks[1], 6: c.drinks[2],
           7: c.drinks[3], 8: c.drinks[4], 11: c.special },
+        colors: { 11: [c.accent, c.sigAlt || '#fff4d8'] },
         goalTier: GOALS[i],
         flicks: FLICKS[i],
         star2: lines.star2,

@@ -431,3 +431,15 @@ h1, h2, h3, .logo, .btn, .hud-score, .combo, .callout, .result-title, .intro-pla
 .tour-bar i { display: block; height: 100%; background: linear-gradient(90deg, #ffd75e, #ffb347); }
 .tour-count { font-size: 11.5px; font-weight: 800; color: #ffd75e; }
 .tour-stops { font-size: 11px; opacity: 0.6; }
+
+/* ---------- collection: country signatures ---------- */
+
+.col-scroll { width: 100%; flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.col-scroll .col-grid { flex: none; overflow: visible; }
+.col-sec {
+  font-size: 13px; font-weight: 800; opacity: 0.75; text-transform: uppercase;
+  letter-spacing: 0.6px; padding: 14px 18px 2px;
+}
+.col-hint { font-size: 12px; opacity: 0.6; padding: 0 18px 10px; }
+.sig-card { position: relative; }
+.sig-lock { width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; font-size: 26px; }
