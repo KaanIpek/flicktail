@@ -3,6 +3,20 @@
 
 const PENTA = [523.25, 587.33, 659.25, 783.99, 880.00, 1046.5, 1174.7, 1318.5, 1568.0, 1760.0];
 
+// game event -> sampled one-shot (falls back to the procedural voice below
+// whenever the sample is missing, so the game still sounds right offline)
+const SAMPLE_FOR = {
+  clink: 'clink', thunk: 'clink', splash: 'splash', splashSmall: 'splash',
+  flick: 'whoosh', order: 'chime', win: 'fanfare', fanfare: 'fanfare',
+  lose: 'fail', meow: 'meow', meowBig: 'meow_big', purr: 'purr',
+  pour: 'pour', ice: 'ice', shaker: 'shaker',
+};
+// per-event level/pitch trims so one sample can voice several events
+const SAMPLE_TWEAK = {
+  thunk: { v: 0.55, r: 0.72 },
+  splashSmall: { v: 0.5, r: 1.25 },
+};
+
 export class AudioMan {
   constructor() {
     this.ctx = null;
@@ -57,6 +71,8 @@ export class AudioMan {
     if (this.ctx.state === 'suspended') this.ctx.resume();
     if (this.pendingMusic) { const m = this.pendingMusic; this.pendingMusic = null; this.music(m); }
     if (this.pendingAmb) { const a = this.pendingAmb; this.pendingAmb = null; this.ambient(a); }
+    // one-shots fetched before the context existed still need decoding
+    this.primeSfx().then(() => this.startSlideBed());
     document.addEventListener('visibilitychange', () => {
       if (!this.ctx) return;
       if (document.hidden) this.ctx.suspend(); else this.ctx.resume();
@@ -67,7 +83,13 @@ export class AudioMan {
     try {
       const res = await fetch(url);
       if (!res.ok) return;
-      this.buffers.set(name, { raw: await res.arrayBuffer(), buf: null });
+      const ent = { raw: await res.arrayBuffer(), buf: null };
+      this.buffers.set(name, ent);
+      // one-shots must be ready to fire the instant the game asks for them
+      if (name.startsWith('sfx_') && this.ctx) {
+        try { ent.buf = await this.ctx.decodeAudioData(ent.raw.slice(0)); ent.raw = null; } catch {}
+        if (name === 'sfx_slide') this.startSlideBed();
+      }
     } catch {}
   }
 
@@ -119,8 +141,65 @@ export class AudioMan {
     src.start(t); src.stop(t + dur + 0.1);
   }
 
+  // ---------- sampled one-shots (Stable Audio) ----------
+  // Decoded up front so play() can fire them synchronously; the procedural
+  // layer below stays as the fallback whenever a sample is missing.
+
+  async primeSfx() {
+    if (!this.ctx) return;
+    for (const [name, ent] of this.buffers) {
+      if (!name.startsWith('sfx_') || ent.buf || !ent.raw) continue;
+      try { ent.buf = await this.ctx.decodeAudioData(ent.raw.slice(0)); ent.raw = null; } catch {}
+    }
+  }
+
+  sample(name, { volume = 1, rate = 1, detune = 0 } = {}) {
+    const ent = this.buffers.get('sfx_' + name);
+    if (!ent || !ent.buf) return false;
+    const src = this.ctx.createBufferSource();
+    src.buffer = ent.buf;
+    src.playbackRate.value = Math.max(0.25, rate * (1 + (detune ? detune * (Math.random() * 2 - 1) : 0)));
+    const g = this.ctx.createGain();
+    g.gain.value = volume;
+    src.connect(g); g.connect(this.sfxGain);
+    src.start();
+    return true;
+  }
+
+  // A looping bed of glass-on-wood friction whose level follows how much is
+  // actually sliding on the table, so motion is something you HEAR.
+  startSlideBed() {
+    const ent = this.buffers.get('sfx_slide');
+    if (!ent || !ent.buf || this.slideSrc || !this.ctx) return;
+    const src = this.ctx.createBufferSource();
+    src.buffer = ent.buf;
+    src.loop = true;
+    const g = this.ctx.createGain();
+    g.gain.value = 0;
+    src.connect(g); g.connect(this.sfxGain);
+    src.start();
+    this.slideSrc = src;
+    this.slideGain = g;
+  }
+
+  setSlideIntensity(v) {
+    if (!this.slideGain || !this.ctx) return;
+    const target = Math.max(0, Math.min(1, v)) * 0.34;
+    this.slideGain.gain.setTargetAtTime(target, this.ctx.currentTime, 0.06);
+  }
+
   play(name, { volume = 1, rate = 1, detune = 0 } = {}) {
     if (!this.unlocked || this.muted.sfx) return;
+    // prefer a real sample when one exists for this event
+    const mapped = SAMPLE_FOR[name] || (name.startsWith('merge') ? 'merge_pop' : null);
+    if (mapped) {
+      const tweak = SAMPLE_TWEAK[name] || null;
+      if (this.sample(mapped, {
+        volume: volume * (tweak ? tweak.v : 1),
+        rate: rate * (tweak ? tweak.r : 1),
+        detune: detune || 0.06,
+      })) return;
+    }
     const t = this.ctx.currentTime;
     const v = volume;
     const jitter = 1 + (detune ? detune * (Math.random() * 2 - 1) : 0);

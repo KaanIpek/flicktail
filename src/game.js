@@ -1,7 +1,7 @@
 // Level state machine: spawn queue, flicks, merges, combos, orders, hazards,
 // win/fail. Physics events are consumed here, end-of-step.
 
-import { TABLE, PHYS, FLICK, TIERS, TOP_TIER_CLINK_BONUS, COMBO, ORDERS, SPAWN, FAIL, COMBO_CALLOUTS } from './config.js';
+import { TABLE, PHYS, FLICK, TIERS, TOP_TIER_CLINK_BONUS, COMBO, ORDERS, SPAWN, FAIL, COMBO_CALLOUTS, CAT_TIERS } from './config.js';
 import { makeBody, buildWalls } from './physics.js';
 
 function mulberry32(seed) {
@@ -395,6 +395,7 @@ export class Game {
     this.fx.ring(nx, nz, nt.color, nt.r * 1.8);
     this.fx.sparkle(nx, nz, 5 + tier * 2);
     if (mult >= 2) this.emit('combo', { mult, callout: COMBO_CALLOUTS[Math.min(mult, 5)] });
+    if (mult >= 3) this.audio.play('shaker', { volume: 0.28 + mult * 0.04, detune: 0.05 });
     if (tier + 1 >= 8) {
       this.fx.addShake(0.5 + (tier - 7) * 0.2);
       this.fx.addFlash(nt.color, 0.18);
@@ -406,6 +407,10 @@ export class Game {
     // Big mixes get their own escalating buzz so the top of the chain FEELS rare;
     // the tier-11 finale (Atlas) earns a celebratory five-pulse.
     const made = tier + 1;
+    // mixing a CAT glass gets a meow — the legendary Atlas gets the big one
+    if (CAT_TIERS.has(made)) {
+      this.audio.play(made >= 11 ? 'meowBig' : 'meow', { volume: 0.62, detune: 0.07 });
+    }
     this.audio.haptic(
       made >= 11 ? [30, 40, 30, 40, 60] :
       made >= 9 ? [18, 35, 18, 35, 30] :
@@ -450,6 +455,7 @@ export class Game {
           this.fx.burst(o.x, o.z - 20, ['#ffd700', '#ffffff'], 14, 90, { up: 1.6 });
           this.fx.ring(o.x, o.z - 20, '#ffd700', 60);
           this.audio.play('order');
+          this.audio.play('pour', { volume: 0.5, detune: 0.08 });
           this.audio.haptic([10, 30, 20]);
           this.emit('orderServed', { tier: o.tier, pts });
           this.pushOrder(i);

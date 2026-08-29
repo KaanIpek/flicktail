@@ -94,16 +94,32 @@ function preload() {
     if (screen === 'title' || screen === 'map') { /* backgrounds refresh next frame */ }
     backdrop.render();
   });
-  for (const m of ['music_morning', 'music_golden', 'music_last', 'music_neon']) {
+  for (const m of ['music_morning', 'music_golden', 'music_last', 'music_neon',
+    'music_latin', 'music_riviera', 'music_desert', 'music_lagoon']) {
     audio.load(m, 'assets/audio/' + m + '.mp3');
   }
   for (const a of ['amb_beach_day', 'amb_beach_sunset', 'amb_night']) {
     audio.load(a, 'assets/audio/' + a + '.mp3');
   }
+  for (const s of SFX) audio.load('sfx_' + s, 'assets/audio/sfx/' + s + '.mp3');
 }
+
+// sampled one-shots; audio.play falls back to the procedural voice per sound
+// until (or unless) its sample has arrived
+const SFX = ['meow', 'meow_big', 'purr', 'clink', 'merge_pop', 'slide', 'whoosh',
+  'shaker', 'splash', 'pour', 'ice', 'chime', 'fanfare', 'fail'];
+
+// Music is keyed per destination, not just per time of day — Cancún and
+// Waikiki shouldn't share a track. Falls back to the time-of-day pick.
+const MUSIC_BY_LEVEL = {
+  1: 'music_morning', 2: 'music_latin', 3: 'music_latin', 4: 'music_golden',
+  5: 'music_riviera', 6: 'music_riviera', 7: 'music_last', 8: 'music_neon',
+  9: 'music_desert', 10: 'music_morning', 11: 'music_last', 12: 'music_lagoon',
+};
 
 function musicFor(level) {
   if (!level) return 'music_morning';
+  if (MUSIC_BY_LEVEL[level.id]) return MUSIC_BY_LEVEL[level.id];
   if (level.time === 'night') return 'music_neon';
   if (level.time === 'sunset') return level.id >= 7 ? 'music_last' : 'music_golden';
   return 'music_morning';
@@ -175,6 +191,8 @@ function startLevel(id, { zen = false, seed = null, restore = null } = {}) {
   ui.showIntro(level, zen);
   audio.music(musicFor(level));
   audio.ambient(ambientFor(level));
+  // the bar cat greets you once, quietly, as the destination opens
+  if (level.barCat) setTimeout(() => audio.play('purr', { volume: 0.3 }), 700);
 }
 
 // A clean table for the score-chase modes (Waikiki: no hazards, no orders).
@@ -343,12 +361,22 @@ function frame(now) {
       acc -= FIXED;
     }
     fx.update(sdt);
+    // the sliding bed follows how much is actually moving on the table, so a
+    // fast shot is something you hear as well as see
+    let motion = 0;
+    for (const b of game.phys.bodies) {
+      if (b.dead || b.fixed || b.sleeping) continue;
+      motion += Math.hypot(b.vx, b.vz);
+    }
+    audio.setSlideIntensity(motion / 850);
   } else if (screen === 'result') {
     game.advanceTimeScale(dt);
     const sdt = Math.min(FIXED, dt) * game.timeScale;
     game.update(sdt);                  // let the celebration physics run
     fx.update(sdt);
   }
+
+  if (screen !== 'game' || paused) audio.setSlideIntensity(0);
 
   backdrop.update(dt);
 

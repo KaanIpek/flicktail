@@ -46,6 +46,10 @@ export const TIERS = [
   { id: 11, name: 'Paradise Atlas', r: 105, score: 55,  color: '#2ee6c8', alt: '#ffd700' },
 ];
 
+// Cat glasses: these tiers wear ears, a face and a swishing tail — and meow
+// when you mix one. Shared by the renderer (draws them) and the game (sounds).
+export const CAT_TIERS = new Set([2, 5, 8, 11]);
+
 export const TOP_TIER_CLINK_BONUS = 100;  // two Paradise Atlas touch -> both vanish
 
 export const COMBO = {

@@ -2,7 +2,7 @@
 // else (backdrops, sprites, audio) so the game is fully playable offline
 // after the first visit.
 
-const VERSION = 'flicktail-v18';
+const VERSION = 'flicktail-v19';
 const BACKDROPS = ['waikiki', 'miami', 'cancun', 'rio', 'nice', 'positano',
   'santorini', 'ibiza', 'dubai', 'phuket', 'bali', 'borabora'];
 const SHELL = [
@@ -17,8 +17,11 @@ const SHELL = [
   'assets/icon-192.png', 'assets/icon-512.png',
   ...Array.from({ length: 11 }, (_, i) => `assets/drinks/tier${String(i + 1).padStart(2, '0')}.png`),
   ...BACKDROPS.map(b => `assets/backdrops/${b}.webp`),
-  ...['morning', 'golden', 'last', 'neon'].map(m => `assets/audio/music_${m}.mp3`),
+  ...['morning', 'golden', 'last', 'neon', 'latin', 'riviera', 'desert', 'lagoon']
+    .map(m => `assets/audio/music_${m}.mp3`),
   ...['amb_beach_day', 'amb_beach_sunset', 'amb_night'].map(a => `assets/audio/${a}.mp3`),
+  ...['meow', 'meow_big', 'purr', 'clink', 'merge_pop', 'slide', 'whoosh', 'shaker',
+    'splash', 'pour', 'ice', 'chime', 'fanfare', 'fail'].map(s => `assets/audio/sfx/${s}.mp3`),
 ];
 
 self.addEventListener('install', e => {

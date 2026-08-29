@@ -6,15 +6,15 @@
 // subtle billboard lean toward the camera), and every level gets a light
 // grade + vignette so the backdrop and the table feel like one place.
 
-import { TABLE, TIERS, ORDERS, FRICTION } from './config.js';
+import { TABLE, TIERS, ORDERS, FRICTION, CAT_TIERS } from './config.js';
 
 const RAIL_H = 24;        // world units of rail height
 const RAIL_TH = 26;       // world units of rail thickness (outward)
 
 // Cute layer: some drinks are CAT glasses (ears, a swishing tail, a little
 // face); others fizz. Drawn procedurally over the sprite so the tail can
-// actually move — a baked sprite could never wag.
-const CAT_TIERS = new Set([2, 5, 8, 11]);
+// actually move — a baked sprite could never wag. CAT_TIERS lives in config
+// because the game needs it too (to meow).
 const FIZZ_TIERS = new Set([1, 3, 4, 7]);
 const GLINT_TIERS = new Set([9, 10, 11]);
 
