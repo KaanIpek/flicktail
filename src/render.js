@@ -11,6 +11,13 @@ import { TABLE, TIERS, ORDERS, FRICTION } from './config.js';
 const RAIL_H = 24;        // world units of rail height
 const RAIL_TH = 26;       // world units of rail thickness (outward)
 
+// Cute layer: some drinks are CAT glasses (ears, a swishing tail, a little
+// face); others fizz. Drawn procedurally over the sprite so the tail can
+// actually move — a baked sprite could never wag.
+const CAT_TIERS = new Set([2, 5, 8, 11]);
+const FIZZ_TIERS = new Set([1, 3, 4, 7]);
+const GLINT_TIERS = new Set([9, 10, 11]);
+
 export class Renderer {
   constructor(view, assets) {
     this.view = view;
@@ -492,7 +499,10 @@ export class Renderer {
       ctx.save();
       ctx.translate(ax, ay);
       ctx.transform(1, 0, shear, 1, 0, 0);
+      // tail sits BEHIND the glass so it reads as coming out from behind it
+      if (CAT_TIERS.has(b.tier)) this.drawCatTail(ctx, b, wpx, ih * squash, time);
       ctx.drawImage(img, -wpx / 2, -ih * 0.96 * squash, wpx, ih * squash);
+      this.drawCharm(ctx, b, wpx, ih * squash, time);
       ctx.restore();
     } else {
       const ih = wpx * 1.35;
@@ -504,6 +514,127 @@ export class Renderer {
       ctx.lineWidth = Math.max(1.5, wpx * 0.045);
       roundRect(ctx, x - wpx * 0.36, y - ih, wpx * 0.72, ih * 0.92, wpx * 0.18);
       ctx.stroke();
+    }
+  }
+
+  // A tail curling out from behind the glass, swishing on its own rhythm.
+  // Origin is the glass anchor; the sprite spans y ∈ [-h*0.96, h*0.04].
+  drawCatTail(ctx, b, w, h, time) {
+    const t = TIERS[b.tier - 1];
+    const ph = time * 2.2 + b.id * 1.9;
+    const sway = Math.sin(ph);
+    // spine: leaves the glass near its foot, arcs out and up, hooks back at the tip
+    const x0 = w * 0.14, y0 = -h * 0.07;
+    const x1 = w * 0.40, y1 = -h * 0.09 + sway * h * 0.02;
+    const x2 = w * 0.48 + sway * w * 0.07, y2 = -h * 0.29;
+    const x3 = w * 0.27 + sway * w * 0.11, y3 = -h * 0.40;
+    const pt = s => {
+      const u = 1 - s;
+      return {
+        x: u * u * u * x0 + 3 * u * u * s * x1 + 3 * u * s * s * x2 + s * s * s * x3,
+        y: u * u * u * y0 + 3 * u * u * s * y1 + 3 * u * s * s * y2 + s * s * s * y3,
+      };
+    };
+    const N = 14, base = Math.max(1.5, w * 0.075);
+    const left = [], right = [];
+    for (let i = 0; i <= N; i++) {
+      const s = i / N, p = pt(s), q = pt(Math.min(1, s + 0.02));
+      const dx = q.x - p.x, dy = q.y - p.y, len = Math.hypot(dx, dy) || 1;
+      const nx = -dy / len, ny = dx / len, wd = base * (1 - s * 0.7);
+      left.push([p.x + nx * wd, p.y + ny * wd]);
+      right.push([p.x - nx * wd, p.y - ny * wd]);
+    }
+    ctx.save();
+    ctx.fillStyle = shade(t.color, -0.1);
+    ctx.beginPath();
+    left.forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y));
+    for (let i = right.length - 1; i >= 0; i--) ctx.lineTo(right[i][0], right[i][1]);
+    ctx.closePath(); ctx.fill();
+    const tip = pt(1);                                  // pale rounded tip
+    ctx.fillStyle = shade(t.alt || t.color, 0.3);
+    ctx.beginPath(); ctx.arc(tip.x, tip.y, base * 0.36, 0, 7); ctx.fill();
+    ctx.restore();
+  }
+
+  // Ears + face for cat glasses, fizz bubbles for sodas, a glint for premiums.
+  drawCharm(ctx, b, w, h, time) {
+    const tier = TIERS[b.tier - 1];
+    const topY = -h * 0.96;
+    if (CAT_TIERS.has(b.tier)) {
+      const ph = time * 2.2 + b.id * 1.9;
+      const earW = w * 0.17, earH = h * 0.11;
+      for (const side of [-1, 1]) {
+        const ex = side * w * 0.19;
+        const tilt = Math.sin(ph + (side > 0 ? 0.6 : 0)) * w * 0.015;
+        ctx.fillStyle = shade(tier.color, -0.08);
+        ctx.beginPath();
+        ctx.moveTo(ex - earW / 2, topY + earH * 0.9);
+        ctx.quadraticCurveTo(ex + tilt, topY - earH * 0.4, ex + earW / 2, topY + earH * 0.9);
+        ctx.closePath(); ctx.fill();
+        ctx.fillStyle = 'rgba(255,178,202,0.92)';
+        ctx.beginPath();
+        ctx.moveTo(ex - earW * 0.2, topY + earH * 0.75);
+        ctx.quadraticCurveTo(ex + tilt, topY + earH * 0.04, ex + earW * 0.2, topY + earH * 0.75);
+        ctx.closePath(); ctx.fill();
+      }
+      // face
+      const fy = topY + h * 0.44;
+      const blink = ((time * 0.55 + b.id * 0.7) % 3.4) < 0.13;
+      const eo = w * 0.12, er = Math.max(1.3, w * 0.034);
+      ctx.fillStyle = 'rgba(38,26,32,0.88)';
+      ctx.strokeStyle = 'rgba(38,26,32,0.88)';
+      ctx.lineWidth = Math.max(1.2, w * 0.024);
+      ctx.lineCap = 'round';
+      for (const side of [-1, 1]) {
+        const ex = side * eo;
+        ctx.beginPath();
+        if (blink) { ctx.moveTo(ex - er, fy); ctx.lineTo(ex + er, fy); ctx.stroke(); }
+        else { ctx.arc(ex, fy, er, 0, 7); ctx.fill(); }
+      }
+      ctx.fillStyle = 'rgba(255,140,170,0.38)';
+      for (const side of [-1, 1]) {
+        ctx.beginPath(); ctx.ellipse(side * w * 0.2, fy + er * 1.3, w * 0.05, w * 0.033, 0, 0, 7); ctx.fill();
+      }
+      ctx.beginPath();   // :3 mouth
+      ctx.arc(-er * 0.55, fy + er * 1.45, er * 0.6, 0, Math.PI);
+      ctx.arc(er * 0.55, fy + er * 1.45, er * 0.6, 0, Math.PI);
+      ctx.stroke();
+      ctx.globalAlpha = 0.45;   // whiskers
+      for (const side of [-1, 1]) for (let i = -1; i <= 1; i++) {
+        ctx.beginPath();
+        ctx.moveTo(side * w * 0.14, fy + i * er * 0.7 + er * 0.9);
+        ctx.lineTo(side * w * 0.27, fy + i * er * 1.5 + er * 0.7);
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+    }
+    if (FIZZ_TIERS.has(b.tier)) {
+      ctx.fillStyle = 'rgba(255,255,255,0.6)';
+      for (let i = 0; i < 5; i++) {
+        const seed = i * 1.7 + b.id * 0.9;
+        const t01 = (time * 0.55 + seed) % 1;
+        const r = Math.max(0.8, w * 0.024 * (1 - t01 * 0.4));
+        ctx.globalAlpha = 0.5 * (1 - t01);
+        ctx.beginPath();
+        ctx.arc(Math.sin(seed * 3.1) * w * 0.16, topY + h * (0.74 - t01 * 0.34), r, 0, 7);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+    }
+    if (GLINT_TIERS.has(b.tier)) {
+      const g = ((time * 0.5 + b.id) % 3) / 3;
+      if (g < 0.34) {
+        ctx.save();
+        ctx.globalAlpha = 0.32 * Math.sin(g * 3 * Math.PI);
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = w * 0.05;
+        const gx = -w * 0.5 + g * 3 * w;
+        ctx.beginPath();
+        ctx.moveTo(gx, topY + h * 0.16);
+        ctx.lineTo(gx - w * 0.1, topY + h * 0.72);
+        ctx.stroke();
+        ctx.restore();
+      }
     }
   }
 

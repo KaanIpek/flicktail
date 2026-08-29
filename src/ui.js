@@ -248,6 +248,16 @@ export class UI {
           <div id="hudFlicks" class="hud-flicks"></div>
         </div>
       </div>
+      <div class="hud-missions" id="hudMissions">
+        <div class="mission" id="missionMain">
+          <span class="mission-tick" id="mainTick">○</span>
+          <span class="mission-text">Mix a <b>${TIERS[l.goalTier - 1].name}</b></span>
+        </div>
+        <div class="mission hidden" id="sideGoal">
+          <span class="mission-tick" id="sideTick">○</span>
+          <span class="mission-text"></span>
+        </div>
+      </div>
       <div id="combo" class="combo hidden"></div>
       <div id="callout" class="callout hidden"></div>
       <div class="hud-bottom">
@@ -255,7 +265,6 @@ export class UI {
           <span class="next-label">NEXT</span>
           <div id="nextQueue" class="next-queue"></div>
         </div>
-        <div id="sideGoal" class="side-goal"></div>
         <button id="finishBtn" class="btn tiny finish hidden" data-act="finishNow">FINISH ✓</button>
       </div>
       <div id="toast" class="toast hidden"></div>
@@ -267,6 +276,8 @@ export class UI {
     this.calloutEl = document.getElementById('callout');
     this.nextQueue = document.getElementById('nextQueue');
     this.sideGoalEl = document.getElementById('sideGoal');
+    this.mainTick = document.getElementById('mainTick');
+    this.sideTick = document.getElementById('sideTick');
     this.toastEl = document.getElementById('toast');
     this.lastScore = -1;
     this.lastFlicks = -1;
@@ -297,8 +308,25 @@ export class UI {
       this.lastQueue = q;
     }
     if (game.goalDone) this.hudGoal.classList.add('done');
+    // missions live at the TOP: main goal first, then the level's side challenge
+    const mainDone = game.goalDone;
+    if (this.mainTick && this.mainDoneShown !== mainDone) {
+      this.mainDoneShown = mainDone;
+      this.mainTick.textContent = mainDone ? '✓' : '○';
+      document.getElementById('missionMain')?.classList.toggle('done', mainDone);
+    }
     const sg = game.sideGoalProgress();
-    if (sg) this.sideGoalEl.textContent = `${sg.label}: ${Math.min(sg.cur, sg.count)}/${sg.count}`;
+    if (sg) {
+      const cur = Math.min(sg.cur, sg.count), done = cur >= sg.count;
+      const label = `${sg.label} ${cur}/${sg.count}`;
+      this.sideGoalEl.classList.remove('hidden');
+      if (this.sideShown !== label) {
+        this.sideShown = label;
+        this.sideGoalEl.querySelector('.mission-text').textContent = label;
+        this.sideTick.textContent = done ? '✓' : '○';
+        this.sideGoalEl.classList.toggle('done', done);
+      }
+    } else this.sideGoalEl.classList.add('hidden');
     const fb = document.getElementById('finishBtn');
     // Endless/Daily are survival runs — no early "FINISH ✓" cash-out (daily
     // would burn the one scored run on a mis-tap). endless covers daily too.
