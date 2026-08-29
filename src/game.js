@@ -211,7 +211,9 @@ export class Game {
 
   advancePopIn(dt) {
     for (const b of this.phys.bodies) {
-      if (!b.dead && b.born !== undefined && b.born < 1) b.born = Math.min(1, b.born + dt * 7.5);
+      if (b.dead) continue;
+      if (b.born !== undefined && b.born < 1) b.born = Math.min(1, b.born + dt * 7.5);
+      if (b.cheer > 0) b.cheer = Math.max(0, b.cheer - dt * 1.15);
     }
   }
 
@@ -399,6 +401,12 @@ export class Game {
     this.fx.burst(nx, nz, [t.color, t.alt], 12 + tier * 2, 70 + tier * 8);
     this.fx.ring(nx, nz, nt.color, nt.r * 1.8);
     this.fx.sparkle(nx, nz, 5 + tier * 2);
+    // the creatures react: the new one cheers, the neighbours look over
+    nb.cheer = 1;
+    for (const o of this.phys.bodies) {
+      if (o.dead || o.fixed || o === nb) continue;
+      if (Math.hypot(o.x - nx, o.z - nz) < 190) o.cheer = Math.max(o.cheer || 0, 0.55);
+    }
     if (mult >= 2) this.emit('combo', { mult, callout: COMBO_CALLOUTS[Math.min(mult, 5)] });
     if (mult >= 3) this.audio.play('shaker', { volume: 0.28 + mult * 0.04, detune: 0.05 });
     if (tier + 1 >= 8) {

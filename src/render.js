@@ -424,6 +424,8 @@ export class Renderer {
 
   draw(ctx, game, time) {
     const view = this.view;
+    // faces read the run's outcome: everyone beams on a win, wilts on a loss
+    this.mood = game.state === 'won' ? 'happy' : (game.state === 'failed' ? 'sad' : null);
     if (this.tableCanvas) ctx.drawImage(this.tableCanvas, 0, 0);
 
     // tide flood overlay
@@ -441,6 +443,7 @@ export class Renderer {
     if (game.level.orders) this.drawDocks(ctx, game, time);
     // after the docks so the cat is never hidden behind an order card
     if (game.level.barCat) this.drawBarCat(ctx, game, time);
+    this.drawTableGuest(ctx, game, time);
 
     // overcrowd warning pulse
     if (game.overcrowdT > 0) {
@@ -513,8 +516,9 @@ export class Renderer {
     const creature = CREATURE[b.tier];
     if (creature) {
       // the cup IS the animal — drawn, so its ears and tail can move
-      const CW = wpx * 0.62, CH = CW * 1.22 * squash;
-      const ax = hpx.x, ay = hpx.y + b.r * p.s * 0.35;
+      const cheer = b.cheer > 0 ? Math.sin(Math.min(1, b.cheer) * Math.PI) : 0;
+      const CW = wpx * 0.62 * (1 + cheer * 0.06), CH = CW * 1.22 * squash * (1 - cheer * 0.05);
+      const ax = hpx.x, ay = hpx.y + b.r * p.s * 0.35 - cheer * CH * 0.16;
       if (glossA > 0 && b.y < 40) {          // a soft colour bloom on the table
         ctx.save();
         ctx.globalAlpha = glossA * sh * 1.4;
@@ -651,6 +655,86 @@ export class Renderer {
       }
       ctx.restore();
     }
+  }
+
+  // A guest that pads onto the table now and then, sits down to watch you mix,
+  // hops when something merges, then wanders off again.
+  drawTableGuest(ctx, game, time) {
+    const cfg = game.level.guest;
+    if (!cfg) return;
+    const CYCLE = 52, IN = 4.5, STAY = 17, OUT = 4.5;
+    const t = (time + (cfg.offset || 0)) % CYCLE;
+    let x, walking = false;
+    const side = cfg.side || 1;
+    const offX = side * (TABLE.halfW + 90);
+    const sitX = side * (TABLE.halfW - 78);
+    const z = cfg.z || 745;
+    if (t < IN) { const p = t / IN; x = offX + (sitX - offX) * (1 - Math.pow(1 - p, 3)); walking = true; }
+    else if (t < IN + STAY) x = sitX;
+    else if (t < IN + STAY + OUT) { const p = (t - IN - STAY) / OUT; x = sitX + (offX - sitX) * p * p; walking = true; }
+    else return;                                    // away between visits
+
+    // it looks at whatever is liveliest, and hops when a merge lands
+    let watch = 0, best = 0, joy = 0;
+    for (const b of game.phys.bodies) {
+      if (b.dead) continue;
+      if (b.cheer > joy) joy = b.cheer;
+      if (b.sleeping) continue;
+      const sp = Math.hypot(b.vx, b.vz);
+      if (sp > best) { best = sp; watch = Math.max(-1, Math.min(1, (b.x - x) / 340)); }
+    }
+    const hop = joy > 0 ? Math.abs(Math.sin(time * 12)) * joy : 0;
+    const p = this.view.project(x, 0, z);
+    const k = p.s * 1.7;
+    const body = cfg.c || '#8a7f74', pale = cfg.alt || '#f6efe6';
+    const ph = time * 2.2;
+    const blink = ((time * 0.5 + 1.7) % 4) < 0.13;
+
+    softShadow(ctx, p.x, p.y + 2 * k, 15 * k, 6 * k, 0.3);
+    ctx.save();
+    ctx.translate(p.x, p.y - hop * 9 * k);
+    if (side > 0) ctx.scale(-1, 1);                 // always face the table
+    ctx.strokeStyle = body; ctx.lineCap = 'round'; ctx.lineWidth = 4.5 * k;
+    ctx.beginPath();                                 // tail
+    ctx.moveTo(-11 * k, -4 * k);
+    ctx.quadraticCurveTo(-27 * k, 1 * k + Math.sin(ph) * 4 * k, -34 * k, -12 * k + Math.sin(ph) * 7 * k);
+    ctx.stroke();
+    ctx.fillStyle = body;
+    ctx.beginPath(); ctx.ellipse(0, -9 * k, 13 * k, 10 * k, 0, 0, 7); ctx.fill();
+    if (walking) {                                   // little legs while padding
+      ctx.strokeStyle = body; ctx.lineWidth = 3 * k;
+      for (const lx of [-5, 5]) {
+        ctx.beginPath();
+        ctx.moveTo(lx * k, -3 * k);
+        ctx.lineTo(lx * k + Math.sin(time * 14 + lx) * 3 * k, 1 * k);
+        ctx.stroke();
+      }
+    }
+    const hx = watch * 3 * k;
+    ctx.fillStyle = body;
+    ctx.beginPath(); ctx.arc(hx, -23 * k, 9 * k, 0, 7); ctx.fill();
+    for (const s2 of [-1, 1]) {                      // ears
+      ctx.beginPath();
+      ctx.moveTo(hx + s2 * 7.5 * k, -27 * k);
+      ctx.lineTo(hx + s2 * 3.5 * k, -36 * k);
+      ctx.lineTo(hx + s2 * 0.5 * k, -27 * k);
+      ctx.closePath(); ctx.fill();
+    }
+    ctx.fillStyle = pale;
+    ctx.beginPath(); ctx.ellipse(hx * 0.5, -8 * k, 6 * k, 7 * k, 0, 0, 7); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(hx, -20 * k, 5 * k, 3.5 * k, 0, 0, 7); ctx.fill();
+    ctx.fillStyle = 'rgba(20,16,20,0.9)';
+    ctx.strokeStyle = 'rgba(20,16,20,0.9)'; ctx.lineWidth = 1.5 * k;
+    for (const s2 of [-1, 1]) {
+      const ex = hx + s2 * 3.8 * k, ey = -25 * k;
+      ctx.beginPath();
+      if (joy > 0.15) { ctx.arc(ex, ey + 1.2 * k, 2.4 * k, Math.PI * 1.15, Math.PI * 1.85); ctx.stroke(); }
+      else if (blink) { ctx.moveTo(ex - 1.8 * k, ey); ctx.lineTo(ex + 1.8 * k, ey); ctx.stroke(); }
+      else { ctx.arc(ex, ey, 1.7 * k, 0, 7); ctx.fill(); }
+    }
+    ctx.fillStyle = '#ff9db5';
+    ctx.beginPath(); ctx.arc(hx, -20.5 * k, 1.3 * k, 0, 7); ctx.fill();
+    ctx.restore();
   }
 
   // A little bar cat perched on the far rail: it swishes its tail, blinks, and
@@ -819,7 +903,9 @@ export class Renderer {
     // ---- ears (behind the head line so they read as attached) ----
     ctx.save();
     ctx.fillStyle = shade(tier.color, -0.1);
-    const earTwitch = Math.sin(ph * 1.3) * 0.06;
+    const cheerT = b.cheer > 0 ? Math.sin(Math.min(1, b.cheer) * Math.PI) : 0;
+    const earTwitch = Math.sin(ph * 1.3) * 0.06
+      + (this.mood === 'sad' ? 0.5 : 0) - cheerT * 0.22;
     for (const side of [-1, 1]) {
       const ex = side * W * 0.27, ey = -H * 0.97;
       if (spec.ears === 'point' || spec.ears === 'round' || spec.ears === 'long') {
@@ -967,10 +1053,18 @@ export class Renderer {
       ctx.arc(0, fy - H * 0.06, W * 0.2, 0.25, Math.PI - 0.25);
       ctx.stroke();
     } else {
+      const glad = this.mood === 'happy' || b.cheer > 0.15;
+      const glum = this.mood === 'sad';
       for (const side of [-1, 1]) {
         const ex = side * eo;
         ctx.beginPath();
-        if (blink) { ctx.moveTo(ex - er, fy); ctx.lineTo(ex + er, fy); ctx.stroke(); }
+        if (glad) {                                   // ^ ^ delighted
+          ctx.arc(ex, fy + er * 0.5, er * 1.05, Math.PI * 1.15, Math.PI * 1.85);
+          ctx.stroke();
+        } else if (glum) {                            // droopy, looking down
+          ctx.arc(ex, fy - er * 0.4, er, Math.PI * 0.2, Math.PI * 0.8);
+          ctx.stroke();
+        } else if (blink) { ctx.moveTo(ex - er, fy); ctx.lineTo(ex + er, fy); ctx.stroke(); }
         else { ctx.arc(ex, fy, er, 0, 7); ctx.fill(); }
       }
       ctx.fillStyle = 'rgba(255,140,170,0.4)';            // blush
@@ -998,9 +1092,15 @@ export class Renderer {
           ctx.fill();
         }
       } else {
-        ctx.beginPath();                                  // :3
-        ctx.arc(-er * 0.6, fy + er * 1.7, er * 0.62, 0, Math.PI);
-        ctx.arc(er * 0.6, fy + er * 1.7, er * 0.62, 0, Math.PI);
+        ctx.beginPath();
+        if (this.mood === 'sad') {                        // small upside-down curve
+          ctx.arc(0, fy + er * 2.5, er * 0.85, Math.PI * 1.15, Math.PI * 1.85);
+        } else if (this.mood === 'happy' || b.cheer > 0.15) {
+          ctx.arc(0, fy + er * 1.4, er * 1.05, 0.2, Math.PI - 0.2);   // big open smile
+        } else {                                          // :3
+          ctx.arc(-er * 0.6, fy + er * 1.7, er * 0.62, 0, Math.PI);
+          ctx.arc(er * 0.6, fy + er * 1.7, er * 0.62, 0, Math.PI);
+        }
         ctx.stroke();
       }
       if (spec.extra === 'whiskers') {                    // seal
