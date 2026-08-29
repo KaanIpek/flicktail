@@ -12,6 +12,7 @@ const DEFAULTS = {
   maxCombo: 0,        // biggest chain ever
   settings: { music: true, sfx: true, haptics: true, aimLine: true },
   seenTutorial: false,
+  toursDone: {},       // tourId -> true once its completion has been celebrated
   endlessBest: 0,
   // daily challenge
   dailyBest: 0,       // best daily score ever

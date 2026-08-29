@@ -429,6 +429,35 @@ export class UI {
     this._toastT = setTimeout(() => this.toastEl.classList.add('hidden'), ms);
   }
 
+  // The payoff for finishing every stop on a country tour: the bottle you just
+  // earned, and the cast that poured it taking a bow.
+  showTourComplete(tourId) {
+    const tour = tourById(tourId);
+    if (!tour) return;
+    const levels = levelsOfTour(tourId);
+    const lv = levels[0];
+    const bottle = lv ? creatureIcon(11, 160, lv) : null;
+    const seen = new Set();
+    const parade = (lv && lv.cast ? lv.cast.slice(0, 10) : []).map((name, i) => {
+      if (seen.has(name)) return '';
+      seen.add(name);
+      const src = creatureIcon(i + 1, 96, lv);
+      return src ? `<img class="parade-pet" style="animation-delay:${(i * 0.11).toFixed(2)}s" src="${src}" alt="${name}">` : '';
+    }).join('');
+    const stars = levels.reduce((a, l) => a + (this.save.data.stars[l.id] || 0), 0);
+    this.root.innerHTML = `
+    <div class="screen tour-done-screen">
+      <div class="td-flag">${tour.flag}</div>
+      <h2 class="td-title">${tour.name} complete!</h2>
+      <p class="td-sub">Every stop toasted &middot; ★ ${stars}/${levels.length * 3}</p>
+      ${bottle ? `<img class="td-bottle" src="${bottle}" alt="${tour.special}">` : ''}
+      <div class="td-name">${tour.special}</div>
+      <p class="td-note">Added to your Collection</p>
+      <div class="td-parade">${parade}</div>
+      <button class="btn big primary" data-act="tours">Back to the map</button>
+    </div>`;
+  }
+
   showResult(game, result) {
     const l = game.level;
     // next stop WITHIN this tour — ids jump between tours, so ask the tour
@@ -473,6 +502,7 @@ export class UI {
           ${bestLine}
           ${starLine}
           <div class="result-buttons">
+            ${result.tourDone ? `<button class="btn big primary td-claim" data-act="tourDone" data-id="${result.tourDone}">🏆 CLAIM ${(tourById(result.tourDone) || {}).special || 'trophy'}</button>` : ''}
             ${next ? `<button class="btn big primary" data-act="level" data-id="${next.id}">NEXT: ${next.place.toUpperCase()}</button>` : `<button class="btn big primary" data-act="map">WORLD MAP</button>`}
             <button class="btn ghost" data-act="replay">${result.stars < 3 ? 'Replay for ★★★' : 'Replay'}</button>
             <button class="btn ghost" data-act="map">Map</button>

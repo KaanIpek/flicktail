@@ -235,7 +235,9 @@ function startEndless() {
 
 function startDaily() {
   const key = todayKey();
-  const level = levelById(1 + (daySeed(key) % LEVELS.length));  // the day picks a destination
+  // the day picks any stop on the map, not just a flagship one
+  const pool = ALL_LEVELS;
+  const level = pool[daySeed(key) % pool.length];
   currentLevel = level;
   zenMode = false;
   screen = 'intro';
@@ -273,6 +275,7 @@ ui.on('zen', d => { audio.unlock(); startLevel(+d.id, { zen: true }); });
 ui.on('endless', () => { audio.unlock(); startEndless(); });
 ui.on('daily', () => { audio.unlock(); startDaily(); });
 ui.on('endlessAgain', () => startEndless());
+ui.on('tourDone', d => { screen = 'map'; ui.showTourComplete(d.id); });
 ui.on('start', beginPlay);
 // Restart the CURRENT run in its own mode — a campaign restart must not silently
 // drop an Endless/Daily run back to a finite campaign level (or re-roll the
@@ -360,6 +363,16 @@ game.onEvent = (name, data) => {
     case 'outOfDrinks': ui.toast('Cooler empty — let the table settle', 1100); break;
     case 'finished':
       input.enabled = false;
+      // did that stop just complete its tour, for the first time?
+      if (data.won && currentLevel) {
+        const tid = currentLevel.tour || 'world';
+        const stops = levelsOfTour(tid);
+        const all = stops.length > 0 && stops.every(l => (save.data.stars[l.id] || 0) >= 1);
+        if (all && !save.data.toursDone[tid]) {
+          save.data.toursDone[tid] = true; save.write();
+          data.tourDone = tid;
+        }
+      }
       if (data.won && !game.reducedMotion) { fx.confetti(W, H); setTimeout(() => fx.confetti(W, H, 70), 260); }
       setTimeout(() => { screen = 'result'; ui.showResult(game, data); }, data.won ? 1300 : 900);
       break;

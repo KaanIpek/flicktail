@@ -443,3 +443,21 @@ h1, h2, h3, .logo, .btn, .hud-score, .combo, .callout, .result-title, .intro-pla
 .col-hint { font-size: 12px; opacity: 0.6; padding: 0 18px 10px; }
 .sig-card { position: relative; }
 .sig-lock { width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; font-size: 26px; }
+
+/* ---------- tour complete ---------- */
+
+.tour-done-screen {
+  justify-content: center; gap: 6px; text-align: center;
+  background: linear-gradient(180deg, #10365c, #071626);
+}
+.td-flag { font-size: 46px; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.5)); }
+.td-title { font-size: 30px; line-height: 1.1; }
+.td-sub { font-size: 14px; opacity: 0.8; margin-bottom: 6px; }
+.td-bottle { width: 132px; height: 132px; object-fit: contain; animation: tdPop 0.6s cubic-bezier(.2,1.4,.4,1) both; }
+@keyframes tdPop { from { transform: scale(0.2) rotate(-12deg); opacity: 0; } }
+.td-name { font-size: 24px; font-weight: 800; color: #ffd75e; text-shadow: 0 0 16px rgba(255,215,94,0.45); }
+.td-note { font-size: 12.5px; opacity: 0.65; margin-bottom: 14px; }
+.td-parade { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; margin-bottom: 20px; max-width: 320px; }
+.parade-pet { width: 46px; height: 46px; object-fit: contain; animation: tdBob 1.6s ease-in-out infinite; }
+@keyframes tdBob { 50% { transform: translateY(-9px) rotate(3deg); } }
+.td-claim { background: linear-gradient(160deg, #ffd75e, #ffa53c); color: #3a2600; text-shadow: none; }
