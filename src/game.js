@@ -63,6 +63,7 @@ export class Game {
     this.timeScale = 1;
     this.tScale = { value: 1, target: 1, hold: 0 };
     this.spawnPool = level.spawnTiers || SPAWN.tiers;
+    this.bag = null;   // shuffled campaign spawn bag (refilled on demand)
 
     // hazards
     this.wind = level.wind ? { ...level.wind, t: level.wind.period * 0.55, dir: 1, active: 0 } : null;
@@ -111,13 +112,30 @@ export class Game {
   rollTier() {
     // Endless widens the spawn pool as the run gets long, so a survivor keeps
     // being pushed but is handed bigger drinks to keep the board escalating.
-    let pool = this.spawnPool;
     if (this.endless) {
       const top = Math.min(7, 3 + Math.floor(this.time / 45));  // grows every 45s, capped at 7
-      pool = [];
+      const pool = [];
       for (let t = 1; t <= top; t++) pool.push(t);
+      return pool[(this.rng() * pool.length) | 0];
     }
-    return pool[(this.rng() * pool.length) | 0];
+    // Campaign: deal from a shuffled "bag" instead of pure random, so the
+    // sequence is fair and PLANNABLE — no cruel five-in-a-row streaks, and
+    // always enough low tiers to actually build pairs from.
+    if (!this.bag || this.bag.length === 0) this.refillBag();
+    return this.bag.pop();
+  }
+
+  refillBag() {
+    const pool = this.spawnPool;
+    const bag = [];
+    for (const t of pool) bag.push(t, t);        // each tier twice → guaranteed pairs
+    bag.push(pool[0]);                            // a little extra raw material
+    if (pool[1] !== undefined) bag.push(pool[1]);
+    for (let i = bag.length - 1; i > 0; i--) {    // seeded Fisher–Yates
+      const j = (this.rng() * (i + 1)) | 0;
+      const tmp = bag[i]; bag[i] = bag[j]; bag[j] = tmp;
+    }
+    this.bag = bag;
   }
 
   pushOrder(slot) {

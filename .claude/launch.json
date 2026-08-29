@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "flicktail",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "5610", "--directory", "D:/cowork/Flicktail"],
+      "port": 5610
+    }
+  ]
+}

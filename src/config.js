@@ -69,7 +69,8 @@ export const SPAWN = {
 };
 
 export const FAIL = {
-  dwell: 2.0,       // sleeping drink in the launch strip this long = fail
+  dwell: 2.8,       // sleeping drink in the launch strip this long = fail
+                    // (generous: the launch line is a warning, not a guillotine)
 };
 
 export const COMBO_CALLOUTS = { 2: 'Double Pour!', 3: 'Happy Hour!', 4: 'Tiki Time!', 5: 'TIDAL WAVE!' };

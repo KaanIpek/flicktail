@@ -36,15 +36,16 @@ export const LEVELS = [
   {
     id: 1, place: 'Waikiki', country: 'Hawaii, USA', backdrop: 'waikiki',
     accent: '#2EC4B6', felt: '#3aa88f', rail: '#8a5a38', time: 'day',
-    goalTier: 5, flicks: 20, star2: 80, star3: 140,
+    goalTier: 5, flicks: 24, star2: 30, star3: 70,
     friction: FRICTION.sand, rails: rectRails(), spawnTiers: [2, 3],
+    preplace: [{ tier: 3, x: -70, z: 430 }, { tier: 3, x: 66, z: 430 }],
     intro: 'Flick drinks up the table. Twins merge into bigger cocktails!',
     mechanic: 'Sand-soft table — shots die gently.',
   },
   {
     id: 2, place: 'South Beach', country: 'Miami, USA', backdrop: 'miami',
     accent: '#F26CA7', felt: '#4a9e8f', rail: '#c8c8d8', time: 'day',
-    goalTier: 6, flicks: 26, star2: 150, star3: 260,
+    goalTier: 6, flicks: 32, star2: 140, star3: 220,
     friction: FRICTION.wood, rails: rectRails(), railBounce: 0.85, spawnTiers: [1, 2, 3, 4],
     sideGoal: { type: 'bank', count: 1, label: 'Bank-shot merge', required: false, bonus: 25 },
     intro: 'Chrome deco rails love a bank shot.',
@@ -53,7 +54,7 @@ export const LEVELS = [
   {
     id: 3, place: 'Cancún', country: 'Mexico', backdrop: 'cancun',
     accent: '#40E0D0', felt: '#38a0b0', rail: '#c9b08c', time: 'day',
-    goalTier: 6, flicks: 34, star2: 200, star3: 350,
+    goalTier: 6, flicks: 42, star2: 180, star3: 275,
     friction: FRICTION.wood, rails: rectRails(), spawnTiers: [1, 2, 3, 4],
     orders: { count: 3, minTier: 2, maxTier: 4 },
     sideGoal: { type: 'orders', count: 3, label: 'Serve 3 orders', required: true },
@@ -63,7 +64,7 @@ export const LEVELS = [
   {
     id: 4, place: 'Copacabana', country: 'Rio, Brazil', backdrop: 'rio',
     accent: '#FFC65C', felt: '#2f8f78', rail: '#3c3c3c', time: 'sunset',
-    goalTier: 7, flicks: 36, star2: 300, star3: 520,
+    goalTier: 7, flicks: 46, star2: 290, star3: 435,
     friction: FRICTION.wood, rails: crescentRails(),
     orders: { minTier: 2, maxTier: 5 },
     sideGoal: { type: 'bank', count: 2, label: 'Land 2 bank-shots', required: false, bonus: 30 },
@@ -73,7 +74,7 @@ export const LEVELS = [
   {
     id: 5, place: 'Promenade', country: 'Nice, France', backdrop: 'nice',
     accent: '#1F6FB2', felt: '#3a8fa8', rail: '#d8cfc0', time: 'day',
-    goalTier: 7, flicks: 38, star2: 340, star3: 600,
+    goalTier: 7, flicks: 48, star2: 240, star3: 410,
     friction: FRICTION.wood, rails: rectRails(),
     orders: { minTier: 2, maxTier: 5 },
     zones: [
@@ -87,12 +88,18 @@ export const LEVELS = [
   {
     id: 6, place: 'Positano', country: 'Amalfi, Italy', backdrop: 'positano',
     accent: '#D96C47', felt: '#4f8f6f', rail: '#b06a4a', time: 'sunset',
-    goalTier: 7, flicks: 40, star2: 380, star3: 680,
+    goalTier: 7, flicks: 50, star2: 260, star3: 420,
     friction: FRICTION.wood, rails: rectRails(),
     orders: { minTier: 2, maxTier: 5 },
+    // Shorter terraces set back in the far third — they add bank-shot texture
+    // without a horizontal barrier across the near/mid build zone (the old
+    // full-width walls at z420/640 bounced straight shots back into the gutter).
     innerWalls: [
-      { pts: [{ x: -halfW, z: 420 }, { x: -halfW + 220, z: 420 }], both: true },
-      { pts: [{ x: halfW - 220, z: 640 }, { x: halfW, z: 640 }], both: true },
+      { pts: [{ x: -halfW, z: 600 }, { x: -halfW + 150, z: 600 }], both: true },
+      { pts: [{ x: halfW - 150, z: 720 }, { x: halfW, z: 720 }], both: true },
+    ],
+    preplace: [
+      { tier: 5, x: -92, z: 470 }, { tier: 5, x: 88, z: 470 }, { tier: 4, x: 0, z: 340 },
     ],
     sideGoal: { type: 'bank', count: 2, label: 'Bank off 2 terraces', required: false, bonus: 35 },
     intro: 'Cliff terraces — thread your flicks through the gaps.',
@@ -101,10 +108,13 @@ export const LEVELS = [
   {
     id: 7, place: 'Oia', country: 'Santorini, Greece', backdrop: 'santorini',
     accent: '#2A5DAB', felt: '#3a6f9f', rail: '#f0ece4', time: 'sunset',
-    goalTier: 8, flicks: 55, star2: 600, star3: 1000,
+    goalTier: 8, flicks: 68, star2: 440, star3: 820,
     friction: FRICTION.wood, rails: rectRails(),
     orders: { minTier: 3, maxTier: 6 },
     wind: { period: 12, warn: 2, len: 1.6, accel: 620 },
+    preplace: [
+      { tier: 6, x: -118, z: 560 }, { tier: 6, x: 96, z: 560 }, { tier: 5, x: -10, z: 430 },
+    ],
     sideGoal: { type: 'combo', count: 3, label: 'Land a ×3 combo', required: false, bonus: 40 },
     intro: 'The Meltemi wind gusts sideways — watch the napkins flutter.',
     mechanic: 'Wind bends moving drinks. Parked drinks are safe.',
@@ -112,10 +122,13 @@ export const LEVELS = [
   {
     id: 8, place: 'Ibiza', country: 'Spain', backdrop: 'ibiza',
     accent: '#C77DFF', felt: '#2f4470', rail: '#42346a', time: 'night',
-    goalTier: 8, flicks: 58, star2: 650, star3: 1100,
+    goalTier: 8, flicks: 72, star2: 430, star3: 720,
     friction: FRICTION.wood, rails: rectRails(),
     orders: { minTier: 3, maxTier: 6 },
     beachBall: { r: 40, speed: 90 },
+    preplace: [
+      { tier: 6, x: -108, z: 520 }, { tier: 6, x: 104, z: 520 }, { tier: 5, x: 0, z: 400 },
+    ],
     sideGoal: { type: 'combo', count: 4, label: 'Land a ×4 combo', required: false, bonus: 60 },
     intro: 'A glowing beach ball drifts across the party table.',
     mechanic: 'Moving obstacle — light, bouncy, never merges.',
@@ -123,9 +136,12 @@ export const LEVELS = [
   {
     id: 9, place: 'Jumeirah', country: 'Dubai, UAE', backdrop: 'dubai',
     accent: '#F2C14E', felt: '#7fa8b8', rail: '#d8c8a0', time: 'night',
-    goalTier: 8, flicks: 60, star2: 700, star3: 1200,
+    goalTier: 8, flicks: 74, star2: 530, star3: 940,
     friction: FRICTION.marble, rails: rectRails(halfW * 0.85, length * 0.92),
     orders: { minTier: 3, maxTier: 6 },
+    preplace: [
+      { tier: 6, x: -100, z: 500 }, { tier: 6, x: 92, z: 500 }, { tier: 5, x: 0, z: 380 },
+    ],
     sideGoal: { type: 'bank', count: 3, label: 'Land 3 bank-shots', required: false, bonus: 50 },
     intro: 'Polished marble, smaller table. Everything glides.',
     mechanic: 'Ice-slick surface — use the rails.',
@@ -133,7 +149,7 @@ export const LEVELS = [
   {
     id: 10, place: 'Kata Beach', country: 'Phuket, Thailand', backdrop: 'phuket',
     accent: '#23B5A0', felt: '#3aa08a', rail: '#8a5a38', time: 'day',
-    goalTier: 9, flicks: 80, star2: 1000, star3: 1700,
+    goalTier: 9, flicks: 98, star2: 850, star3: 1330,
     friction: FRICTION.wood, rails: rectRails(),
     orders: { minTier: 3, maxTier: 6 },
     spawnTiers: [1, 2, 3, 4, 5, 6],
@@ -144,12 +160,15 @@ export const LEVELS = [
   {
     id: 11, place: 'Tanah Lot', country: 'Bali, Indonesia', backdrop: 'bali',
     accent: '#FF8E53', felt: '#4f6f5f', rail: '#5a4a3a', time: 'sunset',
-    goalTier: 9, flicks: 85, star2: 1100, star3: 1900,
+    goalTier: 9, flicks: 105, star2: 670, star3: 1080,
     friction: FRICTION.wood, rails: rectRails(), spawnTiers: [2, 3, 4, 5, 6],
     orders: { minTier: 3, maxTier: 7 },
+    // A near-adjacent tier-8 pair gives a clean path to the tier-9 goal (nudge
+    // them together), so the win is reliably reachable; the 7 and 6 are extra
+    // score material for chasing stars.
     preplace: [
-      { tier: 8, x: -150, z: 640 }, { tier: 7, x: 120, z: 700 },
-      { tier: 7, x: -60, z: 400 }, { tier: 6, x: 200, z: 520 },
+      { tier: 8, x: -108, z: 555 }, { tier: 8, x: 96, z: 555 },
+      { tier: 7, x: -40, z: 400 }, { tier: 6, x: 200, z: 500 },
     ],
     tide: { period: 25, warn: 3, len: 2.2, fromZ: 640 },
     intro: 'The tide floods the far third — don’t park drinks up there.',
@@ -158,24 +177,24 @@ export const LEVELS = [
   {
     id: 12, place: 'Bora Bora', country: 'French Polynesia', backdrop: 'borabora',
     accent: '#43D9C7', felt: '#2fa8a0', rail: '#b98a5a', time: 'day',
-    goalTier: 11, flicks: 150, star2: 2000, star3: 3400,
+    goalTier: 11, flicks: 175, star2: 700, star3: 1250,
     friction: FRICTION.wood, rails: rectRails(), spawnTiers: [3, 4, 5, 6, 7],
     orders: { minTier: 4, maxTier: 6 },
     obstacles: [
-      { x: -120, z: 560, r: 52, kind: 'motu' },
-      { x: 140, z: 700, r: 44, kind: 'motu' },
+      { x: -168, z: 600, r: 46, kind: 'motu' },
+      { x: 176, z: 730, r: 40, kind: 'motu' },
     ],
     // a running head start toward the Paradise Atlas so the finale is a
     // victory lap of skill, not a starvation grind: two tier-10s already on the
     // table (merge them for the Atlas = 1★), plus tier-9/8 pairs and a wide
     // pool to keep chasing the score thresholds for 2★/3★.
     preplace: [
-      { tier: 10, x: -180, z: 760 }, { tier: 10, x: 210, z: 640 },
-      { tier: 9, x: -60, z: 500 }, { tier: 9, x: 90, z: 420 },
-      { tier: 8, x: -220, z: 560 }, { tier: 8, x: 160, z: 320 },
-      { tier: 7, x: 40, z: 300 },
+      { tier: 10, x: -102, z: 650 }, { tier: 10, x: 102, z: 650 },  // nudge → Paradise Atlas win
+      { tier: 9, x: -70, z: 480 }, { tier: 9, x: 96, z: 400 },
+      { tier: 8, x: -220, z: 540 }, { tier: 8, x: 180, z: 330 },
+      { tier: 7, x: 40, z: 290 },
     ],
-    wind: { period: 22, warn: 2.5, len: 1.2, accel: 320 },
+    wind: { period: 26, warn: 3, len: 1.1, accel: 200 },
     intro: 'The lagoon finale. Mix the Paradise Atlas.',
     mechanic: 'Everything you learned — motu islands, wind, royal orders.',
     finale: true,
