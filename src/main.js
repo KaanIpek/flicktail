@@ -6,6 +6,7 @@ import { Physics } from './physics.js';
 import { View } from './view.js';
 import { Slingshot } from './input.js';
 import { Game, S } from './game.js';
+import { Ads } from './ads.js';
 import { Renderer } from './render.js';
 import { Backdrop } from './backdrop.js';
 import { Fx } from './fx.js';
@@ -29,6 +30,9 @@ const view = new View();
 const physics = new Physics();
 const fx = new Fx();
 const game = new Game(physics, fx, audio, save);
+const ads = new Ads();
+// the game only offers a refill when an ad can actually be shown
+game.canOfferRefill = () => ads.available();
 game.aimAssist = save.data.settings.aimLine;
 const ui = new UI(uiRoot, save, audio);
 const backdropCanvas = document.createElement('canvas');
@@ -42,6 +46,7 @@ let screen = 'title';       // title | map | collection | intro | game | result
 let currentLevel = null;
 let zenMode = false;
 let paused = false;
+let pendingUpdate = false;   // a new build is waiting; apply it out of play
 let W = 0, H = 0, DPR = 1;
 
 // ---- sizing ----
@@ -143,6 +148,7 @@ function setBgFill(key) {
 }
 
 function showTitle() {
+  if (pendingUpdate) { location.reload(); return; }
   screen = 'title';
   zenMode = false;
   input.enabled = false;
@@ -266,6 +272,13 @@ ui.on('shuffle', () => startLevel(currentLevel.id));
 ui.on('pause', () => { paused = true; ui.showPause(game, save.data.settings); });
 ui.on('finishNow', () => game.finishNow());
 ui.on('resume', () => { paused = false; ui.closeModal(); });
+ui.on('refillYes', async () => {
+  ui.closeModal();
+  const rewarded = await ads.show();
+  if (rewarded) game.grantFlicks();
+  else game.declineRefill();
+});
+ui.on('refillNo', () => { ui.closeModal(); game.declineRefill(); });
 function refreshSettingsUI() {
   // toggles live on both the in-game pause modal and the title About screen
   if (screen === 'about') { ui.showAbout(save.data.settings); }
@@ -319,6 +332,15 @@ game.onEvent = (name, data) => {
     case 'autoServed': ui.toast('Auto-served ☀', 900); break;
     case 'atlasClink': ui.showCallout('LEGENDARY CLINK!'); break;
     case 'flick': if (game.flicksLeft === 8 && !game.zen) ui.toast('8 drinks left in the cooler!'); break;
+    case 'offerRefill':
+      input.enabled = false;
+      ui.showRefillOffer(game, data);
+      break;
+    case 'refilled':
+      input.enabled = true;
+      ui.toast(`+${data.n} drinks in the cooler!`, 1400);
+      break;
+    case 'outOfDrinks': ui.toast('Cooler empty — let the table settle', 1100); break;
     case 'finished':
       input.enabled = false;
       if (data.won && !game.reducedMotion) { fx.confetti(W, H); setTimeout(() => fx.confetti(W, H, 70), 260); }
@@ -434,13 +456,29 @@ addEventListener('pointerdown', () => audio.unlock(), { once: true });
 // service worker (only when served over http(s))
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
   addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+  // A cache-first worker keeps serving the build you already have, so a player
+  // could sit on an old version indefinitely. When a new worker takes over,
+  // reload once (guarded, or the reload races the next activation) — but never
+  // mid-run, or it would throw away the table you're playing.
+  let reloading = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (reloading) return;
+    reloading = true;
+    if (screen === 'game' || screen === 'result') {
+      ui.toast('Update ready — it will apply next time you return here', 2600);
+      pendingUpdate = true;
+      reloading = false;
+      return;
+    }
+    location.reload();
+  });
 }
 
 // ---- boot ----
 
 // QA / debug hook (harmless in production, invaluable for automated testing)
 window.__ft = {
-  game, view, renderer, physics, fx, save, audio, backdrop, ui,
+  game, view, renderer, physics, fx, save, audio, backdrop, ui, ads,
   startLevel, showMap,
   async spawn(tier, x, z, vx = 0, vz = 0) {
     const { makeBody } = await import('./physics.js');

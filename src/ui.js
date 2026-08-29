@@ -1,6 +1,6 @@
 // DOM overlay: title, world map, HUD, level intro, win/fail, pause, collection.
 
-import { TIERS, COMBO_CALLOUTS } from './config.js';
+import { TIERS, COMBO_CALLOUTS, REFILL } from './config.js';
 import { LEVELS } from './levels.js';
 import { todayKey } from './save.js';
 
@@ -423,6 +423,26 @@ export class UI {
         </div>
       </div>`;
     }
+  }
+
+  // The cooler ran dry but the goal isn't met — offer another round instead of
+  // ending the run outright.
+  showRefillOffer(game, { gives, used }) {
+    const goal = TIERS[game.level.goalTier - 1];
+    this.root.insertAdjacentHTML('beforeend', `
+    <div class="modal" id="refillModal">
+      <div class="modal-card">
+        <h3>Out of drinks!</h3>
+        <p class="refill-line">You still need a <b>${goal.name}</b>.<br>
+          The bar can send <b>${gives} more</b>.</p>
+        ${this.drinkImg(game.level.goalTier, 'refill-icon')}
+        <div class="result-buttons">
+          <button class="btn big primary" data-act="refillYes">▶ WATCH FOR +${gives}</button>
+          <button class="btn ghost" data-act="refillNo">End the run</button>
+        </div>
+        <p class="credits">Round ${used + 1} of ${REFILL.max}</p>
+      </div>
+    </div>`);
   }
 
   showPause(game, settings) {

@@ -72,6 +72,10 @@ export const SPAWN = {
   mergePopHeight: 60,       // little hop of a newly merged drink
 };
 
+// Running dry isn't the end: the bar can send another round. Gated behind a
+// rewarded ad, capped so a level still has to be earned.
+export const REFILL = { flicks: 6, max: 2 };
+
 export const FAIL = {
   dwell: 2.8,       // sleeping drink in the launch strip this long = fail
                     // (generous: the launch line is a warning, not a guillotine)

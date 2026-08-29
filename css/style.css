@@ -191,6 +191,28 @@ h1, h2, h3, .logo, .btn, .hud-score, .combo, .callout, .result-title, .intro-pla
 .pass-stamp-stars { font-size: 11px; text-align: center; padding-bottom: 6px; color: #ffd75e; letter-spacing: 1px; }
 .pass-stamp:not(.done) .pass-stamp-stars { color: rgba(255,255,255,0.4); }
 
+/* ---------- refill offer + rewarded-ad placeholder ---------- */
+
+.refill-line { font-size: 15px; line-height: 1.45; opacity: 0.9; margin-bottom: 6px; }
+.refill-icon { width: 76px; height: 76px; object-fit: contain; margin-bottom: 4px; }
+.ad-overlay {
+  position: fixed; inset: 0; z-index: 90;
+  background: rgba(4,10,18,0.88); backdrop-filter: blur(3px);
+  display: flex; align-items: center; justify-content: center; padding: 24px;
+}
+.ad-panel {
+  width: min(88%, 340px); text-align: center;
+  background: rgba(16,26,40,0.96); border: 1.5px solid rgba(255,255,255,0.14);
+  border-radius: 22px; padding: 22px 20px;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+}
+.ad-tag {
+  font-size: 11px; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase;
+  color: #ffd75e; border: 1px solid rgba(255,215,94,0.5); border-radius: 999px; padding: 3px 10px;
+}
+.ad-note { font-size: 12.5px; line-height: 1.45; opacity: 0.7; }
+.ad-count { font-size: 40px; font-weight: 800; line-height: 1; }
+
 /* ---------- about / settings ---------- */
 
 .corner-gear {

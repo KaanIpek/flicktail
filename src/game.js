@@ -1,7 +1,7 @@
 // Level state machine: spawn queue, flicks, merges, combos, orders, hazards,
 // win/fail. Physics events are consumed here, end-of-step.
 
-import { TABLE, PHYS, FLICK, TIERS, TOP_TIER_CLINK_BONUS, COMBO, ORDERS, SPAWN, FAIL, COMBO_CALLOUTS, CAT_TIERS } from './config.js';
+import { TABLE, PHYS, FLICK, TIERS, TOP_TIER_CLINK_BONUS, COMBO, ORDERS, SPAWN, FAIL, COMBO_CALLOUTS, CAT_TIERS, REFILL } from './config.js';
 import { makeBody, buildWalls } from './physics.js';
 
 function mulberry32(seed) {
@@ -64,6 +64,8 @@ export class Game {
     this.tScale = { value: 1, target: 1, hold: 0 };
     this.spawnPool = level.spawnTiers || SPAWN.tiers;
     this.bag = null;   // shuffled campaign spawn bag (refilled on demand)
+    this.refills = 0;  // ad-granted cooler top-ups used this run
+    this.offering = false;
 
     // hazards
     this.wind = level.wind ? { ...level.wind, t: level.wind.period * 0.55, dir: 1, active: 0 } : null;
@@ -128,9 +130,8 @@ export class Game {
   refillBag() {
     const pool = this.spawnPool;
     const bag = [];
-    for (const t of pool) bag.push(t, t);        // each tier twice → guaranteed pairs
-    bag.push(pool[0]);                            // a little extra raw material
-    if (pool[1] !== undefined) bag.push(pool[1]);
+    for (const t of pool) bag.push(t, t);        // each tier twice → pairs exist,
+                                                 // but a wide pool spreads them out
     for (let i = bag.length - 1; i > 0; i--) {    // seeded Fisher–Yates
       const j = (this.rng() * (i + 1)) | 0;
       const tmp = bag[i]; bag[i] = bag[j]; bag[j] = tmp;
@@ -155,6 +156,10 @@ export class Game {
 
   flick() {
     if (this.state !== S.AIMING || !this.tee.ready || !this.aim) return false;
+    // The cooler is empty: no more shots. Without this the count ran negative
+    // and the run never ended, because checkEnd only fires once the table
+    // settles and another flick kept it moving.
+    if (this.flicksLeft <= 0) { this.aim = null; this.emit('outOfDrinks'); return false; }
     const a = this.aim;
     if (a.dirZ <= 0.05) { this.aim = null; return false; }  // never toward the gutter
     const tier = this.queue.shift();
@@ -499,12 +504,31 @@ export class Game {
     if (this.zen) return;
     // Reaching the goal does NOT end the level — the remaining flicks are
     // the star budget. The player can cash out early via finishNow().
+    if (this.offering) return;                 // waiting on the refill answer
     if (this.flicksLeft <= 0 && this.tee.ready) {
       if (!this.phys.anyMoving() && this.comboTimer <= 0) {
         if (this.goalDone && this.sideGoalDone()) this.finish(true);
-        else this.finish(false, 'flicks');
+        else if ((this.refills || 0) < REFILL.max && this.canOfferRefill && this.canOfferRefill()) {
+          this.offering = true;                // "one more round?"
+          this.emit('offerRefill', { used: this.refills || 0, gives: REFILL.flicks });
+        } else this.finish(false, 'flicks');
       }
     }
+  }
+
+  // Accepted the refill: top the cooler back up and hand the tee back.
+  grantFlicks(n = REFILL.flicks) {
+    this.offering = false;
+    this.refills = (this.refills || 0) + 1;
+    this.flicksLeft += n;
+    this.tee = { tier: this.queue[0], ready: true, t: 1 };
+    this.emit('refilled', { n, left: this.flicksLeft });
+    this.autosave();
+  }
+
+  declineRefill() {
+    this.offering = false;
+    this.finish(false, 'flicks');
   }
 
   finishNow() {
