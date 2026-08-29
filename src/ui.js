@@ -1,7 +1,7 @@
 // DOM overlay: title, world map, HUD, level intro, win/fail, pause, collection.
 
 import { TIERS, COMBO_CALLOUTS, REFILL } from './config.js';
-import { LEVELS } from './levels.js';
+import { LEVELS, TOURS, tourById, levelsOfTour, tierNameFor } from './levels.js';
 import { creatureIcon } from './render.js';
 import { todayKey } from './save.js';
 
@@ -65,23 +65,64 @@ export class UI {
     </div>`;
   }
 
-  showMap() {
+  // Main map: the tours. World Tour first, then every country.
+  showTours() {
     const s = this.save.data;
-    const total = LEVELS.reduce((a, l) => a + (s.stars[l.id] || 0), 0);
-    const cards = LEVELS.map(l => {
-      const unlocked = l.id <= s.unlockedLevel;
+    const cards = TOURS.map(t => {
+      const levels = levelsOfTour(t.id);
+      const got = levels.reduce((a, l) => a + (s.stars[l.id] || 0), 0);
+      const max = levels.length * 3;
+      const open = t.id === 'world' || this.save.totalStars() >= 1;
+      const done = levels.filter(l => (s.stars[l.id] || 0) >= 1).length;
+      return `
+      <div class="tour-card ${open ? '' : 'locked'}" ${open ? `data-act="tour" data-id="${t.id}"` : ''}>
+        <div class="tour-thumb" style="background-image:url(assets/backdrops/${t.backdrop}.webp)">
+          <div class="tour-flag">${t.flag}</div>
+          ${open ? '' : '<div class="lock">🔒</div>'}
+        </div>
+        <div class="tour-info">
+          <div class="tour-name">${t.name}</div>
+          <div class="tour-blurb">${open ? t.blurb : 'Earn a star to unlock'}</div>
+          <div class="tour-prog">
+            <div class="tour-bar"><i style="width:${max ? (got / max * 100) : 0}%"></i></div>
+            <span class="tour-count">★ ${got}/${max}</span>
+          </div>
+          <div class="tour-stops">${done}/${levels.length} stops toasted</div>
+        </div>
+      </div>`;
+    }).join('');
+    this.root.innerHTML = `
+    <div class="screen map-screen">
+      <div class="map-head">
+        <button class="btn icon" data-act="title">‹</button>
+        <h2>Tours</h2>
+        <div class="map-stars">★ ${this.save.totalStars()}</div>
+      </div>
+      <div class="map-list">${cards}</div>
+    </div>`;
+  }
+
+  // One tour's stops. A stop opens once the one before it has a star.
+  showTour(tourId) {
+    const s = this.save.data;
+    const tour = tourById(tourId) || TOURS[0];
+    const levels = levelsOfTour(tour.id);
+    const total = levels.reduce((a, l) => a + (s.stars[l.id] || 0), 0);
+    const cards = levels.map((l, i) => {
+      const prev = levels[i - 1];
+      const unlocked = i === 0 || (s.stars[prev.id] || 0) >= 1;
       const st = s.stars[l.id] || 0;
       const best = s.bestScore[l.id] || 0;
       return `
       <div class="lv-card ${unlocked ? '' : 'locked'}" ${unlocked ? `data-act="level" data-id="${l.id}"` : ''}>
         <div class="lv-thumb" style="background-image:url(assets/backdrops/${l.backdrop}.webp)">
           ${unlocked ? '' : '<div class="lock">🔒</div>'}
-          <div class="lv-num">${l.id}</div>
+          <div class="lv-num">${i + 1}</div>
         </div>
         <div class="lv-info">
           <div class="lv-name">${l.place}</div>
           <div class="lv-country">${l.country}</div>
-          ${unlocked ? this.stars(st, 'small') : `<div class="lv-hint">Earn a star in ${LEVELS[l.id - 2] ? LEVELS[l.id - 2].place : ''}</div>`}
+          ${unlocked ? this.stars(st, 'small') : `<div class="lv-hint">Earn a star in ${prev ? prev.place : ''}</div>`}
           ${best ? `<div class="lv-best">Best ${best}</div>` : ''}
           ${unlocked && st > 0 ? `<button class="btn tiny zen" data-act="zen" data-id="${l.id}">Vacation ☀</button>` : ''}
         </div>
@@ -90,13 +131,14 @@ export class UI {
     this.root.innerHTML = `
     <div class="screen map-screen">
       <div class="map-head">
-        <button class="btn icon" data-act="title">‹</button>
-        <h2>World Tour</h2>
-        <div class="map-stars">★ ${total}/36</div>
+        <button class="btn icon" data-act="tours">‹</button>
+        <h2>${tour.flag} ${tour.name}</h2>
+        <div class="map-stars">★ ${total}/${levels.length * 3}</div>
       </div>
       <div class="map-list">${cards}</div>
     </div>`;
   }
+
 
   showCollection() {
     const best = this.save.data.bestTier;
@@ -186,7 +228,7 @@ export class UI {
   }
 
   showIntro(level, zen) {
-    const goal = TIERS[level.goalTier - 1];
+    const goal = { ...TIERS[level.goalTier - 1], name: tierNameFor(level, level.goalTier, TIERS) };
     this.root.innerHTML = `
     <div class="screen intro-screen" data-act="start">
       <div class="intro-card">
@@ -254,7 +296,7 @@ export class UI {
       <div class="hud-missions" id="hudMissions">
         <div class="mission" id="missionMain">
           <span class="mission-tick" id="mainTick">○</span>
-          <span class="mission-text">Mix a <b>${TIERS[l.goalTier - 1].name}</b></span>
+          <span class="mission-text">Mix a <b>${tierNameFor(l, l.goalTier, TIERS)}</b></span>
         </div>
         <div class="mission hidden" id="sideGoal">
           <span class="mission-tick" id="sideTick">○</span>
@@ -364,7 +406,9 @@ export class UI {
 
   showResult(game, result) {
     const l = game.level;
-    const next = LEVELS.find(x => x.id === l.id + 1);
+    // next stop WITHIN this tour — ids jump between tours, so ask the tour
+    const sibs = levelsOfTour(l.tour || 'world');
+    const next = sibs[sibs.findIndex(x => x.id === l.id) + 1];
 
     if (result.mode === 'endless' || result.mode === 'daily') {
       const isDaily = result.mode === 'daily';
@@ -417,7 +461,7 @@ export class UI {
         <div class="result-card fail">
           <div class="result-title">${msg}</div>
           <div class="result-score">${result.score}</div>
-          <div class="result-sub">So close — the ${TIERS[l.goalTier - 1].name} is waiting.</div>
+          <div class="result-sub">So close — the ${tierNameFor(l, l.goalTier, TIERS)} is waiting.</div>
           <div class="result-buttons">
             <button class="btn big primary" data-act="retry">RETRY (same drinks)</button>
             <button class="btn ghost" data-act="shuffle">Shuffle drinks</button>
@@ -431,7 +475,7 @@ export class UI {
   // The cooler ran dry but the goal isn't met — offer another round instead of
   // ending the run outright.
   showRefillOffer(game, { gives, used }) {
-    const goal = TIERS[game.level.goalTier - 1];
+    const goal = { name: tierNameFor(game.level, game.level.goalTier, TIERS) };
     this.root.insertAdjacentHTML('beforeend', `
     <div class="modal" id="refillModal">
       <div class="modal-card">

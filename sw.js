@@ -2,7 +2,7 @@
 // else (backdrops, sprites, audio) so the game is fully playable offline
 // after the first visit.
 
-const VERSION = 'flicktail-v23';
+const VERSION = 'flicktail-v24';
 const BACKDROPS = ['waikiki', 'miami', 'cancun', 'rio', 'nice', 'positano',
   'santorini', 'ibiza', 'dubai', 'phuket', 'bali', 'borabora'];
 const SHELL = [
@@ -13,7 +13,7 @@ const SHELL = [
   'src/main.js', 'src/config.js', 'src/levels.js', 'src/physics.js',
   'src/view.js', 'src/input.js', 'src/game.js', 'src/render.js',
   'src/backdrop.js', 'src/fx.js', 'src/audio.js', 'src/assets.js',
-  'src/save.js', 'src/ui.js', 'src/ads.js',
+  'src/save.js', 'src/ui.js', 'src/ads.js', 'src/tours.js',
   'assets/icon-192.png', 'assets/icon-512.png',
   ...Array.from({ length: 11 }, (_, i) => `assets/drinks/tier${String(i + 1).padStart(2, '0')}.png`),
   ...BACKDROPS.map(b => `assets/backdrops/${b}.webp`),

@@ -2,6 +2,7 @@
 // every difficulty knob is visible on the level card — never hidden odds.
 
 import { TABLE, FRICTION } from './config.js';
+import { buildCountryLevels, buildTours } from './tours.js';
 
 const { halfW, length, foulLine } = TABLE;
 
@@ -255,4 +256,21 @@ export const LEVELS = [
   },
 ];
 
-export function levelById(id) { return LEVELS.find(l => l.id === id); }
+// The World Tour keeps ids 1-12; country tours live from 100 up. Everything
+// lands in one flat list so levelById, saves and the daily seed keep working.
+export const WORLD_LEVELS = LEVELS.map(l => ({ ...l, tour: 'world' }));
+export const COUNTRY_LEVELS = buildCountryLevels();
+export const ALL_LEVELS = [...WORLD_LEVELS, ...COUNTRY_LEVELS];
+export const TOURS = buildTours(WORLD_LEVELS.map(l => l.id));
+
+export function levelById(id) { return ALL_LEVELS.find(l => l.id === id); }
+export function tourById(id) { return TOURS.find(t => t.id === id); }
+export function levelsOfTour(id) {
+  const t = tourById(id);
+  return t ? t.levels.map(levelById).filter(Boolean) : [];
+}
+// A level's drink names can be overridden per tour (each country has its own
+// signature pour at the top of the chain).
+export function tierNameFor(level, tierId, tiers) {
+  return (level && level.names && level.names[tierId]) || tiers[tierId - 1].name;
+}

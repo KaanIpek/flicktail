@@ -22,18 +22,77 @@ const GLINT_TIERS = new Set([9, 10, 11]);
 // in code so its ears twitch, its tail swishes and its eyes blink. Tier 11 is
 // deliberately left as the rendered Paradise Atlas sprite — the trophy at the
 // end of the chain should look like a different class of object.
-const CREATURE = {
-  1:  { ears: 'none',   tail: 'none',  extra: 'frog',      belly: '#eafbc8' },
-  2:  { ears: 'point',  tail: 'curl',  extra: null,        belly: '#ffe6c2' },
-  3:  { ears: 'round',  tail: 'curly', extra: 'snout',     belly: '#ffdfe4' },
-  4:  { ears: 'none',   tail: 'stub',  extra: 'shell',     belly: '#d8f4ff' },
-  5:  { ears: 'long',   tail: 'puff',  extra: null,        belly: '#fffaf0' },
-  6:  { ears: 'point',  tail: 'bushy', extra: null,        belly: '#ffe0bd' },
-  7:  { ears: 'none',   tail: 'none',  extra: 'tentacles', belly: '#e8d4ff' },
-  8:  { ears: 'none',   tail: 'none',  extra: 'beak',      belly: '#fff2c2' },
-  9:  { ears: 'none',   tail: 'fin',   extra: 'whiskers',  belly: '#eafcfa' },
-  10: { ears: 'stalks', tail: 'none',  extra: 'claws',     belly: '#ffd9e2' },
+// Creatures are built from parts, so a country can field its own cast without
+// a new drawing per animal: pick ears, a tail and one signature feature.
+export const SPECIES = {
+  frog:     { ears: 'none',   tail: 'none',  extra: 'frog' },
+  cat:      { ears: 'point',  tail: 'curl',  extra: null },
+  fox:      { ears: 'point',  tail: 'bushy', extra: null },
+  lynx:     { ears: 'tuft',   tail: 'stub',  extra: 'whiskers' },
+  bunny:    { ears: 'long',   tail: 'puff',  extra: null },
+  piglet:   { ears: 'round',  tail: 'curly', extra: 'snout' },
+  turtle:   { ears: 'none',   tail: 'stub',  extra: 'shell' },
+  octopus:  { ears: 'none',   tail: 'none',  extra: 'tentacles' },
+  duckling: { ears: 'none',   tail: 'none',  extra: 'beak' },
+  seal:     { ears: 'none',   tail: 'fin',   extra: 'whiskers' },
+  crab:     { ears: 'stalks', tail: 'none',  extra: 'claws' },
+  axolotl:  { ears: 'none',   tail: 'fin',   extra: 'gills' },
+  iguana:   { ears: 'none',   tail: 'long',  extra: 'crest' },
+  coati:    { ears: 'round',  tail: 'long',  extra: 'muzzle' },
+  toucan:   { ears: 'none',   tail: 'plume', extra: 'bigbeak' },
+  armadillo:{ ears: 'round',  tail: 'stub',  extra: 'shell' },
+  jaguar:   { ears: 'round',  tail: 'long',  extra: 'spots' },
+  capybara: { ears: 'round',  tail: 'stub',  extra: 'muzzle' },
+  sloth:    { ears: 'none',   tail: 'none',  extra: 'sleepy' },
+  macaw:    { ears: 'none',   tail: 'plume', extra: 'beak' },
+  monkey:   { ears: 'round',  tail: 'long',  extra: 'muzzle' },
+  hedgehog: { ears: 'round',  tail: 'stub',  extra: 'spines' },
+  songbird: { ears: 'none',   tail: 'plume', extra: 'beak' },
+  goat:     { ears: 'floppy', tail: 'stub',  extra: 'horns' },
+  pelican:  { ears: 'none',   tail: 'none',  extra: 'bigbeak' },
+  dolphin:  { ears: 'none',   tail: 'fin',   extra: 'snoutfin' },
+  poodle:   { ears: 'floppy', tail: 'puff',  extra: 'muzzle' },
+  snail:    { ears: 'stalks', tail: 'none',  extra: 'shell' },
+  bull:     { ears: 'floppy', tail: 'curl',  extra: 'horns' },
+  flamingo: { ears: 'none',   tail: 'plume', extra: 'beak' },
+  gecko:    { ears: 'none',   tail: 'long',  extra: 'crest' },
+  owl:      { ears: 'tuft',   tail: 'none',  extra: 'bigeyes' },
+  camel:    { ears: 'round',  tail: 'stub',  extra: 'hump' },
+  falcon:   { ears: 'none',   tail: 'plume', extra: 'beak' },
+  fennec:   { ears: 'long',   tail: 'bushy', extra: null },
+  oryx:     { ears: 'floppy', tail: 'stub',  extra: 'horns' },
+  elephant: { ears: 'fan',    tail: 'stub',  extra: 'trunk' },
+  gibbon:   { ears: 'round',  tail: 'long',  extra: 'sleepy' },
+  hornbill: { ears: 'none',   tail: 'plume', extra: 'bigbeak' },
+  tiger:    { ears: 'round',  tail: 'long',  extra: 'stripes' },
+  clownfish:{ ears: 'none',   tail: 'fin',   extra: 'stripes' },
+  komodo:   { ears: 'none',   tail: 'long',  extra: 'crest' },
+  ray:      { ears: 'none',   tail: 'whip',  extra: 'wings' },
+  parrotfish:{ ears: 'none',  tail: 'fin',   extra: 'beak' },
+  shark:    { ears: 'none',   tail: 'fin',   extra: 'snoutfin' },
+  seabird:  { ears: 'none',   tail: 'plume', extra: 'beak' },
+  scorpion: { ears: 'stalks', tail: 'sting', extra: 'claws' },
+  gazelle:  { ears: 'long',   tail: 'stub',  extra: 'horns' },
+  orangutan:{ ears: 'round',  tail: 'none',  extra: 'muzzle' },
+  tapir:    { ears: 'round',  tail: 'stub',  extra: 'trunk' },
+  quokka:   { ears: 'round',  tail: 'long',  extra: 'muzzle' },
 };
+
+// The default cast — the World Tour line-up, tiers 1..10.
+export const DEFAULT_CAST = ['frog', 'cat', 'piglet', 'turtle', 'bunny', 'fox',
+  'octopus', 'duckling', 'seal', 'crab'];
+
+const BELLY = ['#eafbc8', '#ffe6c2', '#ffdfe4', '#d8f4ff', '#fffaf0',
+  '#ffe0bd', '#e8d4ff', '#fff2c2', '#eafcfa', '#ffd9e2', '#fff0d0'];
+
+// Resolve which animal a tier is on a given level.
+export function creatureFor(level, tierId) {
+  const cast = (level && level.cast) || DEFAULT_CAST;
+  const name = cast[tierId - 1];
+  if (!name) return null;                       // tier 11 on the World Tour = the Atlas sprite
+  const parts = SPECIES[name] || SPECIES.cat;
+  return { ...parts, name, belly: BELLY[(tierId - 1) % BELLY.length] };
+}
 
 export class Renderer {
   constructor(view, assets) {
@@ -513,7 +572,7 @@ export class Renderer {
     // billboard shear would fight it — keep only a whisper of lean for life.
     const shear = (this.view.cx - p.x) / this.view.w * 0.04;
 
-    const creature = CREATURE[b.tier];
+    const creature = creatureFor(this.level, b.tier);
     if (creature) {
       // the cup IS the animal — drawn, so its ears and tail can move
       const cheer = b.cheer > 0 ? Math.sin(Math.min(1, b.cheer) * Math.PI) : 0;
@@ -548,7 +607,7 @@ export class Renderer {
       ctx.translate(ax, ay);
       ctx.transform(1, 0, shear, 1, 0, 0);
       // tail sits BEHIND the glass so it reads as coming out from behind it
-      if (CAT_TIERS.has(b.tier) && !CREATURE[b.tier]) this.drawCatTail(ctx, b, wpx, ih * squash, time);
+      if (CAT_TIERS.has(b.tier) && !creatureFor(this.level, b.tier)) this.drawCatTail(ctx, b, wpx, ih * squash, time);
       ctx.drawImage(img, -wpx / 2, -ih * 0.96 * squash, wpx, ih * squash);
       this.drawCharm(ctx, b, wpx, ih * squash, time);
       ctx.restore();
@@ -805,7 +864,7 @@ export class Renderer {
   }
 
   drawCreature(ctx, b, tier, W, H, time) {
-    const spec = CREATURE[b.tier];
+    const spec = b.spec || creatureFor(this.level, b.tier);
     const ph = time * 2.1 + b.id * 1.7;
     const sway = Math.sin(ph);
     const dark = shade(tier.color, -0.28);
@@ -866,11 +925,49 @@ export class Renderer {
         ctx.quadraticCurveTo(tw * 1.1, -H * 0.16, tw * 0.7, -H * 0.1);
         ctx.fill();
         break;
-      case 'stub':                                      // turtle
+      case 'stub':                                      // turtle, capybara…
         ctx.beginPath();
         ctx.ellipse(tw * 0.95, -H * 0.14, W * 0.1, W * 0.07, sway * 0.2, 0, 7);
         ctx.fill();
         break;
+      case 'long': {                                    // monkey, iguana, big cats
+        ctx.lineWidth = W * 0.06;
+        ctx.beginPath();
+        ctx.moveTo(tw * 0.72, -H * 0.12);
+        ctx.bezierCurveTo(tw * 1.7, -H * 0.06, tw * 1.85 + sway * W * 0.12, -H * 0.45,
+          tw * 1.15 + sway * W * 0.2, -H * 0.66);
+        ctx.stroke();
+        break;
+      }
+      case 'plume': {                                   // birds
+        for (let i = -1; i <= 1; i++) {
+          ctx.beginPath();
+          ctx.moveTo(tw * 0.7, -H * 0.16);
+          ctx.quadraticCurveTo(tw * 1.35, -H * (0.1 + i * 0.06) + sway * H * 0.02,
+            tw * 1.7, -H * (0.05 + i * 0.16) + sway * H * 0.03);
+          ctx.lineWidth = W * 0.055;
+          ctx.stroke();
+        }
+        break;
+      }
+      case 'whip':                                      // ray
+        ctx.lineWidth = W * 0.045;
+        ctx.beginPath();
+        ctx.moveTo(tw * 0.7, -H * 0.12);
+        ctx.quadraticCurveTo(tw * 1.6, -H * 0.1 + sway * H * 0.04, tw * 2.0, -H * 0.2);
+        ctx.stroke();
+        break;
+      case 'sting': {                                   // scorpion
+        ctx.lineWidth = W * 0.07;
+        ctx.beginPath();
+        ctx.moveTo(tw * 0.7, -H * 0.14);
+        ctx.quadraticCurveTo(tw * 1.6, -H * 0.5, tw * 0.95 + sway * W * 0.08, -H * 0.85);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(tw * 0.95 + sway * W * 0.08, -H * 0.88, W * 0.075, 0, 7);
+        ctx.fill();
+        break;
+      }
     }
     if (spec.extra === 'tentacles') {                   // octopus
       ctx.lineWidth = W * 0.075;
@@ -908,7 +1005,7 @@ export class Renderer {
       + (this.mood === 'sad' ? 0.5 : 0) - cheerT * 0.22;
     for (const side of [-1, 1]) {
       const ex = side * W * 0.27, ey = -H * 0.97;
-      if (spec.ears === 'point' || spec.ears === 'round' || spec.ears === 'long') {
+      if (['point', 'round', 'long', 'tuft', 'floppy', 'fan'].includes(spec.ears)) {
         ctx.save();
         ctx.translate(ex, ey);
         ctx.rotate(side * (0.12 + earTwitch));
@@ -918,8 +1015,15 @@ export class Renderer {
           ctx.quadraticCurveTo(0, -H * 0.20, W * 0.11, H * 0.06);
         } else if (spec.ears === 'round') {
           ctx.arc(0, -H * 0.02, W * 0.12, 0, 7);
-        } else {                                          // long bunny ears
+        } else if (spec.ears === 'long') {                // bunny / fennec
           ctx.ellipse(0, -H * 0.14, W * 0.075, H * 0.19, 0, 0, 7);
+        } else if (spec.ears === 'tuft') {                // lynx / owl
+          ctx.moveTo(-W * 0.08, H * 0.05);
+          ctx.quadraticCurveTo(W * 0.02, -H * 0.26, W * 0.09, H * 0.05);
+        } else if (spec.ears === 'floppy') {              // goat / poodle
+          ctx.ellipse(side * W * 0.06, H * 0.03, W * 0.06, H * 0.13, side * 0.5, 0, 7);
+        } else {                                          // fan (elephant)
+          ctx.ellipse(side * W * 0.09, -H * 0.01, W * 0.15, H * 0.16, side * 0.25, 0, 7);
         }
         ctx.closePath(); ctx.fill();
         ctx.fillStyle = 'rgba(255,178,202,0.9)';          // inner ear
@@ -929,8 +1033,12 @@ export class Renderer {
           ctx.quadraticCurveTo(0, -H * 0.12, W * 0.05, H * 0.04);
         } else if (spec.ears === 'round') {
           ctx.arc(0, -H * 0.02, W * 0.06, 0, 7);
-        } else {
+        } else if (spec.ears === 'long') {
           ctx.ellipse(0, -H * 0.14, W * 0.035, H * 0.13, 0, 0, 7);
+        } else if (spec.ears === 'fan') {
+          ctx.ellipse(side * W * 0.09, -H * 0.01, W * 0.08, H * 0.09, side * 0.25, 0, 7);
+        } else {
+          ctx.ellipse(side * W * 0.04, 0, W * 0.03, H * 0.06, 0, 0, 7);
         }
         ctx.closePath(); ctx.fill();
         ctx.fillStyle = shade(tier.color, -0.1);
@@ -1103,7 +1211,120 @@ export class Renderer {
         }
         ctx.stroke();
       }
-      if (spec.extra === 'whiskers') {                    // seal
+      if (spec.extra === 'horns') {                       // goat, bull, oryx, gazelle
+        ctx.strokeStyle = '#f0e2c8'; ctx.lineWidth = W * 0.055; ctx.lineCap = 'round';
+        for (const side of [-1, 1]) {
+          ctx.beginPath();
+          ctx.moveTo(side * W * 0.17, -H * 0.94);
+          ctx.quadraticCurveTo(side * W * 0.32, -H * 1.12, side * W * 0.2, -H * 1.24);
+          ctx.stroke();
+        }
+        ctx.strokeStyle = 'rgba(28,20,26,0.9)';
+      } else if (spec.extra === 'trunk') {                 // elephant, tapir
+        ctx.strokeStyle = shade(tier.color, -0.16); ctx.lineWidth = W * 0.1; ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(0, fy + er * 1.4);
+        ctx.quadraticCurveTo(W * 0.05, fy + er * 4.2, -W * 0.07 + Math.sin(ph) * W * 0.03, fy + er * 5.6);
+        ctx.stroke();
+        ctx.strokeStyle = 'rgba(28,20,26,0.9)';
+      } else if (spec.extra === 'gills') {                 // axolotl
+        ctx.strokeStyle = 'rgba(255,150,190,0.85)'; ctx.lineWidth = W * 0.045;
+        for (const side of [-1, 1]) for (let i = -1; i <= 1; i++) {
+          ctx.beginPath();
+          ctx.moveTo(side * W * 0.3, fy + i * er * 0.9);
+          ctx.lineTo(side * W * 0.46, fy + i * er * 1.6 - er * 0.5);
+          ctx.stroke();
+        }
+        ctx.strokeStyle = 'rgba(28,20,26,0.9)';
+      } else if (spec.extra === 'crest') {                 // iguana, gecko, komodo
+        ctx.fillStyle = shade(tier.color, -0.3);
+        for (let i = 0; i < 5; i++) {
+          ctx.beginPath();
+          ctx.moveTo(-W * 0.1 + i * W * 0.05, -H * 0.96);
+          ctx.lineTo(-W * 0.075 + i * W * 0.05, -H * 1.08);
+          ctx.lineTo(-W * 0.05 + i * W * 0.05, -H * 0.96);
+          ctx.closePath(); ctx.fill();
+        }
+      } else if (spec.extra === 'spines') {                // hedgehog
+        ctx.fillStyle = shade(tier.color, -0.34);
+        for (let i = 0; i < 7; i++) {
+          const a = Math.PI * (1.08 + i * 0.14);
+          ctx.beginPath();
+          ctx.moveTo(Math.cos(a) * W * 0.4, -H * 0.72 + Math.sin(a) * H * 0.24);
+          ctx.lineTo(Math.cos(a) * W * 0.56, -H * 0.72 + Math.sin(a) * H * 0.36);
+          ctx.lineTo(Math.cos(a + 0.1) * W * 0.4, -H * 0.72 + Math.sin(a + 0.1) * H * 0.24);
+          ctx.closePath(); ctx.fill();
+        }
+      } else if (spec.extra === 'spots') {                 // jaguar
+        ctx.fillStyle = 'rgba(60,40,20,0.35)';
+        for (let i = 0; i < 6; i++) {
+          const a = i * 1.7;
+          ctx.beginPath();
+          ctx.ellipse(Math.cos(a) * W * 0.24, -H * 0.34 + Math.sin(a) * H * 0.18,
+            W * 0.045, W * 0.035, a, 0, 7);
+          ctx.fill();
+        }
+      } else if (spec.extra === 'stripes') {               // tiger, clownfish
+        ctx.strokeStyle = 'rgba(40,28,20,0.4)'; ctx.lineWidth = W * 0.05;
+        for (let i = -1; i <= 1; i++) {
+          ctx.beginPath();
+          ctx.moveTo(i * W * 0.16 - W * 0.06, -H * 0.16);
+          ctx.lineTo(i * W * 0.16 + W * 0.04, -H * 0.44);
+          ctx.stroke();
+        }
+        ctx.strokeStyle = 'rgba(28,20,26,0.9)';
+      } else if (spec.extra === 'hump') {                  // camel
+        ctx.fillStyle = shade(tier.color, -0.16);
+        ctx.beginPath();
+        ctx.ellipse(0, -H * 0.98, W * 0.2, H * 0.1, 0, Math.PI, 0);
+        ctx.fill();
+      } else if (spec.extra === 'wings') {                 // ray
+        ctx.fillStyle = shade(tier.color, -0.14);
+        for (const side of [-1, 1]) {
+          ctx.beginPath();
+          ctx.moveTo(side * W * 0.4, -H * 0.5);
+          ctx.quadraticCurveTo(side * W * 0.95, -H * (0.42 + Math.sin(ph) * 0.06),
+            side * W * 0.78, -H * 0.2);
+          ctx.quadraticCurveTo(side * W * 0.5, -H * 0.3, side * W * 0.4, -H * 0.5);
+          ctx.fill();
+        }
+      } else if (spec.extra === 'bigeyes') {               // owl
+        ctx.fillStyle = 'rgba(255,255,255,0.85)';
+        for (const side of [-1, 1]) {
+          ctx.beginPath(); ctx.arc(side * eo, fy, er * 2.1, 0, 7); ctx.fill();
+        }
+        ctx.fillStyle = 'rgba(28,20,26,0.9)';
+        for (const side of [-1, 1]) {
+          ctx.beginPath(); ctx.arc(side * eo, fy, er * 1.05, 0, 7); ctx.fill();
+        }
+      } else if (spec.extra === 'sleepy') {                // sloth, gibbon
+        ctx.strokeStyle = 'rgba(28,20,26,0.75)'; ctx.lineWidth = Math.max(1.2, W * 0.03);
+        for (const side of [-1, 1]) {
+          ctx.beginPath();
+          ctx.arc(side * eo, fy - er * 0.5, er * 1.1, Math.PI * 0.15, Math.PI * 0.85);
+          ctx.stroke();
+        }
+      } else if (spec.extra === 'snoutfin') {              // dolphin, shark
+        ctx.fillStyle = shade(tier.color, -0.22);
+        ctx.beginPath();
+        ctx.moveTo(-W * 0.09, -H * 0.98);
+        ctx.quadraticCurveTo(W * 0.02, -H * 1.2, W * 0.13, -H * 0.96);
+        ctx.closePath(); ctx.fill();
+      } else if (spec.extra === 'bigbeak') {               // toucan, pelican, hornbill
+        ctx.fillStyle = '#ff9c2e';
+        ctx.beginPath();
+        ctx.moveTo(-W * 0.1, fy + er * 1.2);
+        ctx.quadraticCurveTo(W * 0.34, fy + er * 2.6, -W * 0.05, fy + er * 4.4);
+        ctx.closePath(); ctx.fill();
+      } else if (spec.extra === 'muzzle') {                // monkey, capybara, coati
+        ctx.fillStyle = spec.belly;
+        ctx.beginPath();
+        ctx.ellipse(0, fy + er * 2.1, W * 0.15, W * 0.11, 0, 0, 7); ctx.fill();
+        ctx.fillStyle = 'rgba(50,32,28,0.85)';
+        ctx.beginPath();
+        ctx.ellipse(0, fy + er * 1.5, W * 0.045, W * 0.032, 0, 0, 7); ctx.fill();
+      }
+      if (spec.extra === 'whiskers') {                    // seal, lynx
         ctx.globalAlpha = 0.5;
         for (const side of [-1, 1]) for (let i = -1; i <= 1; i++) {
           ctx.beginPath();
@@ -1161,7 +1382,7 @@ export class Renderer {
     const topY = -h * 0.96;
     // creature cups draw their own ears/face/tail; this overlay is only for
     // the sprite-based tiers that are still plain cocktails
-    if (CAT_TIERS.has(b.tier) && !CREATURE[b.tier]) {
+    if (CAT_TIERS.has(b.tier) && !creatureFor(this.level, b.tier)) {
       const ph = time * 2.2 + b.id * 1.9;
       const earW = w * 0.17, earH = h * 0.11;
       for (const side of [-1, 1]) {
@@ -1472,9 +1693,10 @@ function easeOutBack(t) {
 // the player meets on the table, so icons are rendered from the very same
 // drawing code rather than the old cocktail sprites. Cached per tier+size.
 const ICON_CACHE = new Map();
-export function creatureIcon(tierId, px = 128) {
-  if (!CREATURE[tierId]) return null;                 // tier 11 keeps its sprite
-  const key = tierId + ':' + px;
+export function creatureIcon(tierId, px = 128, level = null) {
+  const spec = creatureFor(level, tierId);
+  if (!spec) return null;                             // tier 11 keeps its sprite
+  const key = tierId + ':' + px + ':' + spec.name;
   if (ICON_CACHE.has(key)) return ICON_CACHE.get(key);
   const c = document.createElement('canvas');
   c.width = px; c.height = px;
@@ -1484,7 +1706,8 @@ export function creatureIcon(tierId, px = 128) {
   ctx.translate(px / 2, px * 0.93);
   // t=1.1 so nobody is mid-blink in a still icon
   Renderer.prototype.drawCreature.call(
-    { cupPath: Renderer.prototype.cupPath }, ctx, { tier: tierId, id: 0 }, tier, W, H, 1.1);
+    { cupPath: Renderer.prototype.cupPath }, ctx,
+    { tier: tierId, id: 0, spec }, tier, W, H, 1.1);
   const url = c.toDataURL();
   ICON_CACHE.set(key, url);
   return url;

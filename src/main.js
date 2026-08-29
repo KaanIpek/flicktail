@@ -1,7 +1,7 @@
 // Boot, screens, and the loop.
 
 import { TABLE, TIERS } from './config.js';
-import { LEVELS, levelById } from './levels.js';
+import { LEVELS, ALL_LEVELS, TOURS, levelById, levelsOfTour } from './levels.js';
 import { Physics } from './physics.js';
 import { View } from './view.js';
 import { Slingshot } from './input.js';
@@ -93,7 +93,12 @@ function preload() {
     const k = 'tier' + String(i).padStart(2, '0');
     entries.push([k, 'assets/drinks/' + k + '.png']);
   }
-  for (const l of LEVELS) entries.push(['bg_' + l.backdrop, 'assets/backdrops/' + l.backdrop + '.webp']);
+  const seenBg = new Set();
+  for (const l of ALL_LEVELS) {
+    if (seenBg.has(l.backdrop)) continue;
+    seenBg.add(l.backdrop);
+    entries.push(['bg_' + l.backdrop, 'assets/backdrops/' + l.backdrop + '.webp']);
+  }
   // fire and forget; the game renders fallbacks until each arrives
   for (const [k, u] of entries) assets.load(k, u).then(() => {
     if (screen === 'title' || screen === 'map') { /* backgrounds refresh next frame */ }
@@ -179,16 +184,26 @@ function resumeSaved() {
   beginPlay();
 }
 
-function showMap() {
+let currentTour = 'world';
+
+function showMap() {                    // the tour picker is the main map now
   screen = 'map';
   input.enabled = false;
-  ui.showMap();
+  ui.showTours();
+}
+
+function showTour(id) {
+  currentTour = id;
+  screen = 'map';
+  input.enabled = false;
+  ui.showTour(id);
 }
 
 function startLevel(id, { zen = false, seed = null, restore = null } = {}) {
   const level = levelById(id);
   if (!level) return;
   currentLevel = level;
+  currentTour = level.tour || 'world';
   zenMode = zen;
   screen = 'intro';
   paused = false;
@@ -248,7 +263,9 @@ function beginPlay() {
 ui.on('play', () => { audio.unlock(); showMap(); });
 ui.on('resumeRun', () => resumeSaved());
 ui.on('title', showTitle);
-ui.on('map', () => { game.clearSaved(); showMap(); });
+ui.on('map', () => { game.clearSaved(); showTour(currentTour); });
+ui.on('tours', () => { game.clearSaved(); showMap(); });
+ui.on('tour', d => showTour(d.id));
 ui.on('collection', () => { screen = 'collection'; ui.showCollection(); });
 ui.on('passport', () => { screen = 'passport'; ui.showPassport(); });
 ui.on('level', d => { audio.unlock(); startLevel(+d.id); });
