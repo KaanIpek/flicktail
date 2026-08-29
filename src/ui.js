@@ -2,6 +2,7 @@
 
 import { TIERS, COMBO_CALLOUTS, REFILL } from './config.js';
 import { LEVELS } from './levels.js';
+import { creatureIcon } from './render.js';
 import { todayKey } from './save.js';
 
 export class UI {
@@ -22,7 +23,9 @@ export class UI {
   on(act, fn) { this.handlers[act] = fn; }
 
   drinkImg(tier, cls = '') {
-    return `<img class="drink-icon ${cls}" src="assets/drinks/tier${String(tier).padStart(2, '0')}.png" alt="${TIERS[tier - 1].name}" onerror="this.style.visibility='hidden'">`;
+    // creature tiers draw their own icon so the UI matches the table
+    const src = creatureIcon(tier) || `assets/drinks/tier${String(tier).padStart(2, '0')}.png`;
+    return `<img class="drink-icon ${cls}" src="${src}" alt="${TIERS[tier - 1].name}" onerror="this.style.visibility='hidden'">`;
   }
 
   stars(n, cls = '') {

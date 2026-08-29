@@ -18,6 +18,23 @@ const RAIL_TH = 26;       // world units of rail thickness (outward)
 const FIZZ_TIERS = new Set([1, 3, 4, 7]);
 const GLINT_TIERS = new Set([9, 10, 11]);
 
+// The drinks ARE creatures: each tier is a different animal-shaped cup, drawn
+// in code so its ears twitch, its tail swishes and its eyes blink. Tier 11 is
+// deliberately left as the rendered Paradise Atlas sprite — the trophy at the
+// end of the chain should look like a different class of object.
+const CREATURE = {
+  1:  { ears: 'none',   tail: 'none',  extra: 'frog',      belly: '#eafbc8' },
+  2:  { ears: 'point',  tail: 'curl',  extra: null,        belly: '#ffe6c2' },
+  3:  { ears: 'round',  tail: 'curly', extra: 'snout',     belly: '#ffdfe4' },
+  4:  { ears: 'none',   tail: 'stub',  extra: 'shell',     belly: '#d8f4ff' },
+  5:  { ears: 'long',   tail: 'puff',  extra: null,        belly: '#fffaf0' },
+  6:  { ears: 'point',  tail: 'bushy', extra: null,        belly: '#ffe0bd' },
+  7:  { ears: 'none',   tail: 'none',  extra: 'tentacles', belly: '#e8d4ff' },
+  8:  { ears: 'none',   tail: 'none',  extra: 'beak',      belly: '#fff2c2' },
+  9:  { ears: 'none',   tail: 'fin',   extra: 'whiskers',  belly: '#eafcfa' },
+  10: { ears: 'stalks', tail: 'none',  extra: 'claws',     belly: '#ffd9e2' },
+};
+
 export class Renderer {
   constructor(view, assets) {
     this.view = view;
@@ -493,7 +510,25 @@ export class Renderer {
     // billboard shear would fight it — keep only a whisper of lean for life.
     const shear = (this.view.cx - p.x) / this.view.w * 0.04;
 
-    if (img) {
+    const creature = CREATURE[b.tier];
+    if (creature) {
+      // the cup IS the animal — drawn, so its ears and tail can move
+      const CW = wpx * 0.62, CH = CW * 1.22 * squash;
+      const ax = hpx.x, ay = hpx.y + b.r * p.s * 0.35;
+      if (glossA > 0 && b.y < 40) {          // a soft colour bloom on the table
+        ctx.save();
+        ctx.globalAlpha = glossA * sh * 1.4;
+        ctx.fillStyle = tier.color;
+        ellipse(ctx, ax, ay + CH * 0.1, CW * 0.5, CH * 0.14);
+        ctx.restore();
+      }
+      ctx.save();
+      ctx.translate(ax, ay);
+      ctx.transform(1, 0, shear, 1, 0, 0);
+      this.drawCreature(ctx, b, tier, CW, CH, time);
+      this.drawCharm(ctx, b, CW, CH, time);
+      ctx.restore();
+    } else if (img) {
       const ih = wpx * (img.naturalHeight / img.naturalWidth);
       const ax = hpx.x, ay = hpx.y + b.r * p.s * 0.35;
       // reflection on the felt
@@ -509,7 +544,7 @@ export class Renderer {
       ctx.translate(ax, ay);
       ctx.transform(1, 0, shear, 1, 0, 0);
       // tail sits BEHIND the glass so it reads as coming out from behind it
-      if (CAT_TIERS.has(b.tier)) this.drawCatTail(ctx, b, wpx, ih * squash, time);
+      if (CAT_TIERS.has(b.tier) && !CREATURE[b.tier]) this.drawCatTail(ctx, b, wpx, ih * squash, time);
       ctx.drawImage(img, -wpx / 2, -ih * 0.96 * squash, wpx, ih * squash);
       this.drawCharm(ctx, b, wpx, ih * squash, time);
       ctx.restore();
@@ -672,6 +707,315 @@ export class Renderer {
     ctx.restore();
   }
 
+  // ---------- creature cups ----------
+  // Origin is the foot of the cup: the body spans y ∈ [-H, 0], x ∈ [-W/2, W/2].
+
+  cupPath(ctx, W, H) {
+    const tw = W / 2, bw = W * 0.32;
+    ctx.beginPath();
+    ctx.moveTo(-tw, -H);
+    ctx.bezierCurveTo(-tw * 1.12, -H * 0.58, -tw * 1.06, -H * 0.16, -bw, -H * 0.03);
+    ctx.quadraticCurveTo(0, H * 0.12, bw, -H * 0.03);
+    ctx.bezierCurveTo(tw * 1.06, -H * 0.16, tw * 1.12, -H * 0.58, tw, -H);
+    ctx.closePath();
+  }
+
+  drawCreature(ctx, b, tier, W, H, time) {
+    const spec = CREATURE[b.tier];
+    const ph = time * 2.1 + b.id * 1.7;
+    const sway = Math.sin(ph);
+    const dark = shade(tier.color, -0.28);
+    const lite = shade(tier.color, 0.22);
+    const tw = W / 2;
+
+    // ---- behind the body: tail, shell, tentacles, claws ----
+    ctx.save();
+    ctx.fillStyle = dark;
+    ctx.strokeStyle = dark;
+    ctx.lineCap = 'round';
+    switch (spec.tail) {
+      case 'curl': {                                    // cat
+        ctx.lineWidth = W * 0.10;
+        ctx.beginPath();
+        ctx.moveTo(tw * 0.75, -H * 0.14);
+        ctx.bezierCurveTo(tw * 1.5, -H * 0.16, tw * 1.7 + sway * W * 0.1, -H * 0.5,
+          tw * 1.05 + sway * W * 0.14, -H * 0.72);
+        ctx.stroke();
+        break;
+      }
+      case 'bushy': {                                   // fox
+        ctx.beginPath();
+        ctx.moveTo(tw * 0.7, -H * 0.1);
+        ctx.quadraticCurveTo(tw * 1.9 + sway * W * 0.08, -H * 0.22,
+          tw * 1.25 + sway * W * 0.12, -H * 0.68);
+        ctx.quadraticCurveTo(tw * 1.0, -H * 0.3, tw * 0.7, -H * 0.1);
+        ctx.fill();
+        ctx.fillStyle = '#fff6ea';                      // white tip
+        ctx.beginPath();
+        ctx.arc(tw * 1.25 + sway * W * 0.12, -H * 0.66, W * 0.1, 0, 7);
+        ctx.fill();
+        break;
+      }
+      case 'curly': {                                   // piglet
+        ctx.lineWidth = W * 0.065;
+        ctx.beginPath();
+        for (let i = 0; i <= 16; i++) {
+          const t = i / 16, a = t * 8 + sway * 0.5;
+          const r = W * 0.14 * (1 - t * 0.35);
+          const x = tw * 0.85 + Math.cos(a) * r + t * W * 0.16;
+          const y = -H * 0.2 - Math.sin(a) * r;
+          i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+        }
+        ctx.stroke();
+        break;
+      }
+      case 'puff':                                      // bunny
+        ctx.fillStyle = '#fffaf2';
+        ctx.beginPath();
+        ctx.arc(tw * 0.92, -H * 0.16 + sway * H * 0.015, W * 0.15, 0, 7);
+        ctx.fill();
+        break;
+      case 'fin':                                       // seal
+        ctx.beginPath();
+        ctx.moveTo(tw * 0.7, -H * 0.1);
+        ctx.quadraticCurveTo(tw * 1.5, -H * 0.02 + sway * H * 0.05, tw * 1.55, -H * 0.28);
+        ctx.quadraticCurveTo(tw * 1.1, -H * 0.16, tw * 0.7, -H * 0.1);
+        ctx.fill();
+        break;
+      case 'stub':                                      // turtle
+        ctx.beginPath();
+        ctx.ellipse(tw * 0.95, -H * 0.14, W * 0.1, W * 0.07, sway * 0.2, 0, 7);
+        ctx.fill();
+        break;
+    }
+    if (spec.extra === 'tentacles') {                   // octopus
+      ctx.lineWidth = W * 0.075;
+      for (let i = -2; i <= 2; i++) {
+        if (i === 0) continue;
+        const s0 = i * W * 0.17;
+        ctx.beginPath();
+        ctx.moveTo(s0 * 0.6, -H * 0.1);
+        ctx.quadraticCurveTo(s0 * 1.25, H * 0.06 + Math.sin(ph + i) * H * 0.03,
+          s0 * 1.5, -H * 0.05 + Math.sin(ph + i * 1.4) * H * 0.05);
+        ctx.stroke();
+      }
+    }
+    if (spec.extra === 'claws') {                       // crab
+      for (const side of [-1, 1]) {
+        const cx = side * tw * 1.28, cy = -H * 0.4 + Math.sin(ph + side) * H * 0.04;
+        ctx.lineWidth = W * 0.075;
+        ctx.beginPath();
+        ctx.moveTo(side * tw * 0.85, -H * 0.28);
+        ctx.lineTo(cx, cy);
+        ctx.stroke();
+        ctx.beginPath();                                 // pincer
+        ctx.arc(cx, cy, W * 0.14, side > 0 ? -2.1 : 1.05, side > 0 ? 1.05 : -2.1);
+        ctx.lineWidth = W * 0.1;
+        ctx.stroke();
+      }
+    }
+    ctx.restore();
+
+    // ---- ears (behind the head line so they read as attached) ----
+    ctx.save();
+    ctx.fillStyle = shade(tier.color, -0.1);
+    const earTwitch = Math.sin(ph * 1.3) * 0.06;
+    for (const side of [-1, 1]) {
+      const ex = side * W * 0.27, ey = -H * 0.97;
+      if (spec.ears === 'point' || spec.ears === 'round' || spec.ears === 'long') {
+        ctx.save();
+        ctx.translate(ex, ey);
+        ctx.rotate(side * (0.12 + earTwitch));
+        ctx.beginPath();
+        if (spec.ears === 'point') {
+          ctx.moveTo(-W * 0.11, H * 0.06);
+          ctx.quadraticCurveTo(0, -H * 0.20, W * 0.11, H * 0.06);
+        } else if (spec.ears === 'round') {
+          ctx.arc(0, -H * 0.02, W * 0.12, 0, 7);
+        } else {                                          // long bunny ears
+          ctx.ellipse(0, -H * 0.14, W * 0.075, H * 0.19, 0, 0, 7);
+        }
+        ctx.closePath(); ctx.fill();
+        ctx.fillStyle = 'rgba(255,178,202,0.9)';          // inner ear
+        ctx.beginPath();
+        if (spec.ears === 'point') {
+          ctx.moveTo(-W * 0.05, H * 0.04);
+          ctx.quadraticCurveTo(0, -H * 0.12, W * 0.05, H * 0.04);
+        } else if (spec.ears === 'round') {
+          ctx.arc(0, -H * 0.02, W * 0.06, 0, 7);
+        } else {
+          ctx.ellipse(0, -H * 0.14, W * 0.035, H * 0.13, 0, 0, 7);
+        }
+        ctx.closePath(); ctx.fill();
+        ctx.fillStyle = shade(tier.color, -0.1);
+        ctx.restore();
+      } else if (spec.ears === 'stalks') {                // crab eye stalks
+        ctx.strokeStyle = shade(tier.color, -0.1);
+        ctx.lineWidth = W * 0.05;
+        ctx.beginPath();
+        ctx.moveTo(side * W * 0.16, -H * 0.92);
+        ctx.lineTo(ex, ey - H * 0.09 + Math.sin(ph + side) * H * 0.015);
+        ctx.stroke();
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(ex, ey - H * 0.10, W * 0.075, 0, 7); ctx.fill();
+        ctx.fillStyle = 'rgba(30,22,28,0.9)';
+        ctx.beginPath();
+        ctx.arc(ex, ey - H * 0.10, W * 0.035, 0, 7); ctx.fill();
+        ctx.fillStyle = shade(tier.color, -0.1);
+      }
+    }
+    ctx.restore();
+
+    // ---- body ----
+    const g = ctx.createLinearGradient(-tw, -H, tw * 0.6, 0);
+    g.addColorStop(0, lite);
+    g.addColorStop(0.45, tier.color);
+    g.addColorStop(1, dark);
+    ctx.fillStyle = g;
+    this.cupPath(ctx, W, H);
+    ctx.fill();
+    ctx.strokeStyle = shade(tier.color, -0.42);
+    ctx.lineWidth = Math.max(1, W * 0.035);
+    ctx.stroke();
+
+    // belly patch
+    ctx.save();
+    this.cupPath(ctx, W, H);
+    ctx.clip();
+    ctx.fillStyle = spec.belly;
+    ctx.globalAlpha = 0.55;
+    ctx.beginPath();
+    ctx.ellipse(0, -H * 0.24, W * 0.3, H * 0.24, 0, 0, 7);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+    if (spec.extra === 'shell') {                        // turtle shell plates
+      ctx.strokeStyle = 'rgba(30,60,70,0.35)';
+      ctx.lineWidth = Math.max(1, W * 0.03);
+      for (let i = 0; i < 3; i++) {
+        ctx.beginPath();
+        ctx.arc(0, -H * 0.3, W * (0.16 + i * 0.13), Math.PI * 1.15, Math.PI * 1.85);
+        ctx.stroke();
+      }
+    }
+    // liquid surface + gloss
+    ctx.fillStyle = shade(tier.alt || lite, 0.1);
+    ctx.beginPath();
+    ctx.ellipse(0, -H * 0.9, tw * 0.93, tw * 0.3, 0, 0, 7);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,0.3)';
+    ctx.beginPath();
+    ctx.ellipse(-tw * 0.44, -H * 0.5, W * 0.07, H * 0.24, 0.13, 0, 7);
+    ctx.fill();
+    ctx.restore();
+
+    // inner shading so the body reads as a rounded vessel, not a flat shape
+    ctx.save();
+    this.cupPath(ctx, W, H);
+    ctx.clip();
+    const shd = ctx.createLinearGradient(0, -H * 0.35, 0, H * 0.1);
+    shd.addColorStop(0, 'rgba(0,0,0,0)');
+    shd.addColorStop(1, 'rgba(0,0,0,0.36)');
+    ctx.fillStyle = shd;
+    ctx.fillRect(-tw * 1.2, -H * 0.4, W * 1.4, H * 0.6);
+    const side = ctx.createLinearGradient(tw * 0.25, 0, tw * 1.1, 0);
+    side.addColorStop(0, 'rgba(0,0,0,0)');
+    side.addColorStop(1, 'rgba(0,0,0,0.3)');
+    ctx.fillStyle = side;
+    ctx.fillRect(0, -H, tw * 1.2, H);
+    ctx.restore();
+
+    // rim: a bright band so the cup has a lip you can read
+    ctx.fillStyle = shade(tier.color, 0.5);
+    ctx.beginPath();
+    ctx.ellipse(0, -H * 0.97, tw, tw * 0.3, 0, 0, 7);
+    ctx.fill();
+    ctx.fillStyle = shade(tier.alt || tier.color, 0.05);
+    ctx.beginPath();
+    ctx.ellipse(0, -H * 0.945, tw * 0.88, tw * 0.245, 0, 0, 7);
+    ctx.fill();
+    ctx.strokeStyle = shade(tier.color, -0.42);
+    ctx.lineWidth = Math.max(1, W * 0.03);
+    ctx.beginPath();
+    ctx.ellipse(0, -H * 0.97, tw, tw * 0.3, 0, 0, 7);
+    ctx.stroke();
+
+    // ---- face ----
+    const fy = -H * 0.56;
+    const blink = ((time * 0.5 + b.id * 0.9) % 3.6) < 0.13;
+    const eo = W * 0.15, er = Math.max(1.4, W * 0.055);
+    ctx.fillStyle = 'rgba(28,20,26,0.9)';
+    ctx.strokeStyle = 'rgba(28,20,26,0.9)';
+    ctx.lineWidth = Math.max(1.2, W * 0.03);
+    ctx.lineCap = 'round';
+    if (spec.extra === 'frog') {                          // frog eyes ride on top
+      for (const side of [-1, 1]) {
+        const ex = side * W * 0.22, ey = -H * 1.0;
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath(); ctx.arc(ex, ey, W * 0.13, 0, 7); ctx.fill();
+        ctx.strokeStyle = shade(tier.color, -0.42);
+        ctx.lineWidth = Math.max(1, W * 0.028); ctx.stroke();
+        ctx.fillStyle = 'rgba(28,20,26,0.9)';
+        ctx.beginPath();
+        if (blink) { ctx.rect(ex - W * 0.07, ey - W * 0.012, W * 0.14, W * 0.024); }
+        else ctx.arc(ex, ey, W * 0.055, 0, 7);
+        ctx.fill();
+      }
+      ctx.strokeStyle = 'rgba(28,20,26,0.85)';
+      ctx.lineWidth = Math.max(1.2, W * 0.032);
+      ctx.beginPath();                                    // wide frog smile
+      ctx.arc(0, fy - H * 0.06, W * 0.2, 0.25, Math.PI - 0.25);
+      ctx.stroke();
+    } else {
+      for (const side of [-1, 1]) {
+        const ex = side * eo;
+        ctx.beginPath();
+        if (blink) { ctx.moveTo(ex - er, fy); ctx.lineTo(ex + er, fy); ctx.stroke(); }
+        else { ctx.arc(ex, fy, er, 0, 7); ctx.fill(); }
+      }
+      ctx.fillStyle = 'rgba(255,140,170,0.4)';            // blush
+      for (const side of [-1, 1]) {
+        ctx.beginPath();
+        ctx.ellipse(side * W * 0.26, fy + er * 1.5, W * 0.065, W * 0.042, 0, 0, 7);
+        ctx.fill();
+      }
+      ctx.strokeStyle = 'rgba(28,20,26,0.9)';
+      if (spec.extra === 'beak') {                        // duckling
+        ctx.fillStyle = '#ff9c2e';
+        ctx.beginPath();
+        ctx.moveTo(-W * 0.11, fy + er * 1.5);
+        ctx.quadraticCurveTo(0, fy + er * 3.6, W * 0.11, fy + er * 1.5);
+        ctx.closePath(); ctx.fill();
+      } else if (spec.extra === 'snout') {                // piglet
+        ctx.fillStyle = 'rgba(255,150,175,0.95)';
+        ctx.beginPath();
+        ctx.ellipse(0, fy + er * 2.2, W * 0.11, W * 0.078, 0, 0, 7);
+        ctx.fill();
+        ctx.fillStyle = 'rgba(150,70,95,0.8)';
+        for (const side of [-1, 1]) {
+          ctx.beginPath();
+          ctx.ellipse(side * W * 0.04, fy + er * 2.2, W * 0.018, W * 0.028, 0, 0, 7);
+          ctx.fill();
+        }
+      } else {
+        ctx.beginPath();                                  // :3
+        ctx.arc(-er * 0.6, fy + er * 1.7, er * 0.62, 0, Math.PI);
+        ctx.arc(er * 0.6, fy + er * 1.7, er * 0.62, 0, Math.PI);
+        ctx.stroke();
+      }
+      if (spec.extra === 'whiskers') {                    // seal
+        ctx.globalAlpha = 0.5;
+        for (const side of [-1, 1]) for (let i = -1; i <= 1; i++) {
+          ctx.beginPath();
+          ctx.moveTo(side * W * 0.14, fy + er * 1.6 + i * er * 0.5);
+          ctx.lineTo(side * W * 0.34, fy + er * 1.3 + i * er * 1.3);
+          ctx.stroke();
+        }
+        ctx.globalAlpha = 1;
+      }
+    }
+  }
+
   // A tail curling out from behind the glass, swishing on its own rhythm.
   // Origin is the glass anchor; the sprite spans y ∈ [-h*0.96, h*0.04].
   drawCatTail(ctx, b, w, h, time) {
@@ -715,7 +1059,9 @@ export class Renderer {
   drawCharm(ctx, b, w, h, time) {
     const tier = TIERS[b.tier - 1];
     const topY = -h * 0.96;
-    if (CAT_TIERS.has(b.tier)) {
+    // creature cups draw their own ears/face/tail; this overlay is only for
+    // the sprite-based tiers that are still plain cocktails
+    if (CAT_TIERS.has(b.tier) && !CREATURE[b.tier]) {
       const ph = time * 2.2 + b.id * 1.9;
       const earW = w * 0.17, earH = h * 0.11;
       for (const side of [-1, 1]) {
@@ -1020,4 +1366,26 @@ function dotLine(ctx, view, x0, z0, x1, z1, style) {
 function easeOutBack(t) {
   const c1 = 1.70158, c3 = c1 + 1;
   return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
+}
+
+// The UI (collection, passport, HUD, order cards) must show the same creature
+// the player meets on the table, so icons are rendered from the very same
+// drawing code rather than the old cocktail sprites. Cached per tier+size.
+const ICON_CACHE = new Map();
+export function creatureIcon(tierId, px = 128) {
+  if (!CREATURE[tierId]) return null;                 // tier 11 keeps its sprite
+  const key = tierId + ':' + px;
+  if (ICON_CACHE.has(key)) return ICON_CACHE.get(key);
+  const c = document.createElement('canvas');
+  c.width = px; c.height = px;
+  const ctx = c.getContext('2d');
+  const tier = TIERS[tierId - 1];
+  const W = px * 0.62, H = W * 1.22;
+  ctx.translate(px / 2, px * 0.93);
+  // t=1.1 so nobody is mid-blink in a still icon
+  Renderer.prototype.drawCreature.call(
+    { cupPath: Renderer.prototype.cupPath }, ctx, { tier: tierId, id: 0 }, tier, W, H, 1.1);
+  const url = c.toDataURL();
+  ICON_CACHE.set(key, url);
+  return url;
 }

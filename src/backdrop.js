@@ -4,18 +4,18 @@
 
 // Per-scene ambient spec: sea band (fractions of canvas height) + mover type.
 const SCENES = {
-  waikiki:   { mover: 'boat',     band: [0.44, 0.52], boatColor: '#ffffff', birds: true },
-  miami:     { mover: 'ship',     band: [0.40, 0.46], boatColor: '#e8e0f0', birds: true },
-  cancun:    { mover: 'parasail', band: [0.16, 0.30], birds: true },
-  rio:       { mover: 'cablecar', band: [0.30, 0.38], birds: true, sparkleColor: '#ffd98e' },
-  nice:      { mover: 'plane',    band: [0.14, 0.24], birds: true },
-  positano:  { mover: 'boat',     band: [0.52, 0.60], boatColor: '#f5f1e8' },
-  santorini: { mover: 'boat',     band: [0.52, 0.62], boatColor: '#f7f3ee', sparkleColor: '#ffb87a', windows: true },
-  ibiza:     { mover: 'beams',    band: [0.52, 0.62], night: true, shootingStars: true },
-  dubai:     { mover: 'shimmer',  band: [0.50, 0.62], night: true, sparkleColor: '#f2c14e' },
-  phuket:    { mover: 'longtail', band: [0.48, 0.58], boatColor: '#d14b3c', birds: true },
-  bali:      { mover: 'kite',     band: [0.10, 0.28], sparkleColor: '#ffb25e' },
-  borabora:  { mover: 'ray',      band: [0.55, 0.68], birds: true },
+  waikiki:   { mover: 'boat',     band: [0.44, 0.52], boatColor: '#ffffff', birds: true, critters: [{ t:'gull', y:0.13, period:24 }, { t:'butterfly', y:0.20, period:19, dir:-1 }, { t:'dolphin', y:0.35, period:31 }] },
+  miami:     { mover: 'ship',     band: [0.40, 0.46], boatColor: '#e8e0f0', birds: true, critters: [{ t:'pelican', y:0.12, period:27 }, { t:'butterfly', y:0.22, period:21, dir:-1 }] },
+  cancun:    { mover: 'parasail', band: [0.16, 0.30], birds: true, critters: [{ t:'butterfly', y:0.18, period:18 }, { t:'turtle', y:0.34, period:34, dir:-1 }, { t:'fish', y:0.36, period:23 }] },
+  rio:       { mover: 'cablecar', band: [0.30, 0.38], birds: true, sparkleColor: '#ffd98e', critters: [{ t:'gull', y:0.14, period:23, dir:-1 }, { t:'butterfly', y:0.24, period:20 }] },
+  nice:      { mover: 'plane',    band: [0.14, 0.24], birds: true, critters: [{ t:'butterfly', y:0.19, period:17 }, { t:'gull', y:0.11, period:26, dir:-1 }] },
+  positano:  { mover: 'boat',     band: [0.52, 0.60], boatColor: '#f5f1e8', critters: [{ t:'butterfly', y:0.21, period:18, dir:-1 }, { t:'gull', y:0.13, period:25 }] },
+  santorini: { mover: 'boat',     band: [0.52, 0.62], boatColor: '#f7f3ee', sparkleColor: '#ffb87a', windows: true, critters: [{ t:'gull', y:0.12, period:24 }, { t:'butterfly', y:0.23, period:20, dir:-1 }] },
+  ibiza:     { mover: 'beams',    band: [0.52, 0.62], night: true, shootingStars: true, critters: [{ t:'bat', y:0.15, period:21, dir:-1 }, { t:'bat', y:0.22, period:28 }] },
+  dubai:     { mover: 'shimmer',  band: [0.50, 0.62], night: true, sparkleColor: '#f2c14e', critters: [{ t:'gull', y:0.13, period:26, dir:-1 }, { t:'fish', y:0.36, period:24 }] },
+  phuket:    { mover: 'longtail', band: [0.48, 0.58], boatColor: '#d14b3c', birds: true, critters: [{ t:'butterfly', y:0.20, period:18 }, { t:'dolphin', y:0.35, period:29, dir:-1 }] },
+  bali:      { mover: 'kite',     band: [0.10, 0.28], sparkleColor: '#ffb25e', critters: [{ t:'butterfly', y:0.19, period:17, dir:-1 }, { t:'fish', y:0.35, period:25 }] },
+  borabora:  { mover: 'ray',      band: [0.55, 0.68], birds: true, critters: [{ t:'dolphin', y:0.34, period:27 }, { t:'turtle', y:0.37, period:36, dir:-1 }, { t:'butterfly', y:0.18, period:19 }] },
 };
 
 export class Backdrop {
@@ -90,6 +90,7 @@ export class Backdrop {
     this.drawMover(ctx, w, h, bandY);
 
     if (s.birds) this.drawBirds(ctx, w, h);
+    this.drawCritters(ctx, w, h);
     if (s.shootingStars) this.drawShootingStar(ctx, w, h);
     if (s.night) this.drawFireflies(ctx, w, h);
     else this.drawLightRays(ctx, w, h);
@@ -284,6 +285,139 @@ export class Backdrop {
         ctx.quadraticCurveTo(-12, 0, -18, -6); ctx.quadraticCurveTo(-10, -2, 0, -8);
         ctx.closePath(); ctx.fill();
         ctx.restore();
+        break;
+      }
+    }
+  }
+
+  // Little visitors crossing the scene: they enter, cross, and leave, then the
+  // pass repeats after a gap so the place feels inhabited rather than busy.
+  drawCritters(ctx, w, h) {
+    const list = this.scene.critters;
+    if (!list) return;
+    const t = this.t;
+    list.forEach((c, i) => {
+      const period = c.period || 22;
+      const ph = ((t + i * 7.7) % period) / period;
+      if (ph > 0.8) return;                       // off-stage between passes
+      const p = ph / 0.8;
+      const dir = c.dir || 1;
+      const x = dir > 0 ? p * (w + 140) - 70 : w + 70 - p * (w + 140);
+      const sz = h * 0.026 * (c.size || 1);
+      ctx.save();
+      ctx.translate(x, c.y * h);
+      if (dir < 0) ctx.scale(-1, 1);
+      this.drawCritter(ctx, c.t, sz, t, i, p);
+      ctx.restore();
+    });
+  }
+
+  drawCritter(ctx, kind, s, t, i, p) {
+    const wob = Math.sin(t * 3 + i * 2);
+    switch (kind) {
+      case 'butterfly': {
+        ctx.translate(0, wob * s * 0.7);
+        const flap = 0.35 + 0.55 * Math.abs(Math.sin(t * 9 + i));
+        ctx.fillStyle = 'rgba(255,150,190,0.9)';
+        for (const side of [-1, 1]) {
+          ctx.beginPath();
+          ctx.ellipse(side * s * 0.42 * flap, -s * 0.16, s * 0.42 * flap, s * 0.3, side * 0.4, 0, 7);
+          ctx.fill();
+          ctx.beginPath();
+          ctx.ellipse(side * s * 0.34 * flap, s * 0.2, s * 0.3 * flap, s * 0.22, -side * 0.4, 0, 7);
+          ctx.fill();
+        }
+        ctx.fillStyle = 'rgba(70,45,60,0.85)';
+        ctx.beginPath(); ctx.ellipse(0, 0, s * 0.09, s * 0.34, 0, 0, 7); ctx.fill();
+        break;
+      }
+      case 'gull': case 'pelican': {
+        const big = kind === 'pelican' ? 1.5 : 1;
+        ctx.translate(0, wob * s * 0.5);
+        const flap = Math.sin(t * (kind === 'gull' ? 7 : 4.5) + i) * s * 0.5;
+        ctx.fillStyle = 'rgba(252,250,248,0.95)';
+        ctx.beginPath();
+        ctx.ellipse(0, 0, s * 0.5 * big, s * 0.22 * big, 0, 0, 7); ctx.fill();
+        ctx.beginPath();                                   // head
+        ctx.arc(s * 0.5 * big, -s * 0.1 * big, s * 0.17 * big, 0, 7); ctx.fill();
+        ctx.fillStyle = '#ffae3c';
+        ctx.beginPath();                                   // beak
+        ctx.moveTo(s * 0.62 * big, -s * 0.12 * big);
+        ctx.lineTo(s * 0.92 * big, -s * 0.05 * big);
+        ctx.lineTo(s * 0.62 * big, s * 0.02 * big);
+        ctx.closePath(); ctx.fill();
+        ctx.strokeStyle = 'rgba(230,228,226,0.95)';        // wings
+        ctx.lineWidth = s * 0.16 * big; ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(-s * 0.1, 0); ctx.lineTo(-s * 0.5 * big, -flap * big);
+        ctx.stroke();
+        break;
+      }
+      case 'bat': {
+        ctx.translate(0, wob * s * 0.9);
+        const flap = 0.3 + 0.7 * Math.abs(Math.sin(t * 8 + i));
+        ctx.fillStyle = 'rgba(28,20,44,0.9)';
+        ctx.beginPath(); ctx.ellipse(0, 0, s * 0.2, s * 0.26, 0, 0, 7); ctx.fill();
+        for (const side of [-1, 1]) {
+          ctx.beginPath();
+          ctx.moveTo(0, -s * 0.05);
+          ctx.quadraticCurveTo(side * s * 0.5, -s * 0.4 * flap, side * s * 0.85, s * 0.1 * flap);
+          ctx.quadraticCurveTo(side * s * 0.45, s * 0.02, 0, s * 0.14);
+          ctx.closePath(); ctx.fill();
+        }
+        break;
+      }
+      case 'dolphin': {
+        // leaps: three arcs across the pass
+        const leap = Math.sin(p * Math.PI * 3);
+        const up = Math.max(0, leap);
+        ctx.translate(0, -up * s * 1.9);
+        ctx.rotate(Math.cos(p * Math.PI * 3) * 0.5);
+        ctx.fillStyle = 'rgba(96,124,150,0.95)';
+        ctx.beginPath();
+        ctx.ellipse(0, 0, s * 0.78, s * 0.26, 0, 0, 7); ctx.fill();
+        ctx.beginPath();                                    // dorsal
+        ctx.moveTo(0, -s * 0.16);
+        ctx.quadraticCurveTo(s * 0.06, -s * 0.6, s * 0.3, -s * 0.14);
+        ctx.closePath(); ctx.fill();
+        ctx.beginPath();                                    // tail fluke
+        ctx.moveTo(-s * 0.66, 0);
+        ctx.lineTo(-s * 1.05, -s * 0.3);
+        ctx.lineTo(-s * 1.02, s * 0.28);
+        ctx.closePath(); ctx.fill();
+        ctx.fillStyle = 'rgba(20,26,34,0.85)';
+        ctx.beginPath(); ctx.arc(s * 0.6, -s * 0.05, s * 0.05, 0, 7); ctx.fill();
+        break;
+      }
+      case 'fish': {
+        const leap = Math.max(0, Math.sin(p * Math.PI * 5));
+        ctx.translate(0, -leap * s * 1.1);
+        ctx.rotate(Math.cos(p * Math.PI * 5) * 0.6);
+        ctx.fillStyle = 'rgba(150,205,225,0.9)';
+        ctx.beginPath(); ctx.ellipse(0, 0, s * 0.38, s * 0.18, 0, 0, 7); ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(-s * 0.32, 0);
+        ctx.lineTo(-s * 0.58, -s * 0.2);
+        ctx.lineTo(-s * 0.56, s * 0.2);
+        ctx.closePath(); ctx.fill();
+        break;
+      }
+      case 'turtle': {
+        ctx.translate(0, wob * s * 0.25);
+        ctx.fillStyle = 'rgba(74,126,92,0.95)';
+        ctx.beginPath(); ctx.ellipse(0, 0, s * 0.5, s * 0.34, 0, Math.PI, 0); ctx.fill();
+        ctx.strokeStyle = 'rgba(40,80,58,0.8)'; ctx.lineWidth = s * 0.06;
+        for (let k = 1; k <= 2; k++) {
+          ctx.beginPath(); ctx.arc(0, 0, s * 0.18 * k, Math.PI, 0); ctx.stroke();
+        }
+        ctx.fillStyle = 'rgba(110,160,120,0.95)';
+        ctx.beginPath(); ctx.arc(s * 0.56, -s * 0.06, s * 0.15, 0, 7); ctx.fill();
+        for (const fx2 of [-0.3, 0.3]) {                    // flippers
+          ctx.beginPath();
+          ctx.ellipse(s * fx2, s * 0.08 + Math.sin(t * 4 + fx2 * 6) * s * 0.05,
+            s * 0.18, s * 0.09, 0.4, 0, 7);
+          ctx.fill();
+        }
         break;
       }
     }
