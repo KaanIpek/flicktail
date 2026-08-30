@@ -10,6 +10,12 @@
 // flow can be played and tuned. It must not ship as if it were an ad: call
 // ads.use(realProvider) before release, or ads.disable() to hide the offer.
 
+// The stand-in is a development tool. It stays available on localhost and on
+// the web build (where the flow is tuned and tested) and is switched off
+// everywhere else, which is what a packaged app is.
+const ALLOW_PLACEHOLDER = typeof location !== 'undefined'
+  && /^(localhost|127\.0\.0\.1|.*\.github\.io)$/.test(location.hostname);
+
 export class Ads {
   constructor() {
     this.provider = placeholderProvider();
@@ -23,6 +29,12 @@ export class Ads {
 
   available() {
     if (!this.provider || !this.provider.available()) return false;
+    // A shipped build must never offer "watch an ad" and then show the labelled
+    // stand-in — that is a promise the app cannot keep, and it reads as a bug
+    // or a trick. The placeholder exists to tune the flow during development;
+    // on a release build the refill simply is not offered until a real network
+    // is registered with ads.use().
+    if (this.placeholder && !ALLOW_PLACEHOLDER) return false;
     // never two in a row within a few seconds, however the game asks
     return Date.now() - this.lastShown > 4000;
   }

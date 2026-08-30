@@ -263,7 +263,7 @@ export class UI {
       if (active) action = '<div class="skin-on">EQUIPPED</div>';
       else if (owned) action = `<button class="btn tiny zen" data-act="equipSkin" data-id="${sk.id}">Wear it</button>`;
       else if (canStar) action = `<button class="btn tiny primary" data-act="unlockSkin" data-id="${sk.id}">Unlock ★ ${sk.stars}</button>`;
-      else action = `<div class="skin-locked">★ ${sk.stars} to unlock${sk.price ? ` &middot; or ${sk.price} soon` : ''}</div>`;
+      else action = `<div class="skin-locked">★ ${sk.stars} to unlock</div>`;
       return `
       <div class="skin-card ${owned ? '' : 'locked'}">
         <div class="skin-row">${preview}</div>
@@ -280,8 +280,8 @@ export class UI {
         <div class="map-stars">★ ${stars}</div>
       </div>
       <div class="shop-scroll">
-        <p class="shop-note">Skins change how every drink looks. Earn one with stars now
-          &mdash; card payment arrives once the store is connected.</p>
+        <p class="shop-note">Skins change how every drink looks. Earn one with the
+          stars you collect on tour.</p>
         ${cards}
       </div>
     </div>`;
@@ -422,9 +422,9 @@ export class UI {
         </div>
       </div>
       <div class="hud-missions" id="hudMissions">
-        <div class="mission ${game.rush || game.shift ? 'hidden' : ''}" id="missionMain">
+        <div class="mission ${game.shift ? 'hidden' : ''}" id="missionMain">
           <span class="mission-tick" id="mainTick">○</span>
-          <span class="mission-text">Mix a <b>${tierNameFor(l, l.goalTier, TIERS)}</b></span>
+          <span class="mission-text">Mix a <b>${tierNameFor(l, game.chaseTier(), TIERS)}</b></span>
         </div>
         <div class="mission hidden" id="sideGoal">
           <span class="mission-tick" id="sideTick">○</span>
@@ -448,6 +448,7 @@ export class UI {
     this.hudTickets = document.getElementById('hudTickets');
     this.lastTickets = -1;
     this.lastNeed = '';
+    this.lastChase = -1;
     this.hudFlicks = document.getElementById('hudFlicks');
     this.hudGoal = document.getElementById('hudGoal');
     this.comboEl = document.getElementById('combo');
@@ -509,6 +510,16 @@ export class UI {
       this.nextQueue.innerHTML = game.queue.slice(0, 2)
         .map((t, i) => this.drinkImg(t, i === 0 ? 'next1' : 'next2', game.level)).join('');
       this.lastQueue = q;
+    }
+    // Endless and Rush retarget as you climb, so the chip has to be rewritten
+    // rather than set once at level load.
+    if (game.endless || game.rush) {
+      const t = game.chaseTier();
+      if (t !== this.lastChase) {
+        const el = document.querySelector('#missionMain .mission-text');
+        if (el) el.innerHTML = `Mix a <b>${tierNameFor(game.level, t, TIERS)}</b>`;
+        this.lastChase = t;
+      }
     }
     if (game.goalDone) this.hudGoal.classList.add('done');
     // missions live at the TOP: main goal first, then the level's side challenge
@@ -688,8 +699,11 @@ export class UI {
         </div>
         <div class="result-buttons">
           <button class="btn big primary" data-act="resume">RESUME</button>
-          <button class="btn ghost" data-act="replay">Restart level</button>
-          <button class="btn ghost" data-act="map">Quit to map</button>
+          <button class="btn ghost" data-act="replay">Restart</button>
+          ${game.zen || game.endless || game.daily || game.rush || game.shift
+            ? '<button class="btn ghost" data-act="title">Quit to menu</button>'
+            : '<button class="btn ghost" data-act="map">Quit to map</button>'
+              + '<button class="btn ghost" data-act="title">Quit to menu</button>'}
         </div>
         <p class="credits">Backdrops &amp; drink art generated for this game · Fonts: Baloo 2, Nunito (OFL)</p>
       </div>

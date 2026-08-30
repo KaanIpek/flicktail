@@ -7,7 +7,7 @@
   "star2": 14,
   "star3": 25,
   "winRate": "5/5",
-  "star3Rate": "2/5",
+  "star3Rate": "1/5",
   "scoreMin": 11,
   "scoreMed": 14,
   "scoreP80": 25,
@@ -46,11 +46,11 @@
   "star2": 232,
   "star3": 237,
   "winRate": "4/5",
-  "star3Rate": "0/5",
-  "scoreMin": 180,
-  "scoreMed": 232,
-  "scoreP80": 237,
-  "scoreMax": 237,
+  "star3Rate": "2/5",
+  "scoreMin": 168,
+  "scoreMed": 237,
+  "scoreP80": 256,
+  "scoreMax": 256,
   "maxTierReached": 6,
   "why": {
    "won": 4,
@@ -65,16 +65,15 @@
   "flicks": 19,
   "star2": 108,
   "star3": 213,
-  "winRate": "4/5",
+  "winRate": "5/5",
   "star3Rate": "0/5",
-  "scoreMin": 67,
-  "scoreMed": 108,
-  "scoreP80": 213,
-  "scoreMax": 213,
+  "scoreMin": 86,
+  "scoreMed": 111,
+  "scoreP80": 118,
+  "scoreMax": 118,
   "maxTierReached": 7,
   "why": {
-   "won": 4,
-   "flicks": 1
+   "won": 5
   },
   "flicksLeftMed": 6
  },
@@ -85,18 +84,17 @@
   "flicks": 37,
   "star2": 348,
   "star3": 385,
-  "winRate": "3/5",
+  "winRate": "5/5",
   "star3Rate": "0/5",
-  "scoreMin": 274,
-  "scoreMed": 348,
-  "scoreP80": 385,
-  "scoreMax": 385,
+  "scoreMin": 281,
+  "scoreMed": 315,
+  "scoreP80": 363,
+  "scoreMax": 363,
   "maxTierReached": 8,
   "why": {
-   "flicks": 2,
-   "won": 3
+   "won": 5
   },
-  "flicksLeftMed": 1
+  "flicksLeftMed": 4
  },
  {
   "id": 105,
@@ -105,58 +103,57 @@
   "flicks": 35,
   "star2": 355,
   "star3": 415,
-  "winRate": "2/5",
-  "star3Rate": "0/5",
-  "scoreMin": 274,
-  "scoreMed": 355,
-  "scoreP80": 415,
-  "scoreMax": 415,
+  "winRate": "5/5",
+  "star3Rate": "1/5",
+  "scoreMin": 281,
+  "scoreMed": 304,
+  "scoreP80": 418,
+  "scoreMax": 418,
   "maxTierReached": 8,
   "why": {
-   "flicks": 3,
-   "won": 2
+   "won": 5
   },
-  "flicksLeftMed": 0
+  "flicksLeftMed": 2
  },
  {
   "id": 106,
   "place": "Bacalar",
   "goalTier": 9,
   "flicks": 34,
-  "star2": 358,
-  "star3": 472,
-  "winRate": "4/5",
+  "star2": 344,
+  "star3": 358,
+  "winRate": "2/5",
   "star3Rate": "0/5",
-  "scoreMin": 275,
-  "scoreMed": 344,
-  "scoreP80": 358,
-  "scoreMax": 358,
+  "scoreMin": 160,
+  "scoreMed": 239,
+  "scoreP80": 344,
+  "scoreMax": 344,
   "maxTierReached": 9,
   "why": {
-   "won": 4,
-   "flicks": 1
+   "overcrowd": 3,
+   "won": 2
   },
-  "flicksLeftMed": 6
+  "flicksLeftMed": 10
  },
  {
   "id": 107,
   "place": "Chichen Coast",
   "goalTier": 11,
   "flicks": 165,
-  "star2": 750,
-  "star3": 1250,
-  "winRate": "4/5",
-  "star3Rate": "4/5",
-  "scoreMin": 1882,
-  "scoreMed": 3045,
-  "scoreP80": 4047,
-  "scoreMax": 4047,
+  "star2": 3045,
+  "star3": 4047,
+  "winRate": "3/5",
+  "star3Rate": "0/5",
+  "scoreMin": 1455,
+  "scoreMed": 1929,
+  "scoreP80": 3012,
+  "scoreMax": 3012,
   "maxTierReached": 11,
   "why": {
-   "won": 4,
-   "overcrowd": 1
+   "won": 3,
+   "overcrowd": 2
   },
-  "flicksLeftMed": 52
+  "flicksLeftMed": 73
  },
  {
   "id": 110,
@@ -166,7 +163,7 @@
   "star2": 14,
   "star3": 25,
   "winRate": "5/5",
-  "star3Rate": "2/5",
+  "star3Rate": "1/5",
   "scoreMin": 11,
   "scoreMed": 14,
   "scoreP80": 25,
@@ -185,16 +182,16 @@
   "star2": 123,
   "star3": 157,
   "winRate": "5/5",
-  "star3Rate": "1/5",
-  "scoreMin": 107,
-  "scoreMed": 123,
-  "scoreP80": 157,
-  "scoreMax": 157,
+  "star3Rate": "0/5",
+  "scoreMin": 102,
+  "scoreMed": 105,
+  "scoreP80": 126,
+  "scoreMax": 126,
   "maxTierReached": 5,
   "why": {
    "won": 5
   },
-  "flicksLeftMed": 2
+  "flicksLeftMed": 4
  },
  {
   "id": 112,
@@ -203,16 +200,16 @@
   "flicks": 34,
   "star2": 221,
   "star3": 239,
-  "winRate": "4/5",
+  "winRate": "3/5",
   "star3Rate": "1/5",
-  "scoreMin": 207,
-  "scoreMed": 221,
-  "scoreP80": 239,
-  "scoreMax": 239,
-  "maxTierReached": 6,
+  "scoreMin": 157,
+  "scoreMed": 202,
+  "scoreP80": 327,
+  "scoreMax": 327,
+  "maxTierReached": 7,
   "why": {
-   "won": 4,
-   "flicks": 1
+   "flicks": 2,
+   "won": 3
   },
   "flicksLeftMed": 6
  },
@@ -223,16 +220,15 @@
   "flicks": 19,
   "star2": 108,
   "star3": 213,
-  "winRate": "4/5",
+  "winRate": "5/5",
   "star3Rate": "0/5",
-  "scoreMin": 67,
-  "scoreMed": 108,
-  "scoreP80": 213,
-  "scoreMax": 213,
+  "scoreMin": 86,
+  "scoreMed": 111,
+  "scoreP80": 118,
+  "scoreMax": 118,
   "maxTierReached": 7,
   "why": {
-   "won": 4,
-   "flicks": 1
+   "won": 5
   },
   "flicksLeftMed": 6
  },
@@ -243,15 +239,16 @@
   "flicks": 37,
   "star2": 305,
   "star3": 343,
-  "winRate": "4/5",
-  "star3Rate": "1/5",
+  "winRate": "3/5",
+  "star3Rate": "0/5",
   "scoreMin": 191,
-  "scoreMed": 305,
-  "scoreP80": 343,
-  "scoreMax": 343,
+  "scoreMed": 272,
+  "scoreP80": 339,
+  "scoreMax": 339,
   "maxTierReached": 8,
   "why": {
-   "won": 4,
+   "won": 3,
+   "flicks": 1,
    "overcrowd": 1
   },
   "flicksLeftMed": 6
@@ -263,36 +260,35 @@
   "flicks": 35,
   "star2": 355,
   "star3": 415,
-  "winRate": "2/5",
-  "star3Rate": "0/5",
-  "scoreMin": 274,
-  "scoreMed": 355,
-  "scoreP80": 415,
-  "scoreMax": 415,
+  "winRate": "5/5",
+  "star3Rate": "1/5",
+  "scoreMin": 281,
+  "scoreMed": 304,
+  "scoreP80": 418,
+  "scoreMax": 418,
   "maxTierReached": 8,
   "why": {
-   "flicks": 3,
-   "won": 2
+   "won": 5
   },
-  "flicksLeftMed": 0
+  "flicksLeftMed": 2
  },
  {
   "id": 116,
   "place": "Fernando de Noronha",
   "goalTier": 9,
   "flicks": 34,
-  "star2": 435,
-  "star3": 670,
+  "star2": 363,
+  "star3": 468,
   "winRate": "3/5",
   "star3Rate": "0/5",
-  "scoreMin": 330,
-  "scoreMed": 363,
-  "scoreP80": 468,
-  "scoreMax": 468,
+  "scoreMin": 299,
+  "scoreMed": 438,
+  "scoreP80": 481,
+  "scoreMax": 481,
   "maxTierReached": 9,
   "why": {
-   "flicks": 2,
-   "won": 3
+   "won": 3,
+   "flicks": 2
   },
   "flicksLeftMed": 6
  },
@@ -301,20 +297,20 @@
   "place": "Trancoso",
   "goalTier": 11,
   "flicks": 165,
-  "star2": 750,
-  "star3": 1250,
-  "winRate": "3/5",
-  "star3Rate": "3/5",
-  "scoreMin": 1430,
-  "scoreMed": 2295,
-  "scoreP80": 3831,
-  "scoreMax": 3831,
+  "star2": 2295,
+  "star3": 3831,
+  "winRate": "4/5",
+  "star3Rate": "0/5",
+  "scoreMin": 1870,
+  "scoreMed": 2675,
+  "scoreP80": 3383,
+  "scoreMax": 3383,
   "maxTierReached": 11,
   "why": {
-   "overcrowd": 2,
-   "won": 3
+   "won": 4,
+   "overcrowd": 1
   },
-  "flicksLeftMed": 82
+  "flicksLeftMed": 63
  },
  {
   "id": 120,
@@ -323,16 +319,15 @@
   "flicks": 8,
   "star2": 17,
   "star3": 20,
-  "winRate": "4/5",
-  "star3Rate": "1/5",
+  "winRate": "5/5",
+  "star3Rate": "3/5",
   "scoreMin": 14,
-  "scoreMed": 17,
-  "scoreP80": 20,
-  "scoreMax": 20,
+  "scoreMed": 20,
+  "scoreP80": 28,
+  "scoreMax": 28,
   "maxTierReached": 4,
   "why": {
-   "flicks": 1,
-   "won": 4
+   "won": 5
   },
   "flicksLeftMed": 2
  },
@@ -344,16 +339,16 @@
   "star2": 114,
   "star3": 130,
   "winRate": "5/5",
-  "star3Rate": "1/5",
-  "scoreMin": 107,
-  "scoreMed": 114,
-  "scoreP80": 130,
-  "scoreMax": 130,
+  "star3Rate": "0/5",
+  "scoreMin": 102,
+  "scoreMed": 105,
+  "scoreP80": 125,
+  "scoreMax": 125,
   "maxTierReached": 5,
   "why": {
    "won": 5
   },
-  "flicksLeftMed": 2
+  "flicksLeftMed": 4
  },
  {
   "id": 122,
@@ -362,18 +357,19 @@
   "flicks": 34,
   "star2": 171,
   "star3": 237,
-  "winRate": "4/5",
+  "winRate": "2/5",
   "star3Rate": "1/5",
-  "scoreMin": 165,
-  "scoreMed": 171,
-  "scoreP80": 237,
-  "scoreMax": 237,
+  "scoreMin": 53,
+  "scoreMed": 129,
+  "scoreP80": 244,
+  "scoreMax": 244,
   "maxTierReached": 6,
   "why": {
-   "won": 4,
+   "won": 2,
+   "overcrowd": 2,
    "flicks": 1
   },
-  "flicksLeftMed": 5
+  "flicksLeftMed": 4
  },
  {
   "id": 123,
@@ -382,16 +378,15 @@
   "flicks": 19,
   "star2": 108,
   "star3": 213,
-  "winRate": "4/5",
+  "winRate": "5/5",
   "star3Rate": "0/5",
-  "scoreMin": 67,
-  "scoreMed": 108,
-  "scoreP80": 213,
-  "scoreMax": 213,
+  "scoreMin": 86,
+  "scoreMed": 111,
+  "scoreP80": 118,
+  "scoreMax": 118,
   "maxTierReached": 7,
   "why": {
-   "won": 4,
-   "flicks": 1
+   "won": 5
   },
   "flicksLeftMed": 6
  },
@@ -404,15 +399,15 @@
   "star3": 373,
   "winRate": "5/5",
   "star3Rate": "1/5",
-  "scoreMin": 280,
-  "scoreMed": 327,
-  "scoreP80": 373,
-  "scoreMax": 373,
+  "scoreMin": 272,
+  "scoreMed": 315,
+  "scoreP80": 381,
+  "scoreMax": 381,
   "maxTierReached": 8,
   "why": {
    "won": 5
   },
-  "flicksLeftMed": 3
+  "flicksLeftMed": 4
  },
  {
   "id": 125,
@@ -421,57 +416,59 @@
   "flicks": 35,
   "star2": 347,
   "star3": 398,
-  "winRate": "4/5",
-  "star3Rate": "1/5",
-  "scoreMin": 246,
-  "scoreMed": 347,
-  "scoreP80": 398,
-  "scoreMax": 398,
+  "winRate": "3/5",
+  "star3Rate": "0/5",
+  "scoreMin": 245,
+  "scoreMed": 272,
+  "scoreP80": 364,
+  "scoreMax": 364,
   "maxTierReached": 8,
   "why": {
-   "won": 4,
+   "won": 3,
+   "flicks": 1,
    "overcrowd": 1
   },
-  "flicksLeftMed": 4
+  "flicksLeftMed": 5
  },
  {
   "id": 126,
   "place": "Procida",
   "goalTier": 9,
   "flicks": 34,
-  "star2": 534,
-  "star3": 613,
-  "winRate": "5/5",
-  "star3Rate": "0/5",
-  "scoreMin": 330,
-  "scoreMed": 395,
-  "scoreP80": 524,
-  "scoreMax": 524,
+  "star2": 395,
+  "star3": 524,
+  "winRate": "4/5",
+  "star3Rate": "1/5",
+  "scoreMin": 379,
+  "scoreMed": 424,
+  "scoreP80": 565,
+  "scoreMax": 565,
   "maxTierReached": 9,
   "why": {
-   "won": 5
+   "flicks": 1,
+   "won": 4
   },
-  "flicksLeftMed": 6
+  "flicksLeftMed": 1
  },
  {
   "id": 127,
   "place": "Ravello",
   "goalTier": 11,
   "flicks": 165,
-  "star2": 750,
-  "star3": 1250,
+  "star2": 3268,
+  "star3": 5244,
   "winRate": "4/5",
-  "star3Rate": "4/5",
-  "scoreMin": 2475,
-  "scoreMed": 3268,
-  "scoreP80": 5244,
-  "scoreMax": 5244,
+  "star3Rate": "0/5",
+  "scoreMin": 3036,
+  "scoreMed": 4177,
+  "scoreP80": 5130,
+  "scoreMax": 5130,
   "maxTierReached": 11,
   "why": {
    "won": 4,
    "overcrowd": 1
   },
-  "flicksLeftMed": 50
+  "flicksLeftMed": 33
  },
  {
   "id": 130,
@@ -483,14 +480,14 @@
   "winRate": "5/5",
   "star3Rate": "1/5",
   "scoreMin": 11,
-  "scoreMed": 14,
+  "scoreMed": 11,
   "scoreP80": 25,
   "scoreMax": 25,
   "maxTierReached": 4,
   "why": {
    "won": 5
   },
-  "flicksLeftMed": 4
+  "flicksLeftMed": 3
  },
  {
   "id": 131,
@@ -500,16 +497,16 @@
   "star2": 114,
   "star3": 130,
   "winRate": "5/5",
-  "star3Rate": "1/5",
-  "scoreMin": 107,
-  "scoreMed": 114,
-  "scoreP80": 130,
-  "scoreMax": 130,
+  "star3Rate": "0/5",
+  "scoreMin": 102,
+  "scoreMed": 105,
+  "scoreP80": 125,
+  "scoreMax": 125,
   "maxTierReached": 5,
   "why": {
    "won": 5
   },
-  "flicksLeftMed": 2
+  "flicksLeftMed": 4
  },
  {
   "id": 132,
@@ -518,18 +515,19 @@
   "flicks": 34,
   "star2": 171,
   "star3": 237,
-  "winRate": "4/5",
+  "winRate": "2/5",
   "star3Rate": "1/5",
-  "scoreMin": 165,
-  "scoreMed": 171,
-  "scoreP80": 237,
-  "scoreMax": 237,
+  "scoreMin": 53,
+  "scoreMed": 129,
+  "scoreP80": 244,
+  "scoreMax": 244,
   "maxTierReached": 6,
   "why": {
-   "won": 4,
+   "won": 2,
+   "overcrowd": 2,
    "flicks": 1
   },
-  "flicksLeftMed": 5
+  "flicksLeftMed": 4
  },
  {
   "id": 133,
@@ -538,16 +536,15 @@
   "flicks": 19,
   "star2": 118,
   "star3": 120,
-  "winRate": "4/5",
-  "star3Rate": "1/5",
-  "scoreMin": 101,
-  "scoreMed": 118,
-  "scoreP80": 120,
-  "scoreMax": 120,
+  "winRate": "5/5",
+  "star3Rate": "0/5",
+  "scoreMin": 90,
+  "scoreMed": 96,
+  "scoreP80": 118,
+  "scoreMax": 118,
   "maxTierReached": 7,
   "why": {
-   "won": 4,
-   "flicks": 1
+   "won": 5
   },
   "flicksLeftMed": 6
  },
@@ -560,15 +557,15 @@
   "star3": 373,
   "winRate": "5/5",
   "star3Rate": "1/5",
-  "scoreMin": 280,
-  "scoreMed": 327,
-  "scoreP80": 373,
-  "scoreMax": 373,
+  "scoreMin": 272,
+  "scoreMed": 315,
+  "scoreP80": 381,
+  "scoreMax": 381,
   "maxTierReached": 8,
   "why": {
    "won": 5
   },
-  "flicksLeftMed": 3
+  "flicksLeftMed": 4
  },
  {
   "id": 135,
@@ -577,56 +574,58 @@
   "flicks": 35,
   "star2": 339,
   "star3": 715,
-  "winRate": "5/5",
-  "star3Rate": "1/5",
-  "scoreMin": 313,
-  "scoreMed": 339,
-  "scoreP80": 715,
-  "scoreMax": 715,
+  "winRate": "3/5",
+  "star3Rate": "0/5",
+  "scoreMin": 361,
+  "scoreMed": 401,
+  "scoreP80": 433,
+  "scoreMax": 433,
   "maxTierReached": 8,
   "why": {
-   "won": 5
+   "won": 3,
+   "flicks": 2
   },
-  "flicksLeftMed": 6
+  "flicksLeftMed": 1
  },
  {
   "id": 136,
   "place": "Zakynthos",
   "goalTier": 9,
   "flicks": 34,
-  "star2": 534,
-  "star3": 613,
-  "winRate": "5/5",
-  "star3Rate": "0/5",
-  "scoreMin": 330,
-  "scoreMed": 395,
-  "scoreP80": 524,
-  "scoreMax": 524,
+  "star2": 395,
+  "star3": 524,
+  "winRate": "4/5",
+  "star3Rate": "1/5",
+  "scoreMin": 379,
+  "scoreMed": 424,
+  "scoreP80": 565,
+  "scoreMax": 565,
   "maxTierReached": 9,
   "why": {
-   "won": 5
+   "flicks": 1,
+   "won": 4
   },
-  "flicksLeftMed": 6
+  "flicksLeftMed": 1
  },
  {
   "id": 137,
   "place": "Santorini",
   "goalTier": 11,
   "flicks": 165,
-  "star2": 750,
-  "star3": 1250,
+  "star2": 3268,
+  "star3": 5244,
   "winRate": "4/5",
-  "star3Rate": "4/5",
-  "scoreMin": 2475,
-  "scoreMed": 3268,
-  "scoreP80": 5244,
-  "scoreMax": 5244,
+  "star3Rate": "0/5",
+  "scoreMin": 3036,
+  "scoreMed": 4177,
+  "scoreP80": 5130,
+  "scoreMax": 5130,
   "maxTierReached": 11,
   "why": {
    "won": 4,
    "overcrowd": 1
   },
-  "flicksLeftMed": 50
+  "flicksLeftMed": 33
  },
  {
   "id": 140,
@@ -636,11 +635,11 @@
   "star2": 14,
   "star3": 25,
   "winRate": "5/5",
-  "star3Rate": "1/5",
+  "star3Rate": "0/5",
   "scoreMin": 11,
   "scoreMed": 14,
-  "scoreP80": 25,
-  "scoreMax": 25,
+  "scoreP80": 14,
+  "scoreMax": 14,
   "maxTierReached": 4,
   "why": {
    "won": 5
@@ -655,16 +654,16 @@
   "star2": 114,
   "star3": 130,
   "winRate": "5/5",
-  "star3Rate": "1/5",
-  "scoreMin": 107,
-  "scoreMed": 114,
-  "scoreP80": 130,
-  "scoreMax": 130,
+  "star3Rate": "0/5",
+  "scoreMin": 102,
+  "scoreMed": 105,
+  "scoreP80": 125,
+  "scoreMax": 125,
   "maxTierReached": 5,
   "why": {
    "won": 5
   },
-  "flicksLeftMed": 2
+  "flicksLeftMed": 4
  },
  {
   "id": 142,
@@ -673,17 +672,18 @@
   "flicks": 34,
   "star2": 227,
   "star3": 256,
-  "winRate": "5/5",
-  "star3Rate": "1/5",
-  "scoreMin": 183,
-  "scoreMed": 227,
-  "scoreP80": 256,
-  "scoreMax": 256,
+  "winRate": "3/5",
+  "star3Rate": "0/5",
+  "scoreMin": 170,
+  "scoreMed": 246,
+  "scoreP80": 260,
+  "scoreMax": 260,
   "maxTierReached": 6,
   "why": {
-   "won": 5
+   "won": 3,
+   "flicks": 2
   },
-  "flicksLeftMed": 6
+  "flicksLeftMed": 4
  },
  {
   "id": 143,
@@ -692,16 +692,15 @@
   "flicks": 19,
   "star2": 108,
   "star3": 213,
-  "winRate": "4/5",
+  "winRate": "5/5",
   "star3Rate": "0/5",
-  "scoreMin": 67,
-  "scoreMed": 108,
-  "scoreP80": 213,
-  "scoreMax": 213,
+  "scoreMin": 86,
+  "scoreMed": 111,
+  "scoreP80": 118,
+  "scoreMax": 118,
   "maxTierReached": 7,
   "why": {
-   "won": 4,
-   "flicks": 1
+   "won": 5
   },
   "flicksLeftMed": 6
  },
@@ -712,15 +711,16 @@
   "flicks": 37,
   "star2": 305,
   "star3": 343,
-  "winRate": "4/5",
-  "star3Rate": "1/5",
+  "winRate": "3/5",
+  "star3Rate": "0/5",
   "scoreMin": 191,
-  "scoreMed": 305,
-  "scoreP80": 343,
-  "scoreMax": 343,
+  "scoreMed": 272,
+  "scoreP80": 339,
+  "scoreMax": 339,
   "maxTierReached": 8,
   "why": {
-   "won": 4,
+   "won": 3,
+   "flicks": 1,
    "overcrowd": 1
   },
   "flicksLeftMed": 6
@@ -732,15 +732,16 @@
   "flicks": 35,
   "star2": 434,
   "star3": 472,
-  "winRate": "5/5",
+  "winRate": "4/5",
   "star3Rate": "1/5",
-  "scoreMin": 365,
-  "scoreMed": 434,
-  "scoreP80": 472,
-  "scoreMax": 472,
+  "scoreMin": 403,
+  "scoreMed": 428,
+  "scoreP80": 501,
+  "scoreMax": 501,
   "maxTierReached": 8,
   "why": {
-   "won": 5
+   "won": 4,
+   "flicks": 1
   },
   "flicksLeftMed": 6
  },
@@ -749,39 +750,40 @@
   "place": "Porquerolles",
   "goalTier": 9,
   "flicks": 34,
-  "star2": 534,
-  "star3": 613,
-  "winRate": "5/5",
-  "star3Rate": "0/5",
-  "scoreMin": 330,
-  "scoreMed": 395,
-  "scoreP80": 524,
-  "scoreMax": 524,
+  "star2": 395,
+  "star3": 524,
+  "winRate": "4/5",
+  "star3Rate": "1/5",
+  "scoreMin": 379,
+  "scoreMed": 424,
+  "scoreP80": 565,
+  "scoreMax": 565,
   "maxTierReached": 9,
   "why": {
-   "won": 5
+   "flicks": 1,
+   "won": 4
   },
-  "flicksLeftMed": 6
+  "flicksLeftMed": 1
  },
  {
   "id": 147,
   "place": "Cap Ferrat",
   "goalTier": 11,
   "flicks": 165,
-  "star2": 750,
-  "star3": 1250,
+  "star2": 2372,
+  "star3": 2583,
   "winRate": "3/5",
-  "star3Rate": "3/5",
-  "scoreMin": 1185,
-  "scoreMed": 2372,
-  "scoreP80": 2583,
-  "scoreMax": 2583,
+  "star3Rate": "1/5",
+  "scoreMin": 1545,
+  "scoreMed": 1661,
+  "scoreP80": 2723,
+  "scoreMax": 2723,
   "maxTierReached": 11,
   "why": {
    "overcrowd": 2,
    "won": 3
   },
-  "flicksLeftMed": 70
+  "flicksLeftMed": 80
  },
  {
   "id": 150,
@@ -810,16 +812,16 @@
   "star2": 123,
   "star3": 157,
   "winRate": "5/5",
-  "star3Rate": "1/5",
-  "scoreMin": 107,
-  "scoreMed": 123,
-  "scoreP80": 157,
-  "scoreMax": 157,
+  "star3Rate": "0/5",
+  "scoreMin": 102,
+  "scoreMed": 105,
+  "scoreP80": 126,
+  "scoreMax": 126,
   "maxTierReached": 5,
   "why": {
    "won": 5
   },
-  "flicksLeftMed": 2
+  "flicksLeftMed": 4
  },
  {
   "id": 152,
@@ -829,11 +831,11 @@
   "star2": 232,
   "star3": 237,
   "winRate": "4/5",
-  "star3Rate": "0/5",
-  "scoreMin": 180,
-  "scoreMed": 232,
-  "scoreP80": 237,
-  "scoreMax": 237,
+  "star3Rate": "2/5",
+  "scoreMin": 168,
+  "scoreMed": 237,
+  "scoreP80": 256,
+  "scoreMax": 256,
   "maxTierReached": 6,
   "why": {
    "won": 4,
@@ -849,11 +851,11 @@
   "star2": 81,
   "star3": 108,
   "winRate": "5/5",
-  "star3Rate": "1/5",
+  "star3Rate": "2/5",
   "scoreMin": 75,
-  "scoreMed": 81,
-  "scoreP80": 108,
-  "scoreMax": 108,
+  "scoreMed": 91,
+  "scoreP80": 112,
+  "scoreMax": 112,
   "maxTierReached": 7,
   "why": {
    "won": 5
@@ -867,17 +869,18 @@
   "flicks": 37,
   "star2": 297,
   "star3": 720,
-  "winRate": "5/5",
-  "star3Rate": "1/5",
-  "scoreMin": 284,
-  "scoreMed": 297,
-  "scoreP80": 720,
-  "scoreMax": 720,
+  "winRate": "4/5",
+  "star3Rate": "0/5",
+  "scoreMin": 306,
+  "scoreMed": 351,
+  "scoreP80": 445,
+  "scoreMax": 445,
   "maxTierReached": 8,
   "why": {
-   "won": 5
+   "won": 4,
+   "flicks": 1
   },
-  "flicksLeftMed": 6
+  "flicksLeftMed": 3
  },
  {
   "id": 155,
@@ -888,34 +891,34 @@
   "star3": 447,
   "winRate": "4/5",
   "star3Rate": "0/5",
-  "scoreMin": 280,
-  "scoreMed": 315,
-  "scoreP80": 447,
-  "scoreMax": 447,
+  "scoreMin": 299,
+  "scoreMed": 348,
+  "scoreP80": 400,
+  "scoreMax": 400,
   "maxTierReached": 8,
   "why": {
    "won": 4,
    "flicks": 1
   },
-  "flicksLeftMed": 5
+  "flicksLeftMed": 6
  },
  {
   "id": 156,
   "place": "Tarifa",
   "goalTier": 9,
   "flicks": 34,
-  "star2": 435,
-  "star3": 670,
+  "star2": 363,
+  "star3": 468,
   "winRate": "3/5",
   "star3Rate": "0/5",
-  "scoreMin": 330,
-  "scoreMed": 363,
-  "scoreP80": 468,
-  "scoreMax": 468,
+  "scoreMin": 299,
+  "scoreMed": 438,
+  "scoreP80": 481,
+  "scoreMax": 481,
   "maxTierReached": 9,
   "why": {
-   "flicks": 2,
-   "won": 3
+   "won": 3,
+   "flicks": 2
   },
   "flicksLeftMed": 6
  },
@@ -924,20 +927,20 @@
   "place": "Formentera",
   "goalTier": 11,
   "flicks": 165,
-  "star2": 750,
-  "star3": 1250,
-  "winRate": "4/5",
-  "star3Rate": "4/5",
-  "scoreMin": 1882,
-  "scoreMed": 3045,
-  "scoreP80": 4047,
-  "scoreMax": 4047,
+  "star2": 3045,
+  "star3": 4047,
+  "winRate": "3/5",
+  "star3Rate": "0/5",
+  "scoreMin": 1455,
+  "scoreMed": 1929,
+  "scoreP80": 3012,
+  "scoreMax": 3012,
   "maxTierReached": 11,
   "why": {
-   "won": 4,
-   "overcrowd": 1
+   "won": 3,
+   "overcrowd": 2
   },
-  "flicksLeftMed": 52
+  "flicksLeftMed": 73
  },
  {
   "id": 160,
@@ -949,7 +952,7 @@
   "winRate": "2/5",
   "star3Rate": "1/5",
   "scoreMin": 0,
-  "scoreMed": 6,
+  "scoreMed": 4,
   "scoreP80": 9,
   "scoreMax": 9,
   "maxTierReached": 4,
@@ -967,16 +970,16 @@
   "star2": 114,
   "star3": 130,
   "winRate": "5/5",
-  "star3Rate": "1/5",
-  "scoreMin": 107,
-  "scoreMed": 114,
-  "scoreP80": 130,
-  "scoreMax": 130,
+  "star3Rate": "0/5",
+  "scoreMin": 102,
+  "scoreMed": 105,
+  "scoreP80": 125,
+  "scoreMax": 125,
   "maxTierReached": 5,
   "why": {
    "won": 5
   },
-  "flicksLeftMed": 2
+  "flicksLeftMed": 4
  },
  {
   "id": 162,
@@ -985,16 +988,16 @@
   "flicks": 34,
   "star2": 221,
   "star3": 239,
-  "winRate": "4/5",
+  "winRate": "3/5",
   "star3Rate": "1/5",
-  "scoreMin": 207,
-  "scoreMed": 221,
-  "scoreP80": 239,
-  "scoreMax": 239,
-  "maxTierReached": 6,
+  "scoreMin": 157,
+  "scoreMed": 202,
+  "scoreP80": 327,
+  "scoreMax": 327,
+  "maxTierReached": 7,
   "why": {
-   "won": 4,
-   "flicks": 1
+   "flicks": 2,
+   "won": 3
   },
   "flicksLeftMed": 6
  },
@@ -1005,16 +1008,15 @@
   "flicks": 19,
   "star2": 118,
   "star3": 120,
-  "winRate": "4/5",
-  "star3Rate": "1/5",
-  "scoreMin": 101,
-  "scoreMed": 118,
-  "scoreP80": 120,
-  "scoreMax": 120,
+  "winRate": "5/5",
+  "star3Rate": "0/5",
+  "scoreMin": 90,
+  "scoreMed": 96,
+  "scoreP80": 118,
+  "scoreMax": 118,
   "maxTierReached": 7,
   "why": {
-   "won": 4,
-   "flicks": 1
+   "won": 5
   },
   "flicksLeftMed": 6
  },
@@ -1025,17 +1027,18 @@
   "flicks": 37,
   "star2": 297,
   "star3": 720,
-  "winRate": "5/5",
-  "star3Rate": "1/5",
-  "scoreMin": 284,
-  "scoreMed": 297,
-  "scoreP80": 720,
-  "scoreMax": 720,
+  "winRate": "4/5",
+  "star3Rate": "0/5",
+  "scoreMin": 306,
+  "scoreMed": 351,
+  "scoreP80": 445,
+  "scoreMax": 445,
   "maxTierReached": 8,
   "why": {
-   "won": 5
+   "won": 4,
+   "flicks": 1
   },
-  "flicksLeftMed": 6
+  "flicksLeftMed": 3
  },
  {
   "id": 165,
@@ -1044,17 +1047,16 @@
   "flicks": 35,
   "star2": 244,
   "star3": 265,
-  "winRate": "3/5",
-  "star3Rate": "0/5",
-  "scoreMin": 232,
-  "scoreMed": 244,
-  "scoreP80": 265,
-  "scoreMax": 265,
+  "winRate": "4/5",
+  "star3Rate": "1/5",
+  "scoreMin": 189,
+  "scoreMed": 229,
+  "scoreP80": 321,
+  "scoreMax": 321,
   "maxTierReached": 8,
   "why": {
-   "won": 3,
-   "overcrowd": 1,
-   "flicks": 1
+   "flicks": 1,
+   "won": 4
   },
   "flicksLeftMed": 6
  },
@@ -1063,39 +1065,40 @@
   "place": "Outer Banks",
   "goalTier": 9,
   "flicks": 34,
-  "star2": 534,
-  "star3": 613,
-  "winRate": "5/5",
-  "star3Rate": "0/5",
-  "scoreMin": 330,
-  "scoreMed": 395,
-  "scoreP80": 524,
-  "scoreMax": 524,
+  "star2": 395,
+  "star3": 524,
+  "winRate": "4/5",
+  "star3Rate": "1/5",
+  "scoreMin": 379,
+  "scoreMed": 424,
+  "scoreP80": 565,
+  "scoreMax": 565,
   "maxTierReached": 9,
   "why": {
-   "won": 5
+   "flicks": 1,
+   "won": 4
   },
-  "flicksLeftMed": 6
+  "flicksLeftMed": 1
  },
  {
   "id": 167,
   "place": "Big Island",
   "goalTier": 11,
   "flicks": 165,
-  "star2": 750,
-  "star3": 1250,
-  "winRate": "3/5",
-  "star3Rate": "3/5",
-  "scoreMin": 1430,
-  "scoreMed": 2295,
-  "scoreP80": 3831,
-  "scoreMax": 3831,
+  "star2": 2295,
+  "star3": 3831,
+  "winRate": "4/5",
+  "star3Rate": "0/5",
+  "scoreMin": 1870,
+  "scoreMed": 2675,
+  "scoreP80": 3383,
+  "scoreMax": 3383,
   "maxTierReached": 11,
   "why": {
-   "overcrowd": 2,
-   "won": 3
+   "won": 4,
+   "overcrowd": 1
   },
-  "flicksLeftMed": 82
+  "flicksLeftMed": 63
  },
  {
   "id": 170,
@@ -1105,11 +1108,11 @@
   "star2": 14,
   "star3": 25,
   "winRate": "5/5",
-  "star3Rate": "1/5",
+  "star3Rate": "0/5",
   "scoreMin": 11,
   "scoreMed": 14,
-  "scoreP80": 25,
-  "scoreMax": 25,
+  "scoreP80": 14,
+  "scoreMax": 14,
   "maxTierReached": 4,
   "why": {
    "won": 5
@@ -1124,16 +1127,16 @@
   "star2": 114,
   "star3": 130,
   "winRate": "5/5",
-  "star3Rate": "1/5",
-  "scoreMin": 107,
-  "scoreMed": 114,
-  "scoreP80": 130,
-  "scoreMax": 130,
+  "star3Rate": "0/5",
+  "scoreMin": 102,
+  "scoreMed": 105,
+  "scoreP80": 125,
+  "scoreMax": 125,
   "maxTierReached": 5,
   "why": {
    "won": 5
   },
-  "flicksLeftMed": 2
+  "flicksLeftMed": 4
  },
  {
   "id": 172,
@@ -1143,11 +1146,11 @@
   "star2": 232,
   "star3": 237,
   "winRate": "4/5",
-  "star3Rate": "0/5",
-  "scoreMin": 180,
-  "scoreMed": 232,
-  "scoreP80": 237,
-  "scoreMax": 237,
+  "star3Rate": "2/5",
+  "scoreMin": 168,
+  "scoreMed": 237,
+  "scoreP80": 256,
+  "scoreMax": 256,
   "maxTierReached": 6,
   "why": {
    "won": 4,
@@ -1163,12 +1166,12 @@
   "star2": 123,
   "star3": 127,
   "winRate": "5/5",
-  "star3Rate": "1/5",
-  "scoreMin": 116,
-  "scoreMed": 123,
-  "scoreP80": 127,
-  "scoreMax": 127,
-  "maxTierReached": 7,
+  "star3Rate": "4/5",
+  "scoreMin": 118,
+  "scoreMed": 146,
+  "scoreP80": 183,
+  "scoreMax": 183,
+  "maxTierReached": 8,
   "why": {
    "won": 5
   },
@@ -1181,18 +1184,17 @@
   "flicks": 37,
   "star2": 348,
   "star3": 385,
-  "winRate": "3/5",
+  "winRate": "5/5",
   "star3Rate": "0/5",
-  "scoreMin": 274,
-  "scoreMed": 348,
-  "scoreP80": 385,
-  "scoreMax": 385,
+  "scoreMin": 281,
+  "scoreMed": 315,
+  "scoreP80": 363,
+  "scoreMax": 363,
   "maxTierReached": 8,
   "why": {
-   "flicks": 2,
-   "won": 3
+   "won": 5
   },
-  "flicksLeftMed": 1
+  "flicksLeftMed": 4
  },
  {
   "id": 175,
@@ -1201,15 +1203,16 @@
   "flicks": 35,
   "star2": 434,
   "star3": 472,
-  "winRate": "5/5",
+  "winRate": "4/5",
   "star3Rate": "1/5",
-  "scoreMin": 365,
-  "scoreMed": 434,
-  "scoreP80": 472,
-  "scoreMax": 472,
+  "scoreMin": 403,
+  "scoreMed": 428,
+  "scoreP80": 501,
+  "scoreMax": 501,
   "maxTierReached": 8,
   "why": {
-   "won": 5
+   "won": 4,
+   "flicks": 1
   },
   "flicksLeftMed": 6
  },
@@ -1218,39 +1221,40 @@
   "place": "Sir Bani Yas",
   "goalTier": 9,
   "flicks": 34,
-  "star2": 534,
-  "star3": 613,
-  "winRate": "5/5",
-  "star3Rate": "0/5",
-  "scoreMin": 330,
-  "scoreMed": 395,
-  "scoreP80": 524,
-  "scoreMax": 524,
+  "star2": 395,
+  "star3": 524,
+  "winRate": "4/5",
+  "star3Rate": "1/5",
+  "scoreMin": 379,
+  "scoreMed": 424,
+  "scoreP80": 565,
+  "scoreMax": 565,
   "maxTierReached": 9,
   "why": {
-   "won": 5
+   "flicks": 1,
+   "won": 4
   },
-  "flicksLeftMed": 6
+  "flicksLeftMed": 1
  },
  {
   "id": 177,
   "place": "Saadiyat",
   "goalTier": 11,
   "flicks": 165,
-  "star2": 750,
-  "star3": 1250,
-  "winRate": "4/5",
-  "star3Rate": "4/5",
-  "scoreMin": 1882,
-  "scoreMed": 3045,
-  "scoreP80": 4047,
-  "scoreMax": 4047,
+  "star2": 3045,
+  "star3": 4047,
+  "winRate": "3/5",
+  "star3Rate": "0/5",
+  "scoreMin": 1455,
+  "scoreMed": 1929,
+  "scoreP80": 3012,
+  "scoreMax": 3012,
   "maxTierReached": 11,
   "why": {
-   "won": 4,
-   "overcrowd": 1
+   "won": 3,
+   "overcrowd": 2
   },
-  "flicksLeftMed": 52
+  "flicksLeftMed": 73
  },
  {
   "id": 180,
@@ -1260,7 +1264,7 @@
   "star2": 14,
   "star3": 25,
   "winRate": "5/5",
-  "star3Rate": "2/5",
+  "star3Rate": "1/5",
   "scoreMin": 11,
   "scoreMed": 14,
   "scoreP80": 25,
@@ -1279,16 +1283,16 @@
   "star2": 114,
   "star3": 130,
   "winRate": "5/5",
-  "star3Rate": "1/5",
-  "scoreMin": 107,
-  "scoreMed": 114,
-  "scoreP80": 130,
-  "scoreMax": 130,
+  "star3Rate": "0/5",
+  "scoreMin": 102,
+  "scoreMed": 105,
+  "scoreP80": 125,
+  "scoreMax": 125,
   "maxTierReached": 5,
   "why": {
    "won": 5
   },
-  "flicksLeftMed": 2
+  "flicksLeftMed": 4
  },
  {
   "id": 182,
@@ -1298,11 +1302,11 @@
   "star2": 146,
   "star3": 196,
   "winRate": "5/5",
-  "star3Rate": "1/5",
-  "scoreMin": 121,
-  "scoreMed": 146,
-  "scoreP80": 196,
-  "scoreMax": 196,
+  "star3Rate": "0/5",
+  "scoreMin": 112,
+  "scoreMed": 155,
+  "scoreP80": 167,
+  "scoreMax": 167,
   "maxTierReached": 6,
   "why": {
    "won": 5
@@ -1317,11 +1321,11 @@
   "star2": 96,
   "star3": 121,
   "winRate": "5/5",
-  "star3Rate": "1/5",
-  "scoreMin": 90,
+  "star3Rate": "0/5",
+  "scoreMin": 71,
   "scoreMed": 96,
-  "scoreP80": 121,
-  "scoreMax": 121,
+  "scoreP80": 120,
+  "scoreMax": 120,
   "maxTierReached": 7,
   "why": {
    "won": 5
@@ -1335,18 +1339,17 @@
   "flicks": 37,
   "star2": 348,
   "star3": 385,
-  "winRate": "3/5",
+  "winRate": "5/5",
   "star3Rate": "0/5",
-  "scoreMin": 274,
-  "scoreMed": 348,
-  "scoreP80": 385,
-  "scoreMax": 385,
+  "scoreMin": 281,
+  "scoreMed": 315,
+  "scoreP80": 363,
+  "scoreMax": 363,
   "maxTierReached": 8,
   "why": {
-   "flicks": 2,
-   "won": 3
+   "won": 5
   },
-  "flicksLeftMed": 1
+  "flicksLeftMed": 4
  },
  {
   "id": 185,
@@ -1355,57 +1358,57 @@
   "flicks": 35,
   "star2": 355,
   "star3": 415,
-  "winRate": "2/5",
-  "star3Rate": "0/5",
-  "scoreMin": 274,
-  "scoreMed": 355,
-  "scoreP80": 415,
-  "scoreMax": 415,
+  "winRate": "5/5",
+  "star3Rate": "1/5",
+  "scoreMin": 281,
+  "scoreMed": 304,
+  "scoreP80": 418,
+  "scoreMax": 418,
   "maxTierReached": 8,
   "why": {
-   "flicks": 3,
-   "won": 2
+   "won": 5
   },
-  "flicksLeftMed": 0
+  "flicksLeftMed": 2
  },
  {
   "id": 186,
   "place": "Con Dao",
   "goalTier": 9,
   "flicks": 34,
-  "star2": 534,
-  "star3": 613,
-  "winRate": "5/5",
-  "star3Rate": "0/5",
-  "scoreMin": 330,
-  "scoreMed": 395,
-  "scoreP80": 524,
-  "scoreMax": 524,
+  "star2": 395,
+  "star3": 524,
+  "winRate": "4/5",
+  "star3Rate": "1/5",
+  "scoreMin": 379,
+  "scoreMed": 424,
+  "scoreP80": 565,
+  "scoreMax": 565,
   "maxTierReached": 9,
   "why": {
-   "won": 5
+   "flicks": 1,
+   "won": 4
   },
-  "flicksLeftMed": 6
+  "flicksLeftMed": 1
  },
  {
   "id": 187,
   "place": "Koh Lipe",
   "goalTier": 11,
   "flicks": 165,
-  "star2": 750,
-  "star3": 1250,
-  "winRate": "1/5",
-  "star3Rate": "1/5",
-  "scoreMin": 653,
-  "scoreMed": 1245,
-  "scoreP80": 2527,
-  "scoreMax": 2527,
+  "star2": 1245,
+  "star3": 2527,
+  "winRate": "2/5",
+  "star3Rate": "0/5",
+  "scoreMin": 743,
+  "scoreMed": 1449,
+  "scoreP80": 1833,
+  "scoreMax": 1833,
   "maxTierReached": 11,
   "why": {
-   "overcrowd": 4,
-   "won": 1
+   "overcrowd": 3,
+   "won": 2
   },
-  "flicksLeftMed": 110
+  "flicksLeftMed": 112
  },
  {
   "id": 190,
@@ -1415,7 +1418,7 @@
   "star2": 14,
   "star3": 25,
   "winRate": "5/5",
-  "star3Rate": "2/5",
+  "star3Rate": "1/5",
   "scoreMin": 11,
   "scoreMed": 14,
   "scoreP80": 25,
@@ -1434,16 +1437,16 @@
   "star2": 114,
   "star3": 130,
   "winRate": "5/5",
-  "star3Rate": "1/5",
-  "scoreMin": 107,
-  "scoreMed": 114,
-  "scoreP80": 130,
-  "scoreMax": 130,
+  "star3Rate": "0/5",
+  "scoreMin": 102,
+  "scoreMed": 105,
+  "scoreP80": 125,
+  "scoreMax": 125,
   "maxTierReached": 5,
   "why": {
    "won": 5
   },
-  "flicksLeftMed": 2
+  "flicksLeftMed": 4
  },
  {
   "id": 192,
@@ -1452,18 +1455,18 @@
   "flicks": 34,
   "star2": 215,
   "star3": 241,
-  "winRate": "4/5",
-  "star3Rate": "0/5",
-  "scoreMin": 183,
-  "scoreMed": 215,
-  "scoreP80": 241,
-  "scoreMax": 241,
+  "winRate": "3/5",
+  "star3Rate": "2/5",
+  "scoreMin": 188,
+  "scoreMed": 241,
+  "scoreP80": 248,
+  "scoreMax": 248,
   "maxTierReached": 6,
   "why": {
-   "won": 4,
-   "flicks": 1
+   "won": 3,
+   "flicks": 2
   },
-  "flicksLeftMed": 4
+  "flicksLeftMed": 2
  },
  {
   "id": 193,
@@ -1472,16 +1475,15 @@
   "flicks": 19,
   "star2": 108,
   "star3": 213,
-  "winRate": "4/5",
+  "winRate": "5/5",
   "star3Rate": "0/5",
-  "scoreMin": 67,
-  "scoreMed": 108,
-  "scoreP80": 213,
-  "scoreMax": 213,
+  "scoreMin": 86,
+  "scoreMed": 111,
+  "scoreP80": 118,
+  "scoreMax": 118,
   "maxTierReached": 7,
   "why": {
-   "won": 4,
-   "flicks": 1
+   "won": 5
   },
   "flicksLeftMed": 6
  },
@@ -1492,18 +1494,17 @@
   "flicks": 37,
   "star2": 348,
   "star3": 385,
-  "winRate": "3/5",
+  "winRate": "5/5",
   "star3Rate": "0/5",
-  "scoreMin": 274,
-  "scoreMed": 348,
-  "scoreP80": 385,
-  "scoreMax": 385,
+  "scoreMin": 281,
+  "scoreMed": 315,
+  "scoreP80": 363,
+  "scoreMax": 363,
   "maxTierReached": 8,
   "why": {
-   "flicks": 2,
-   "won": 3
+   "won": 5
   },
-  "flicksLeftMed": 1
+  "flicksLeftMed": 4
  },
  {
   "id": 195,
@@ -1512,57 +1513,57 @@
   "flicks": 35,
   "star2": 355,
   "star3": 415,
-  "winRate": "2/5",
-  "star3Rate": "0/5",
-  "scoreMin": 274,
-  "scoreMed": 355,
-  "scoreP80": 415,
-  "scoreMax": 415,
+  "winRate": "5/5",
+  "star3Rate": "1/5",
+  "scoreMin": 281,
+  "scoreMed": 304,
+  "scoreP80": 418,
+  "scoreMax": 418,
   "maxTierReached": 8,
   "why": {
-   "flicks": 3,
-   "won": 2
+   "won": 5
   },
-  "flicksLeftMed": 0
+  "flicksLeftMed": 2
  },
  {
   "id": 196,
   "place": "Flores",
   "goalTier": 9,
   "flicks": 34,
-  "star2": 534,
-  "star3": 613,
-  "winRate": "5/5",
-  "star3Rate": "0/5",
-  "scoreMin": 330,
-  "scoreMed": 395,
-  "scoreP80": 524,
-  "scoreMax": 524,
+  "star2": 395,
+  "star3": 524,
+  "winRate": "4/5",
+  "star3Rate": "1/5",
+  "scoreMin": 379,
+  "scoreMed": 424,
+  "scoreP80": 565,
+  "scoreMax": 565,
   "maxTierReached": 9,
   "why": {
-   "won": 5
+   "flicks": 1,
+   "won": 4
   },
-  "flicksLeftMed": 6
+  "flicksLeftMed": 1
  },
  {
   "id": 197,
   "place": "Raja Ampat",
   "goalTier": 11,
   "flicks": 165,
-  "star2": 750,
-  "star3": 1250,
-  "winRate": "4/5",
-  "star3Rate": "4/5",
-  "scoreMin": 1476,
-  "scoreMed": 1785,
-  "scoreP80": 2004,
-  "scoreMax": 2004,
+  "star2": 1785,
+  "star3": 2004,
+  "winRate": "2/5",
+  "star3Rate": "0/5",
+  "scoreMin": 1097,
+  "scoreMed": 1248,
+  "scoreP80": 2164,
+  "scoreMax": 2164,
   "maxTierReached": 11,
   "why": {
-   "won": 4,
-   "overcrowd": 1
+   "won": 2,
+   "overcrowd": 3
   },
-  "flicksLeftMed": 95
+  "flicksLeftMed": 98
  },
  {
   "id": 200,
@@ -1591,16 +1592,16 @@
   "star2": 114,
   "star3": 130,
   "winRate": "5/5",
-  "star3Rate": "1/5",
-  "scoreMin": 107,
-  "scoreMed": 114,
-  "scoreP80": 130,
-  "scoreMax": 130,
+  "star3Rate": "0/5",
+  "scoreMin": 102,
+  "scoreMed": 105,
+  "scoreP80": 125,
+  "scoreMax": 125,
   "maxTierReached": 5,
   "why": {
    "won": 5
   },
-  "flicksLeftMed": 2
+  "flicksLeftMed": 4
  },
  {
   "id": 202,
@@ -1609,18 +1610,19 @@
   "flicks": 34,
   "star2": 171,
   "star3": 237,
-  "winRate": "4/5",
+  "winRate": "2/5",
   "star3Rate": "1/5",
-  "scoreMin": 165,
-  "scoreMed": 171,
-  "scoreP80": 237,
-  "scoreMax": 237,
+  "scoreMin": 53,
+  "scoreMed": 129,
+  "scoreP80": 244,
+  "scoreMax": 244,
   "maxTierReached": 6,
   "why": {
-   "won": 4,
+   "won": 2,
+   "overcrowd": 2,
    "flicks": 1
   },
-  "flicksLeftMed": 5
+  "flicksLeftMed": 4
  },
  {
   "id": 203,
@@ -1630,11 +1632,11 @@
   "star2": 81,
   "star3": 108,
   "winRate": "5/5",
-  "star3Rate": "1/5",
+  "star3Rate": "2/5",
   "scoreMin": 75,
-  "scoreMed": 81,
-  "scoreP80": 108,
-  "scoreMax": 108,
+  "scoreMed": 91,
+  "scoreP80": 112,
+  "scoreMax": 112,
   "maxTierReached": 7,
   "why": {
    "won": 5
@@ -1649,11 +1651,11 @@
   "star2": 336,
   "star3": 526,
   "winRate": "5/5",
-  "star3Rate": "1/5",
-  "scoreMin": 280,
-  "scoreMed": 336,
-  "scoreP80": 526,
-  "scoreMax": 526,
+  "star3Rate": "0/5",
+  "scoreMin": 315,
+  "scoreMed": 385,
+  "scoreP80": 406,
+  "scoreMax": 406,
   "maxTierReached": 8,
   "why": {
    "won": 5
@@ -1667,16 +1669,15 @@
   "flicks": 35,
   "star2": 315,
   "star3": 391,
-  "winRate": "4/5",
+  "winRate": "5/5",
   "star3Rate": "1/5",
-  "scoreMin": 227,
-  "scoreMed": 315,
-  "scoreP80": 391,
-  "scoreMax": 391,
+  "scoreMin": 245,
+  "scoreMed": 356,
+  "scoreP80": 408,
+  "scoreMax": 408,
   "maxTierReached": 8,
   "why": {
-   "won": 4,
-   "flicks": 1
+   "won": 5
   },
   "flicksLeftMed": 6
  },
@@ -1685,39 +1686,40 @@
   "place": "Tetiaroa",
   "goalTier": 9,
   "flicks": 34,
-  "star2": 534,
-  "star3": 613,
-  "winRate": "5/5",
-  "star3Rate": "0/5",
-  "scoreMin": 330,
-  "scoreMed": 395,
-  "scoreP80": 524,
-  "scoreMax": 524,
+  "star2": 395,
+  "star3": 524,
+  "winRate": "4/5",
+  "star3Rate": "1/5",
+  "scoreMin": 379,
+  "scoreMed": 424,
+  "scoreP80": 565,
+  "scoreMax": 565,
   "maxTierReached": 9,
   "why": {
-   "won": 5
+   "flicks": 1,
+   "won": 4
   },
-  "flicksLeftMed": 6
+  "flicksLeftMed": 1
  },
  {
   "id": 207,
   "place": "Rangiroa Pass",
   "goalTier": 11,
   "flicks": 165,
-  "star2": 750,
-  "star3": 1250,
+  "star2": 3268,
+  "star3": 5244,
   "winRate": "4/5",
-  "star3Rate": "4/5",
-  "scoreMin": 2475,
-  "scoreMed": 3268,
-  "scoreP80": 5244,
-  "scoreMax": 5244,
+  "star3Rate": "0/5",
+  "scoreMin": 3036,
+  "scoreMed": 4177,
+  "scoreP80": 5130,
+  "scoreMax": 5130,
   "maxTierReached": 11,
   "why": {
    "won": 4,
    "overcrowd": 1
   },
-  "flicksLeftMed": 50
+  "flicksLeftMed": 33
  },
  {
   "id": 210,
@@ -1727,7 +1729,7 @@
   "star2": 14,
   "star3": 25,
   "winRate": "5/5",
-  "star3Rate": "2/5",
+  "star3Rate": "1/5",
   "scoreMin": 11,
   "scoreMed": 14,
   "scoreP80": 25,
@@ -1747,10 +1749,10 @@
   "star3": 121,
   "winRate": "5/5",
   "star3Rate": "1/5",
-  "scoreMin": 81,
-  "scoreMed": 111,
-  "scoreP80": 121,
-  "scoreMax": 121,
+  "scoreMin": 101,
+  "scoreMed": 105,
+  "scoreP80": 122,
+  "scoreMax": 122,
   "maxTierReached": 5,
   "why": {
    "won": 5
@@ -1764,18 +1766,19 @@
   "flicks": 34,
   "star2": 171,
   "star3": 237,
-  "winRate": "4/5",
+  "winRate": "2/5",
   "star3Rate": "1/5",
-  "scoreMin": 165,
-  "scoreMed": 171,
-  "scoreP80": 237,
-  "scoreMax": 237,
+  "scoreMin": 53,
+  "scoreMed": 129,
+  "scoreP80": 244,
+  "scoreMax": 244,
   "maxTierReached": 6,
   "why": {
-   "won": 4,
+   "won": 2,
+   "overcrowd": 2,
    "flicks": 1
   },
-  "flicksLeftMed": 5
+  "flicksLeftMed": 4
  },
  {
   "id": 213,
@@ -1787,7 +1790,7 @@
   "winRate": "5/5",
   "star3Rate": "1/5",
   "scoreMin": 46,
-  "scoreMed": 56,
+  "scoreMed": 62,
   "scoreP80": 78,
   "scoreMax": 78,
   "maxTierReached": 7,
@@ -1804,11 +1807,11 @@
   "star2": 351,
   "star3": 403,
   "winRate": "5/5",
-  "star3Rate": "1/5",
-  "scoreMin": 339,
-  "scoreMed": 351,
-  "scoreP80": 403,
-  "scoreMax": 403,
+  "star3Rate": "2/5",
+  "scoreMin": 289,
+  "scoreMed": 372,
+  "scoreP80": 464,
+  "scoreMax": 464,
   "maxTierReached": 8,
   "why": {
    "won": 5
@@ -1822,32 +1825,31 @@
   "flicks": 35,
   "star2": 355,
   "star3": 415,
-  "winRate": "2/5",
-  "star3Rate": "0/5",
-  "scoreMin": 274,
-  "scoreMed": 355,
-  "scoreP80": 415,
-  "scoreMax": 415,
+  "winRate": "5/5",
+  "star3Rate": "1/5",
+  "scoreMin": 281,
+  "scoreMed": 304,
+  "scoreP80": 418,
+  "scoreMax": 418,
   "maxTierReached": 8,
   "why": {
-   "flicks": 3,
-   "won": 2
+   "won": 5
   },
-  "flicksLeftMed": 0
+  "flicksLeftMed": 2
  },
  {
   "id": 216,
   "place": "Amami",
   "goalTier": 9,
   "flicks": 34,
-  "star2": 600,
-  "star3": 646,
+  "star2": 482,
+  "star3": 572,
   "winRate": "5/5",
-  "star3Rate": "0/5",
-  "scoreMin": 375,
-  "scoreMed": 482,
-  "scoreP80": 572,
-  "scoreMax": 572,
+  "star3Rate": "1/5",
+  "scoreMin": 380,
+  "scoreMed": 426,
+  "scoreP80": 600,
+  "scoreMax": 600,
   "maxTierReached": 9,
   "why": {
    "won": 5
@@ -1859,20 +1861,20 @@
   "place": "Yakushima",
   "goalTier": 11,
   "flicks": 165,
-  "star2": 750,
-  "star3": 1250,
+  "star2": 3268,
+  "star3": 5244,
   "winRate": "4/5",
-  "star3Rate": "4/5",
-  "scoreMin": 2475,
-  "scoreMed": 3268,
-  "scoreP80": 5244,
-  "scoreMax": 5244,
+  "star3Rate": "0/5",
+  "scoreMin": 3036,
+  "scoreMed": 4177,
+  "scoreP80": 5130,
+  "scoreMax": 5130,
   "maxTierReached": 11,
   "why": {
    "won": 4,
    "overcrowd": 1
   },
-  "flicksLeftMed": 50
+  "flicksLeftMed": 33
  },
  {
   "id": 220,
@@ -1882,7 +1884,7 @@
   "star2": 14,
   "star3": 25,
   "winRate": "5/5",
-  "star3Rate": "2/5",
+  "star3Rate": "1/5",
   "scoreMin": 11,
   "scoreMed": 14,
   "scoreP80": 25,
@@ -1901,16 +1903,16 @@
   "star2": 114,
   "star3": 130,
   "winRate": "5/5",
-  "star3Rate": "1/5",
-  "scoreMin": 107,
-  "scoreMed": 114,
-  "scoreP80": 130,
-  "scoreMax": 130,
+  "star3Rate": "0/5",
+  "scoreMin": 102,
+  "scoreMed": 105,
+  "scoreP80": 125,
+  "scoreMax": 125,
   "maxTierReached": 5,
   "why": {
    "won": 5
   },
-  "flicksLeftMed": 2
+  "flicksLeftMed": 4
  },
  {
   "id": 222,
@@ -1920,11 +1922,11 @@
   "star2": 232,
   "star3": 237,
   "winRate": "4/5",
-  "star3Rate": "0/5",
-  "scoreMin": 180,
-  "scoreMed": 232,
-  "scoreP80": 237,
-  "scoreMax": 237,
+  "star3Rate": "2/5",
+  "scoreMin": 168,
+  "scoreMed": 237,
+  "scoreP80": 256,
+  "scoreMax": 256,
   "maxTierReached": 6,
   "why": {
    "won": 4,
@@ -1939,16 +1941,15 @@
   "flicks": 19,
   "star2": 108,
   "star3": 213,
-  "winRate": "4/5",
+  "winRate": "5/5",
   "star3Rate": "0/5",
-  "scoreMin": 67,
-  "scoreMed": 108,
-  "scoreP80": 213,
-  "scoreMax": 213,
+  "scoreMin": 86,
+  "scoreMed": 111,
+  "scoreP80": 118,
+  "scoreMax": 118,
   "maxTierReached": 7,
   "why": {
-   "won": 4,
-   "flicks": 1
+   "won": 5
   },
   "flicksLeftMed": 6
  },
@@ -1959,16 +1960,17 @@
   "flicks": 37,
   "star2": 323,
   "star3": 337,
-  "winRate": "2/5",
-  "star3Rate": "1/5",
-  "scoreMin": 227,
-  "scoreMed": 323,
-  "scoreP80": 337,
-  "scoreMax": 337,
+  "winRate": "1/5",
+  "star3Rate": "0/5",
+  "scoreMin": 143,
+  "scoreMed": 231,
+  "scoreP80": 343,
+  "scoreMax": 343,
   "maxTierReached": 8,
   "why": {
-   "won": 2,
-   "flicks": 3
+   "flicks": 3,
+   "overcrowd": 1,
+   "won": 1
   },
   "flicksLeftMed": 0
  },
@@ -1979,57 +1981,57 @@
   "flicks": 35,
   "star2": 357,
   "star3": 428,
-  "winRate": "4/5",
+  "winRate": "5/5",
   "star3Rate": "1/5",
-  "scoreMin": 280,
-  "scoreMed": 357,
-  "scoreP80": 428,
-  "scoreMax": 428,
+  "scoreMin": 272,
+  "scoreMed": 304,
+  "scoreP80": 436,
+  "scoreMax": 436,
   "maxTierReached": 8,
   "why": {
-   "won": 4,
-   "flicks": 1
+   "won": 5
   },
-  "flicksLeftMed": 1
+  "flicksLeftMed": 2
  },
  {
   "id": 226,
   "place": "Madeira",
   "goalTier": 9,
   "flicks": 34,
-  "star2": 416,
-  "star3": 501,
-  "winRate": "5/5",
+  "star2": 395,
+  "star3": 524,
+  "winRate": "4/5",
   "star3Rate": "1/5",
-  "scoreMin": 330,
-  "scoreMed": 395,
-  "scoreP80": 524,
-  "scoreMax": 524,
+  "scoreMin": 379,
+  "scoreMed": 424,
+  "scoreP80": 565,
+  "scoreMax": 565,
   "maxTierReached": 9,
   "why": {
-   "won": 5
+   "flicks": 1,
+   "won": 4
   },
-  "flicksLeftMed": 6
+  "flicksLeftMed": 1
  },
  {
   "id": 227,
   "place": "Porto Santo",
   "goalTier": 11,
   "flicks": 165,
-  "star2": 750,
-  "star3": 1250,
-  "winRate": "4/5",
-  "star3Rate": "4/5",
-  "scoreMin": 1882,
-  "scoreMed": 3045,
-  "scoreP80": 4047,
-  "scoreMax": 4047,
+  "star2": 3045,
+  "star3": 4047,
+  "winRate": "3/5",
+  "star3Rate": "0/5",
+  "scoreMin": 1455,
+  "scoreMed": 1929,
+  "scoreP80": 3012,
+  "scoreMax": 3012,
   "maxTierReached": 11,
   "why": {
-   "won": 4,
-   "overcrowd": 1
+   "won": 3,
+   "overcrowd": 2
   },
-  "flicksLeftMed": 52
+  "flicksLeftMed": 73
  },
  {
   "id": 230,
@@ -2058,16 +2060,16 @@
   "star2": 114,
   "star3": 130,
   "winRate": "5/5",
-  "star3Rate": "1/5",
-  "scoreMin": 107,
-  "scoreMed": 114,
-  "scoreP80": 130,
-  "scoreMax": 130,
+  "star3Rate": "0/5",
+  "scoreMin": 102,
+  "scoreMed": 105,
+  "scoreP80": 125,
+  "scoreMax": 125,
   "maxTierReached": 5,
   "why": {
    "won": 5
   },
-  "flicksLeftMed": 2
+  "flicksLeftMed": 4
  },
  {
   "id": 232,
@@ -2076,16 +2078,16 @@
   "flicks": 34,
   "star2": 221,
   "star3": 239,
-  "winRate": "4/5",
+  "winRate": "3/5",
   "star3Rate": "1/5",
-  "scoreMin": 207,
-  "scoreMed": 221,
-  "scoreP80": 239,
-  "scoreMax": 239,
-  "maxTierReached": 6,
+  "scoreMin": 157,
+  "scoreMed": 202,
+  "scoreP80": 327,
+  "scoreMax": 327,
+  "maxTierReached": 7,
   "why": {
-   "won": 4,
-   "flicks": 1
+   "flicks": 2,
+   "won": 3
   },
   "flicksLeftMed": 6
  },
@@ -2097,11 +2099,11 @@
   "star2": 81,
   "star3": 108,
   "winRate": "5/5",
-  "star3Rate": "1/5",
+  "star3Rate": "2/5",
   "scoreMin": 75,
-  "scoreMed": 81,
-  "scoreP80": 108,
-  "scoreMax": 108,
+  "scoreMed": 91,
+  "scoreP80": 112,
+  "scoreMax": 112,
   "maxTierReached": 7,
   "why": {
    "won": 5
@@ -2117,10 +2119,10 @@
   "star3": 394,
   "winRate": "5/5",
   "star3Rate": "1/5",
-  "scoreMin": 242,
-  "scoreMed": 336,
-  "scoreP80": 394,
-  "scoreMax": 394,
+  "scoreMin": 266,
+  "scoreMed": 363,
+  "scoreP80": 431,
+  "scoreMax": 431,
   "maxTierReached": 8,
   "why": {
    "won": 5
@@ -2134,16 +2136,15 @@
   "flicks": 35,
   "star2": 315,
   "star3": 391,
-  "winRate": "4/5",
+  "winRate": "5/5",
   "star3Rate": "1/5",
-  "scoreMin": 227,
-  "scoreMed": 315,
-  "scoreP80": 391,
-  "scoreMax": 391,
+  "scoreMin": 245,
+  "scoreMed": 356,
+  "scoreP80": 408,
+  "scoreMax": 408,
   "maxTierReached": 8,
   "why": {
-   "won": 4,
-   "flicks": 1
+   "won": 5
   },
   "flicksLeftMed": 6
  },
@@ -2152,39 +2153,40 @@
   "place": "Cape Tribulation",
   "goalTier": 9,
   "flicks": 34,
-  "star2": 534,
-  "star3": 613,
-  "winRate": "5/5",
-  "star3Rate": "0/5",
-  "scoreMin": 330,
-  "scoreMed": 395,
-  "scoreP80": 524,
-  "scoreMax": 524,
+  "star2": 395,
+  "star3": 524,
+  "winRate": "4/5",
+  "star3Rate": "1/5",
+  "scoreMin": 379,
+  "scoreMed": 424,
+  "scoreP80": 565,
+  "scoreMax": 565,
   "maxTierReached": 9,
   "why": {
-   "won": 5
+   "flicks": 1,
+   "won": 4
   },
-  "flicksLeftMed": 6
+  "flicksLeftMed": 1
  },
  {
   "id": 237,
   "place": "Lord Howe",
   "goalTier": 11,
   "flicks": 165,
-  "star2": 750,
-  "star3": 1250,
-  "winRate": "3/5",
-  "star3Rate": "3/5",
-  "scoreMin": 1430,
-  "scoreMed": 2295,
-  "scoreP80": 3831,
-  "scoreMax": 3831,
+  "star2": 2295,
+  "star3": 3831,
+  "winRate": "4/5",
+  "star3Rate": "0/5",
+  "scoreMin": 1870,
+  "scoreMed": 2675,
+  "scoreP80": 3383,
+  "scoreMax": 3383,
   "maxTierReached": 11,
   "why": {
-   "overcrowd": 2,
-   "won": 3
+   "won": 4,
+   "overcrowd": 1
   },
-  "flicksLeftMed": 82
+  "flicksLeftMed": 63
  },
  {
   "id": 240,
@@ -2194,7 +2196,7 @@
   "star2": 14,
   "star3": 25,
   "winRate": "5/5",
-  "star3Rate": "2/5",
+  "star3Rate": "1/5",
   "scoreMin": 11,
   "scoreMed": 14,
   "scoreP80": 25,
@@ -2213,16 +2215,16 @@
   "star2": 114,
   "star3": 130,
   "winRate": "5/5",
-  "star3Rate": "1/5",
-  "scoreMin": 107,
-  "scoreMed": 114,
-  "scoreP80": 130,
-  "scoreMax": 130,
+  "star3Rate": "0/5",
+  "scoreMin": 102,
+  "scoreMed": 105,
+  "scoreP80": 125,
+  "scoreMax": 125,
   "maxTierReached": 5,
   "why": {
    "won": 5
   },
-  "flicksLeftMed": 2
+  "flicksLeftMed": 4
  },
  {
   "id": 242,
@@ -2232,11 +2234,11 @@
   "star2": 146,
   "star3": 196,
   "winRate": "5/5",
-  "star3Rate": "1/5",
-  "scoreMin": 121,
-  "scoreMed": 146,
-  "scoreP80": 196,
-  "scoreMax": 196,
+  "star3Rate": "0/5",
+  "scoreMin": 112,
+  "scoreMed": 155,
+  "scoreP80": 167,
+  "scoreMax": 167,
   "maxTierReached": 6,
   "why": {
    "won": 5
@@ -2250,16 +2252,15 @@
   "flicks": 19,
   "star2": 108,
   "star3": 213,
-  "winRate": "4/5",
+  "winRate": "5/5",
   "star3Rate": "0/5",
-  "scoreMin": 67,
-  "scoreMed": 108,
-  "scoreP80": 213,
-  "scoreMax": 213,
+  "scoreMin": 86,
+  "scoreMed": 111,
+  "scoreP80": 118,
+  "scoreMax": 118,
   "maxTierReached": 7,
   "why": {
-   "won": 4,
-   "flicks": 1
+   "won": 5
   },
   "flicksLeftMed": 6
  },
@@ -2270,18 +2271,17 @@
   "flicks": 37,
   "star2": 348,
   "star3": 385,
-  "winRate": "3/5",
+  "winRate": "5/5",
   "star3Rate": "0/5",
-  "scoreMin": 274,
-  "scoreMed": 348,
-  "scoreP80": 385,
-  "scoreMax": 385,
+  "scoreMin": 281,
+  "scoreMed": 315,
+  "scoreP80": 363,
+  "scoreMax": 363,
   "maxTierReached": 8,
   "why": {
-   "flicks": 2,
-   "won": 3
+   "won": 5
   },
-  "flicksLeftMed": 1
+  "flicksLeftMed": 4
  },
  {
   "id": 245,
@@ -2290,57 +2290,57 @@
   "flicks": 35,
   "star2": 355,
   "star3": 415,
-  "winRate": "2/5",
-  "star3Rate": "0/5",
-  "scoreMin": 274,
-  "scoreMed": 355,
-  "scoreP80": 415,
-  "scoreMax": 415,
+  "winRate": "5/5",
+  "star3Rate": "1/5",
+  "scoreMin": 281,
+  "scoreMed": 304,
+  "scoreP80": 418,
+  "scoreMax": 418,
   "maxTierReached": 8,
   "why": {
-   "flicks": 3,
-   "won": 2
+   "won": 5
   },
-  "flicksLeftMed": 0
+  "flicksLeftMed": 2
  },
  {
   "id": 246,
   "place": "Nha Trang",
   "goalTier": 9,
   "flicks": 34,
-  "star2": 534,
-  "star3": 613,
-  "winRate": "5/5",
-  "star3Rate": "0/5",
-  "scoreMin": 330,
-  "scoreMed": 395,
-  "scoreP80": 524,
-  "scoreMax": 524,
+  "star2": 395,
+  "star3": 524,
+  "winRate": "4/5",
+  "star3Rate": "1/5",
+  "scoreMin": 379,
+  "scoreMed": 424,
+  "scoreP80": 565,
+  "scoreMax": 565,
   "maxTierReached": 9,
   "why": {
-   "won": 5
+   "flicks": 1,
+   "won": 4
   },
-  "flicksLeftMed": 6
+  "flicksLeftMed": 1
  },
  {
   "id": 247,
   "place": "Con Dao",
   "goalTier": 11,
   "flicks": 165,
-  "star2": 750,
-  "star3": 1250,
-  "winRate": "1/5",
-  "star3Rate": "1/5",
-  "scoreMin": 653,
-  "scoreMed": 1245,
-  "scoreP80": 2527,
-  "scoreMax": 2527,
+  "star2": 1245,
+  "star3": 2527,
+  "winRate": "2/5",
+  "star3Rate": "0/5",
+  "scoreMin": 743,
+  "scoreMed": 1449,
+  "scoreP80": 1833,
+  "scoreMax": 1833,
   "maxTierReached": 11,
   "why": {
-   "overcrowd": 4,
-   "won": 1
+   "overcrowd": 3,
+   "won": 2
   },
-  "flicksLeftMed": 110
+  "flicksLeftMed": 112
  },
  {
   "id": 250,
@@ -2350,7 +2350,7 @@
   "star2": 14,
   "star3": 25,
   "winRate": "5/5",
-  "star3Rate": "2/5",
+  "star3Rate": "1/5",
   "scoreMin": 11,
   "scoreMed": 14,
   "scoreP80": 25,
@@ -2368,19 +2368,18 @@
   "flicks": 20,
   "star2": 115,
   "star3": 128,
-  "winRate": "1/5",
-  "star3Rate": "1/5",
-  "scoreMin": 58,
-  "scoreMed": 115,
-  "scoreP80": 128,
-  "scoreMax": 128,
+  "winRate": "3/5",
+  "star3Rate": "0/5",
+  "scoreMin": 86,
+  "scoreMed": 102,
+  "scoreP80": 115,
+  "scoreMax": 115,
   "maxTierReached": 5,
   "why": {
-   "overcrowd": 2,
    "flicks": 2,
-   "won": 1
+   "won": 3
   },
-  "flicksLeftMed": 0
+  "flicksLeftMed": 3
  },
  {
   "id": 252,
@@ -2389,16 +2388,15 @@
   "flicks": 34,
   "star2": 212,
   "star3": 244,
-  "winRate": "4/5",
-  "star3Rate": "0/5",
-  "scoreMin": 200,
-  "scoreMed": 212,
-  "scoreP80": 244,
-  "scoreMax": 244,
+  "winRate": "5/5",
+  "star3Rate": "1/5",
+  "scoreMin": 182,
+  "scoreMed": 197,
+  "scoreP80": 277,
+  "scoreMax": 277,
   "maxTierReached": 6,
   "why": {
-   "won": 4,
-   "flicks": 1
+   "won": 5
   },
   "flicksLeftMed": 6
  },
@@ -2410,11 +2408,11 @@
   "star2": 81,
   "star3": 108,
   "winRate": "5/5",
-  "star3Rate": "1/5",
+  "star3Rate": "2/5",
   "scoreMin": 75,
-  "scoreMed": 81,
-  "scoreP80": 108,
-  "scoreMax": 108,
+  "scoreMed": 91,
+  "scoreP80": 112,
+  "scoreMax": 112,
   "maxTierReached": 7,
   "why": {
    "won": 5
@@ -2429,11 +2427,11 @@
   "star2": 351,
   "star3": 403,
   "winRate": "5/5",
-  "star3Rate": "1/5",
-  "scoreMin": 339,
-  "scoreMed": 351,
-  "scoreP80": 403,
-  "scoreMax": 403,
+  "star3Rate": "2/5",
+  "scoreMin": 289,
+  "scoreMed": 372,
+  "scoreP80": 464,
+  "scoreMax": 464,
   "maxTierReached": 8,
   "why": {
    "won": 5
@@ -2447,32 +2445,31 @@
   "flicks": 35,
   "star2": 355,
   "star3": 415,
-  "winRate": "2/5",
-  "star3Rate": "0/5",
-  "scoreMin": 274,
-  "scoreMed": 355,
-  "scoreP80": 415,
-  "scoreMax": 415,
+  "winRate": "5/5",
+  "star3Rate": "1/5",
+  "scoreMin": 281,
+  "scoreMed": 304,
+  "scoreP80": 418,
+  "scoreMax": 418,
   "maxTierReached": 8,
   "why": {
-   "flicks": 3,
-   "won": 2
+   "won": 5
   },
-  "flicksLeftMed": 0
+  "flicksLeftMed": 2
  },
  {
   "id": 256,
   "place": "West Lake",
   "goalTier": 9,
   "flicks": 34,
-  "star2": 419,
-  "star3": 504,
+  "star2": 397,
+  "star3": 479,
   "winRate": "4/5",
-  "star3Rate": "0/5",
-  "scoreMin": 336,
-  "scoreMed": 397,
-  "scoreP80": 479,
-  "scoreMax": 479,
+  "star3Rate": "1/5",
+  "scoreMin": 345,
+  "scoreMed": 457,
+  "scoreP80": 531,
+  "scoreMax": 531,
   "maxTierReached": 9,
   "why": {
    "won": 4,
@@ -2485,20 +2482,20 @@
   "place": "Gulangyu",
   "goalTier": 11,
   "flicks": 165,
-  "star2": 750,
-  "star3": 1250,
-  "winRate": "2/5",
-  "star3Rate": "1/5",
-  "scoreMin": 946,
-  "scoreMed": 1758,
-  "scoreP80": 2011,
-  "scoreMax": 2011,
+  "star2": 1758,
+  "star3": 2011,
+  "winRate": "1/5",
+  "star3Rate": "0/5",
+  "scoreMin": 928,
+  "scoreMed": 1183,
+  "scoreP80": 1572,
+  "scoreMax": 1572,
   "maxTierReached": 11,
   "why": {
-   "won": 2,
-   "overcrowd": 3
+   "won": 1,
+   "overcrowd": 4
   },
-  "flicksLeftMed": 95
+  "flicksLeftMed": 106
  },
  {
   "id": 260,
@@ -2508,7 +2505,7 @@
   "star2": 14,
   "star3": 25,
   "winRate": "5/5",
-  "star3Rate": "2/5",
+  "star3Rate": "1/5",
   "scoreMin": 11,
   "scoreMed": 14,
   "scoreP80": 25,
@@ -2527,16 +2524,16 @@
   "star2": 99,
   "star3": 130,
   "winRate": "5/5",
-  "star3Rate": "1/5",
-  "scoreMin": 86,
-  "scoreMed": 99,
-  "scoreP80": 130,
-  "scoreMax": 130,
+  "star3Rate": "0/5",
+  "scoreMin": 89,
+  "scoreMed": 96,
+  "scoreP80": 109,
+  "scoreMax": 109,
   "maxTierReached": 5,
   "why": {
    "won": 5
   },
-  "flicksLeftMed": 4
+  "flicksLeftMed": 6
  },
  {
   "id": 262,
@@ -2545,16 +2542,16 @@
   "flicks": 34,
   "star2": 221,
   "star3": 239,
-  "winRate": "4/5",
+  "winRate": "3/5",
   "star3Rate": "1/5",
-  "scoreMin": 207,
-  "scoreMed": 221,
-  "scoreP80": 239,
-  "scoreMax": 239,
-  "maxTierReached": 6,
+  "scoreMin": 157,
+  "scoreMed": 202,
+  "scoreP80": 327,
+  "scoreMax": 327,
+  "maxTierReached": 7,
   "why": {
-   "won": 4,
-   "flicks": 1
+   "flicks": 2,
+   "won": 3
   },
   "flicksLeftMed": 6
  },
@@ -2567,15 +2564,14 @@
   "star3": 49,
   "winRate": "3/5",
   "star3Rate": "0/5",
-  "scoreMin": 21,
-  "scoreMed": 42,
-  "scoreP80": 49,
-  "scoreMax": 49,
+  "scoreMin": 18,
+  "scoreMed": 34,
+  "scoreP80": 47,
+  "scoreMax": 47,
   "maxTierReached": 7,
   "why": {
-   "overcrowd": 1,
-   "won": 3,
-   "flicks": 1
+   "flicks": 2,
+   "won": 3
   },
   "flicksLeftMed": 1
  },
@@ -2586,16 +2582,16 @@
   "flicks": 37,
   "star2": 305,
   "star3": 325,
-  "winRate": "3/5",
-  "star3Rate": "1/5",
-  "scoreMin": 259,
-  "scoreMed": 305,
-  "scoreP80": 325,
-  "scoreMax": 325,
+  "winRate": "4/5",
+  "star3Rate": "2/5",
+  "scoreMin": 275,
+  "scoreMed": 337,
+  "scoreP80": 447,
+  "scoreMax": 447,
   "maxTierReached": 8,
   "why": {
-   "won": 3,
-   "flicks": 2
+   "won": 4,
+   "flicks": 1
   },
   "flicksLeftMed": 6
  },
@@ -2606,57 +2602,57 @@
   "flicks": 35,
   "star2": 355,
   "star3": 415,
-  "winRate": "2/5",
-  "star3Rate": "0/5",
-  "scoreMin": 274,
-  "scoreMed": 355,
-  "scoreP80": 415,
-  "scoreMax": 415,
+  "winRate": "5/5",
+  "star3Rate": "1/5",
+  "scoreMin": 281,
+  "scoreMed": 304,
+  "scoreP80": 418,
+  "scoreMax": 418,
   "maxTierReached": 8,
   "why": {
-   "flicks": 3,
-   "won": 2
+   "won": 5
   },
-  "flicksLeftMed": 0
+  "flicksLeftMed": 2
  },
  {
   "id": 266,
   "place": "Alaçatı",
   "goalTier": 9,
   "flicks": 34,
-  "star2": 473,
-  "star3": 532,
-  "winRate": "5/5",
+  "star2": 412,
+  "star3": 487,
+  "winRate": "3/5",
   "star3Rate": "0/5",
-  "scoreMin": 361,
-  "scoreMed": 412,
-  "scoreP80": 487,
-  "scoreMax": 487,
+  "scoreMin": 410,
+  "scoreMed": 426,
+  "scoreP80": 962,
+  "scoreMax": 962,
   "maxTierReached": 9,
   "why": {
-   "won": 5
+   "won": 3,
+   "flicks": 2
   },
-  "flicksLeftMed": 6
+  "flicksLeftMed": 5
  },
  {
   "id": 267,
   "place": "Kekova",
   "goalTier": 11,
   "flicks": 165,
-  "star2": 750,
-  "star3": 1250,
-  "winRate": "3/5",
-  "star3Rate": "3/5",
-  "scoreMin": 1430,
-  "scoreMed": 2295,
-  "scoreP80": 3831,
-  "scoreMax": 3831,
+  "star2": 2295,
+  "star3": 3831,
+  "winRate": "4/5",
+  "star3Rate": "0/5",
+  "scoreMin": 1870,
+  "scoreMed": 2675,
+  "scoreP80": 3383,
+  "scoreMax": 3383,
   "maxTierReached": 11,
   "why": {
-   "overcrowd": 2,
-   "won": 3
+   "won": 4,
+   "overcrowd": 1
   },
-  "flicksLeftMed": 82
+  "flicksLeftMed": 63
  },
  {
   "id": 270,
@@ -2685,16 +2681,16 @@
   "star2": 114,
   "star3": 130,
   "winRate": "5/5",
-  "star3Rate": "1/5",
-  "scoreMin": 107,
-  "scoreMed": 114,
-  "scoreP80": 130,
-  "scoreMax": 130,
+  "star3Rate": "0/5",
+  "scoreMin": 102,
+  "scoreMed": 105,
+  "scoreP80": 125,
+  "scoreMax": 125,
   "maxTierReached": 5,
   "why": {
    "won": 5
   },
-  "flicksLeftMed": 2
+  "flicksLeftMed": 4
  },
  {
   "id": 272,
@@ -2704,11 +2700,11 @@
   "star2": 232,
   "star3": 237,
   "winRate": "4/5",
-  "star3Rate": "0/5",
-  "scoreMin": 180,
-  "scoreMed": 232,
-  "scoreP80": 237,
-  "scoreMax": 237,
+  "star3Rate": "2/5",
+  "scoreMin": 168,
+  "scoreMed": 237,
+  "scoreP80": 256,
+  "scoreMax": 256,
   "maxTierReached": 6,
   "why": {
    "won": 4,
@@ -2724,11 +2720,11 @@
   "star2": 96,
   "star3": 121,
   "winRate": "5/5",
-  "star3Rate": "1/5",
-  "scoreMin": 90,
+  "star3Rate": "0/5",
+  "scoreMin": 71,
   "scoreMed": 96,
-  "scoreP80": 121,
-  "scoreMax": 121,
+  "scoreP80": 120,
+  "scoreMax": 120,
   "maxTierReached": 7,
   "why": {
    "won": 5
@@ -2744,10 +2740,10 @@
   "star3": 394,
   "winRate": "5/5",
   "star3Rate": "1/5",
-  "scoreMin": 242,
-  "scoreMed": 336,
-  "scoreP80": 394,
-  "scoreMax": 394,
+  "scoreMin": 266,
+  "scoreMed": 363,
+  "scoreP80": 431,
+  "scoreMax": 431,
   "maxTierReached": 8,
   "why": {
    "won": 5
@@ -2761,16 +2757,15 @@
   "flicks": 35,
   "star2": 315,
   "star3": 391,
-  "winRate": "4/5",
+  "winRate": "5/5",
   "star3Rate": "1/5",
-  "scoreMin": 227,
-  "scoreMed": 315,
-  "scoreP80": 391,
-  "scoreMax": 391,
+  "scoreMin": 245,
+  "scoreMed": 356,
+  "scoreP80": 408,
+  "scoreMax": 408,
   "maxTierReached": 8,
   "why": {
-   "won": 4,
-   "flicks": 1
+   "won": 5
   },
   "flicksLeftMed": 6
  },
@@ -2779,39 +2774,40 @@
   "place": "Thoddoo",
   "goalTier": 9,
   "flicks": 34,
-  "star2": 455,
-  "star3": 477,
-  "winRate": "5/5",
+  "star2": 395,
+  "star3": 524,
+  "winRate": "4/5",
   "star3Rate": "1/5",
-  "scoreMin": 330,
-  "scoreMed": 395,
-  "scoreP80": 524,
-  "scoreMax": 524,
+  "scoreMin": 379,
+  "scoreMed": 424,
+  "scoreP80": 565,
+  "scoreMax": 565,
   "maxTierReached": 9,
   "why": {
-   "won": 5
+   "flicks": 1,
+   "won": 4
   },
-  "flicksLeftMed": 6
+  "flicksLeftMed": 1
  },
  {
   "id": 277,
   "place": "Addu Atoll",
   "goalTier": 11,
   "flicks": 165,
-  "star2": 750,
-  "star3": 1250,
-  "winRate": "4/5",
-  "star3Rate": "4/5",
-  "scoreMin": 1882,
-  "scoreMed": 3045,
-  "scoreP80": 4047,
-  "scoreMax": 4047,
+  "star2": 3045,
+  "star3": 4047,
+  "winRate": "3/5",
+  "star3Rate": "0/5",
+  "scoreMin": 1455,
+  "scoreMed": 1929,
+  "scoreP80": 3012,
+  "scoreMax": 3012,
   "maxTierReached": 11,
   "why": {
-   "won": 4,
-   "overcrowd": 1
+   "won": 3,
+   "overcrowd": 2
   },
-  "flicksLeftMed": 52
+  "flicksLeftMed": 73
  },
  {
   "id": 280,
@@ -2823,7 +2819,7 @@
   "winRate": "2/5",
   "star3Rate": "1/5",
   "scoreMin": 0,
-  "scoreMed": 6,
+  "scoreMed": 4,
   "scoreP80": 9,
   "scoreMax": 9,
   "maxTierReached": 4,
@@ -2841,16 +2837,16 @@
   "star2": 99,
   "star3": 130,
   "winRate": "5/5",
-  "star3Rate": "1/5",
-  "scoreMin": 86,
-  "scoreMed": 99,
-  "scoreP80": 130,
-  "scoreMax": 130,
+  "star3Rate": "0/5",
+  "scoreMin": 89,
+  "scoreMed": 96,
+  "scoreP80": 109,
+  "scoreMax": 109,
   "maxTierReached": 5,
   "why": {
    "won": 5
   },
-  "flicksLeftMed": 4
+  "flicksLeftMed": 6
  },
  {
   "id": 282,
@@ -2860,11 +2856,11 @@
   "star2": 232,
   "star3": 237,
   "winRate": "4/5",
-  "star3Rate": "0/5",
-  "scoreMin": 180,
-  "scoreMed": 232,
-  "scoreP80": 237,
-  "scoreMax": 237,
+  "star3Rate": "2/5",
+  "scoreMin": 168,
+  "scoreMed": 237,
+  "scoreP80": 256,
+  "scoreMax": 256,
   "maxTierReached": 6,
   "why": {
    "won": 4,
@@ -2880,12 +2876,12 @@
   "star2": 127,
   "star3": 128,
   "winRate": "5/5",
-  "star3Rate": "1/5",
-  "scoreMin": 118,
+  "star3Rate": "2/5",
+  "scoreMin": 116,
   "scoreMed": 127,
-  "scoreP80": 128,
-  "scoreMax": 128,
-  "maxTierReached": 7,
+  "scoreP80": 178,
+  "scoreMax": 178,
+  "maxTierReached": 8,
   "why": {
    "won": 5
   },
@@ -2898,15 +2894,16 @@
   "flicks": 37,
   "star2": 305,
   "star3": 343,
-  "winRate": "4/5",
-  "star3Rate": "1/5",
+  "winRate": "3/5",
+  "star3Rate": "0/5",
   "scoreMin": 191,
-  "scoreMed": 305,
-  "scoreP80": 343,
-  "scoreMax": 343,
+  "scoreMed": 272,
+  "scoreP80": 339,
+  "scoreMax": 339,
   "maxTierReached": 8,
   "why": {
-   "won": 4,
+   "won": 3,
+   "flicks": 1,
    "overcrowd": 1
   },
   "flicksLeftMed": 6
@@ -2918,17 +2915,16 @@
   "flicks": 35,
   "star2": 244,
   "star3": 265,
-  "winRate": "3/5",
-  "star3Rate": "0/5",
-  "scoreMin": 232,
-  "scoreMed": 244,
-  "scoreP80": 265,
-  "scoreMax": 265,
+  "winRate": "4/5",
+  "star3Rate": "1/5",
+  "scoreMin": 189,
+  "scoreMed": 229,
+  "scoreP80": 321,
+  "scoreMax": 321,
   "maxTierReached": 8,
   "why": {
-   "won": 3,
-   "overcrowd": 1,
-   "flicks": 1
+   "flicks": 1,
+   "won": 4
   },
   "flicksLeftMed": 6
  },
@@ -2937,39 +2933,40 @@
   "place": "Merzouga",
   "goalTier": 9,
   "flicks": 34,
-  "star2": 473,
-  "star3": 532,
-  "winRate": "5/5",
+  "star2": 412,
+  "star3": 487,
+  "winRate": "3/5",
   "star3Rate": "0/5",
-  "scoreMin": 361,
-  "scoreMed": 412,
-  "scoreP80": 487,
-  "scoreMax": 487,
+  "scoreMin": 410,
+  "scoreMed": 426,
+  "scoreP80": 962,
+  "scoreMax": 962,
   "maxTierReached": 9,
   "why": {
-   "won": 5
+   "won": 3,
+   "flicks": 2
   },
-  "flicksLeftMed": 6
+  "flicksLeftMed": 5
  },
  {
   "id": 287,
   "place": "Legzira",
   "goalTier": 11,
   "flicks": 165,
-  "star2": 750,
-  "star3": 1250,
-  "winRate": "4/5",
-  "star3Rate": "4/5",
-  "scoreMin": 1882,
-  "scoreMed": 3045,
-  "scoreP80": 4047,
-  "scoreMax": 4047,
+  "star2": 3045,
+  "star3": 4047,
+  "winRate": "3/5",
+  "star3Rate": "0/5",
+  "scoreMin": 1455,
+  "scoreMed": 1929,
+  "scoreP80": 3012,
+  "scoreMax": 3012,
   "maxTierReached": 11,
   "why": {
-   "won": 4,
-   "overcrowd": 1
+   "won": 3,
+   "overcrowd": 2
   },
-  "flicksLeftMed": 52
+  "flicksLeftMed": 73
  },
  {
   "id": 290,
@@ -2981,7 +2978,7 @@
   "winRate": "2/5",
   "star3Rate": "1/5",
   "scoreMin": 0,
-  "scoreMed": 6,
+  "scoreMed": 4,
   "scoreP80": 9,
   "scoreMax": 9,
   "maxTierReached": 4,
@@ -2999,16 +2996,16 @@
   "star2": 114,
   "star3": 130,
   "winRate": "5/5",
-  "star3Rate": "1/5",
-  "scoreMin": 107,
-  "scoreMed": 114,
-  "scoreP80": 130,
-  "scoreMax": 130,
+  "star3Rate": "0/5",
+  "scoreMin": 102,
+  "scoreMed": 105,
+  "scoreP80": 125,
+  "scoreMax": 125,
   "maxTierReached": 5,
   "why": {
    "won": 5
   },
-  "flicksLeftMed": 2
+  "flicksLeftMed": 4
  },
  {
   "id": 292,
@@ -3018,11 +3015,11 @@
   "star2": 146,
   "star3": 196,
   "winRate": "5/5",
-  "star3Rate": "1/5",
-  "scoreMin": 121,
-  "scoreMed": 146,
-  "scoreP80": 196,
-  "scoreMax": 196,
+  "star3Rate": "0/5",
+  "scoreMin": 112,
+  "scoreMed": 155,
+  "scoreP80": 167,
+  "scoreMax": 167,
   "maxTierReached": 6,
   "why": {
    "won": 5
@@ -3037,12 +3034,12 @@
   "star2": 127,
   "star3": 128,
   "winRate": "5/5",
-  "star3Rate": "1/5",
-  "scoreMin": 118,
+  "star3Rate": "2/5",
+  "scoreMin": 116,
   "scoreMed": 127,
-  "scoreP80": 128,
-  "scoreMax": 128,
-  "maxTierReached": 7,
+  "scoreP80": 178,
+  "scoreMax": 178,
+  "maxTierReached": 8,
   "why": {
    "won": 5
   },
@@ -3055,17 +3052,18 @@
   "flicks": 37,
   "star2": 297,
   "star3": 720,
-  "winRate": "5/5",
-  "star3Rate": "1/5",
-  "scoreMin": 284,
-  "scoreMed": 297,
-  "scoreP80": 720,
-  "scoreMax": 720,
+  "winRate": "4/5",
+  "star3Rate": "0/5",
+  "scoreMin": 306,
+  "scoreMed": 351,
+  "scoreP80": 445,
+  "scoreMax": 445,
   "maxTierReached": 8,
   "why": {
-   "won": 5
+   "won": 4,
+   "flicks": 1
   },
-  "flicksLeftMed": 6
+  "flicksLeftMed": 3
  },
  {
   "id": 295,
@@ -3074,17 +3072,16 @@
   "flicks": 35,
   "star2": 244,
   "star3": 265,
-  "winRate": "3/5",
-  "star3Rate": "0/5",
-  "scoreMin": 232,
-  "scoreMed": 244,
-  "scoreP80": 265,
-  "scoreMax": 265,
+  "winRate": "4/5",
+  "star3Rate": "1/5",
+  "scoreMin": 189,
+  "scoreMed": 229,
+  "scoreP80": 321,
+  "scoreMax": 321,
   "maxTierReached": 8,
   "why": {
-   "won": 3,
-   "overcrowd": 1,
-   "flicks": 1
+   "flicks": 1,
+   "won": 4
   },
   "flicksLeftMed": 6
  },
@@ -3093,39 +3090,40 @@
   "place": "Ras Mohammed",
   "goalTier": 9,
   "flicks": 34,
-  "star2": 534,
-  "star3": 613,
-  "winRate": "5/5",
-  "star3Rate": "0/5",
-  "scoreMin": 330,
-  "scoreMed": 395,
-  "scoreP80": 524,
-  "scoreMax": 524,
+  "star2": 395,
+  "star3": 524,
+  "winRate": "4/5",
+  "star3Rate": "1/5",
+  "scoreMin": 379,
+  "scoreMed": 424,
+  "scoreP80": 565,
+  "scoreMax": 565,
   "maxTierReached": 9,
   "why": {
-   "won": 5
+   "flicks": 1,
+   "won": 4
   },
-  "flicksLeftMed": 6
+  "flicksLeftMed": 1
  },
  {
   "id": 297,
   "place": "Nabq",
   "goalTier": 11,
   "flicks": 165,
-  "star2": 750,
-  "star3": 1250,
-  "winRate": "1/5",
-  "star3Rate": "1/5",
-  "scoreMin": 653,
-  "scoreMed": 1245,
-  "scoreP80": 2527,
-  "scoreMax": 2527,
+  "star2": 1245,
+  "star3": 2527,
+  "winRate": "2/5",
+  "star3Rate": "0/5",
+  "scoreMin": 743,
+  "scoreMed": 1449,
+  "scoreP80": 1833,
+  "scoreMax": 1833,
   "maxTierReached": 11,
   "why": {
-   "overcrowd": 4,
-   "won": 1
+   "overcrowd": 3,
+   "won": 2
   },
-  "flicksLeftMed": 110
+  "flicksLeftMed": 112
  },
  {
   "id": 300,
@@ -3135,7 +3133,7 @@
   "star2": 14,
   "star3": 25,
   "winRate": "5/5",
-  "star3Rate": "2/5",
+  "star3Rate": "1/5",
   "scoreMin": 11,
   "scoreMed": 14,
   "scoreP80": 25,
@@ -3154,16 +3152,16 @@
   "star2": 99,
   "star3": 130,
   "winRate": "5/5",
-  "star3Rate": "1/5",
-  "scoreMin": 86,
-  "scoreMed": 99,
-  "scoreP80": 130,
-  "scoreMax": 130,
+  "star3Rate": "0/5",
+  "scoreMin": 89,
+  "scoreMed": 96,
+  "scoreP80": 109,
+  "scoreMax": 109,
   "maxTierReached": 5,
   "why": {
    "won": 5
   },
-  "flicksLeftMed": 4
+  "flicksLeftMed": 6
  },
  {
   "id": 302,
@@ -3172,17 +3170,18 @@
   "flicks": 34,
   "star2": 227,
   "star3": 256,
-  "winRate": "5/5",
-  "star3Rate": "1/5",
-  "scoreMin": 183,
-  "scoreMed": 227,
-  "scoreP80": 256,
-  "scoreMax": 256,
+  "winRate": "3/5",
+  "star3Rate": "0/5",
+  "scoreMin": 170,
+  "scoreMed": 246,
+  "scoreP80": 260,
+  "scoreMax": 260,
   "maxTierReached": 6,
   "why": {
-   "won": 5
+   "won": 3,
+   "flicks": 2
   },
-  "flicksLeftMed": 6
+  "flicksLeftMed": 4
  },
  {
   "id": 303,
@@ -3192,12 +3191,12 @@
   "star2": 123,
   "star3": 127,
   "winRate": "5/5",
-  "star3Rate": "1/5",
-  "scoreMin": 116,
-  "scoreMed": 123,
-  "scoreP80": 127,
-  "scoreMax": 127,
-  "maxTierReached": 7,
+  "star3Rate": "4/5",
+  "scoreMin": 118,
+  "scoreMed": 146,
+  "scoreP80": 183,
+  "scoreMax": 183,
+  "maxTierReached": 8,
   "why": {
    "won": 5
   },
@@ -3210,15 +3209,16 @@
   "flicks": 37,
   "star2": 305,
   "star3": 343,
-  "winRate": "4/5",
-  "star3Rate": "1/5",
+  "winRate": "3/5",
+  "star3Rate": "0/5",
   "scoreMin": 191,
-  "scoreMed": 305,
-  "scoreP80": 343,
-  "scoreMax": 343,
+  "scoreMed": 272,
+  "scoreP80": 339,
+  "scoreMax": 339,
   "maxTierReached": 8,
   "why": {
-   "won": 4,
+   "won": 3,
+   "flicks": 1,
    "overcrowd": 1
   },
   "flicksLeftMed": 6
@@ -3230,56 +3230,56 @@
   "flicks": 35,
   "star2": 355,
   "star3": 415,
-  "winRate": "2/5",
-  "star3Rate": "0/5",
-  "scoreMin": 274,
-  "scoreMed": 355,
-  "scoreP80": 415,
-  "scoreMax": 415,
+  "winRate": "5/5",
+  "star3Rate": "1/5",
+  "scoreMin": 281,
+  "scoreMed": 304,
+  "scoreP80": 418,
+  "scoreMax": 418,
   "maxTierReached": 8,
   "why": {
-   "flicks": 3,
-   "won": 2
+   "won": 5
   },
-  "flicksLeftMed": 0
+  "flicksLeftMed": 2
  },
  {
   "id": 306,
   "place": "Vis",
   "goalTier": 9,
   "flicks": 34,
-  "star2": 473,
-  "star3": 532,
-  "winRate": "5/5",
+  "star2": 412,
+  "star3": 487,
+  "winRate": "3/5",
   "star3Rate": "0/5",
-  "scoreMin": 361,
-  "scoreMed": 412,
-  "scoreP80": 487,
-  "scoreMax": 487,
+  "scoreMin": 410,
+  "scoreMed": 426,
+  "scoreP80": 962,
+  "scoreMax": 962,
   "maxTierReached": 9,
   "why": {
-   "won": 5
+   "won": 3,
+   "flicks": 2
   },
-  "flicksLeftMed": 6
+  "flicksLeftMed": 5
  },
  {
   "id": 307,
   "place": "Mljet",
   "goalTier": 11,
   "flicks": 165,
-  "star2": 750,
-  "star3": 1250,
+  "star2": 2372,
+  "star3": 2583,
   "winRate": "3/5",
-  "star3Rate": "3/5",
-  "scoreMin": 1185,
-  "scoreMed": 2372,
-  "scoreP80": 2583,
-  "scoreMax": 2583,
+  "star3Rate": "1/5",
+  "scoreMin": 1545,
+  "scoreMed": 1661,
+  "scoreP80": 2723,
+  "scoreMax": 2723,
   "maxTierReached": 11,
   "why": {
    "overcrowd": 2,
    "won": 3
   },
-  "flicksLeftMed": 70
+  "flicksLeftMed": 80
  }
 ]

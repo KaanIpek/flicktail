@@ -6,15 +6,16 @@
   "flicks": 15,
   "star2": 40,
   "star3": 59,
-  "winRate": "6/6",
-  "star3Rate": "2/6",
+  "winRate": "5/6",
+  "star3Rate": "0/6",
   "scoreMin": 34,
   "scoreMed": 40,
-  "scoreP80": 59,
-  "scoreMax": 65,
+  "scoreP80": 40,
+  "scoreMax": 48,
   "maxTierReached": 5,
   "why": {
-   "won": 6
+   "won": 5,
+   "flicks": 1
   },
   "flicksLeftMed": 6
  },
@@ -25,16 +26,16 @@
   "flicks": 27,
   "star2": 187,
   "star3": 188,
-  "winRate": "5/6",
-  "star3Rate": "2/6",
-  "scoreMin": 160,
-  "scoreMed": 187,
-  "scoreP80": 188,
-  "scoreMax": 228,
+  "winRate": "4/6",
+  "star3Rate": "0/6",
+  "scoreMin": 159,
+  "scoreMed": 182,
+  "scoreP80": 184,
+  "scoreMax": 194,
   "maxTierReached": 6,
   "why": {
-   "flicks": 1,
-   "won": 5
+   "won": 4,
+   "flicks": 2
   },
   "flicksLeftMed": 2
  },
@@ -45,16 +46,17 @@
   "flicks": 42,
   "star2": 356,
   "star3": 368,
-  "winRate": "4/6",
-  "star3Rate": "1/6",
-  "scoreMin": 270,
-  "scoreMed": 356,
-  "scoreP80": 368,
-  "scoreMax": 457,
-  "maxTierReached": 7,
+  "winRate": "2/6",
+  "star3Rate": "0/6",
+  "scoreMin": 154,
+  "scoreMed": 362,
+  "scoreP80": 393,
+  "scoreMax": 476,
+  "maxTierReached": 8,
   "why": {
-   "won": 4,
-   "flicks": 2
+   "won": 2,
+   "flicks": 3,
+   "overcrowd": 1
   },
   "flicksLeftMed": 4
  },
@@ -65,18 +67,18 @@
   "flicks": 34,
   "star2": 277,
   "star3": 303,
-  "winRate": "3/6",
-  "star3Rate": "1/6",
-  "scoreMin": 165,
-  "scoreMed": 277,
-  "scoreP80": 303,
-  "scoreMax": 327,
+  "winRate": "2/6",
+  "star3Rate": "0/6",
+  "scoreMin": 170,
+  "scoreMed": 264,
+  "scoreP80": 265,
+  "scoreMax": 308,
   "maxTierReached": 7,
   "why": {
-   "won": 3,
-   "flicks": 3
+   "flicks": 4,
+   "won": 2
   },
-  "flicksLeftMed": 6
+  "flicksLeftMed": 0
  },
  {
   "id": 5,
@@ -86,11 +88,11 @@
   "star2": 157,
   "star3": 170,
   "winRate": "6/6",
-  "star3Rate": "2/6",
-  "scoreMin": 130,
-  "scoreMed": 157,
-  "scoreP80": 170,
-  "scoreMax": 185,
+  "star3Rate": "0/6",
+  "scoreMin": 90,
+  "scoreMed": 127,
+  "scoreP80": 145,
+  "scoreMax": 148,
   "maxTierReached": 8,
   "why": {
    "won": 6
@@ -105,12 +107,12 @@
   "star2": 180,
   "star3": 197,
   "winRate": "6/6",
-  "star3Rate": "2/6",
-  "scoreMin": 138,
-  "scoreMed": 180,
-  "scoreP80": 197,
-  "scoreMax": 205,
-  "maxTierReached": 8,
+  "star3Rate": "0/6",
+  "scoreMin": 150,
+  "scoreMed": 154,
+  "scoreP80": 159,
+  "scoreMax": 192,
+  "maxTierReached": 7,
   "why": {
    "won": 6
   },
@@ -124,11 +126,11 @@
   "star2": 311,
   "star3": 351,
   "winRate": "5/6",
-  "star3Rate": "2/6",
-  "scoreMin": 242,
-  "scoreMed": 311,
-  "scoreP80": 351,
-  "scoreMax": 357,
+  "star3Rate": "1/6",
+  "scoreMin": 257,
+  "scoreMed": 309,
+  "scoreP80": 323,
+  "scoreMax": 374,
   "maxTierReached": 8,
   "why": {
    "won": 5,
@@ -143,16 +145,15 @@
   "flicks": 39,
   "star2": 318,
   "star3": 320,
-  "winRate": "5/6",
-  "star3Rate": "2/6",
-  "scoreMin": 249,
-  "scoreMed": 318,
-  "scoreP80": 320,
-  "scoreMax": 355,
+  "winRate": "6/6",
+  "star3Rate": "1/6",
+  "scoreMin": 254,
+  "scoreMed": 300,
+  "scoreP80": 308,
+  "scoreMax": 327,
   "maxTierReached": 8,
   "why": {
-   "won": 5,
-   "flicks": 1
+   "won": 6
   },
   "flicksLeftMed": 6
  },
@@ -163,16 +164,15 @@
   "flicks": 41,
   "star2": 454,
   "star3": 463,
-  "winRate": "5/6",
-  "star3Rate": "2/6",
-  "scoreMin": 65,
-  "scoreMed": 454,
-  "scoreP80": 463,
-  "scoreMax": 651,
+  "winRate": "6/6",
+  "star3Rate": "3/6",
+  "scoreMin": 361,
+  "scoreMed": 503,
+  "scoreP80": 631,
+  "scoreMax": 649,
   "maxTierReached": 9,
   "why": {
-   "won": 5,
-   "overcrowd": 1
+   "won": 6
   },
   "flicksLeftMed": 6
  },
@@ -185,14 +185,14 @@
   "star3": 515,
   "winRate": "5/6",
   "star3Rate": "2/6",
-  "scoreMin": 461,
-  "scoreMed": 505,
-  "scoreP80": 515,
-  "scoreMax": 521,
+  "scoreMin": 297,
+  "scoreMed": 504,
+  "scoreP80": 551,
+  "scoreMax": 578,
   "maxTierReached": 9,
   "why": {
-   "won": 5,
-   "flicks": 1
+   "flicks": 1,
+   "won": 5
   },
   "flicksLeftMed": 6
  },
@@ -204,12 +204,12 @@
   "star2": 618,
   "star3": 647,
   "winRate": "6/6",
-  "star3Rate": "2/6",
-  "scoreMin": 579,
-  "scoreMed": 618,
-  "scoreP80": 647,
-  "scoreMax": 816,
-  "maxTierReached": 10,
+  "star3Rate": "4/6",
+  "scoreMin": 444,
+  "scoreMed": 651,
+  "scoreP80": 680,
+  "scoreMax": 745,
+  "maxTierReached": 9,
   "why": {
    "won": 6
   },
@@ -222,16 +222,17 @@
   "flicks": 135,
   "star2": 762,
   "star3": 808,
-  "winRate": "6/6",
-  "star3Rate": "2/6",
-  "scoreMin": 282,
-  "scoreMed": 762,
-  "scoreP80": 808,
-  "scoreMax": 1016,
+  "winRate": "5/6",
+  "star3Rate": "1/6",
+  "scoreMin": 230,
+  "scoreMed": 620,
+  "scoreP80": 691,
+  "scoreMax": 957,
   "maxTierReached": 11,
   "why": {
-   "won": 6
+   "won": 5,
+   "overcrowd": 1
   },
-  "flicksLeftMed": 108
+  "flicksLeftMed": 110
  }
 ]

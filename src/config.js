@@ -12,7 +12,8 @@ export const TABLE = {
 
 export const PHYS = {
   gravity: 2600,          // for spawn drops / merge pops (y axis, table px/s^2)
-  coulomb: 40,            // px/s^2 constant sliding deceleration
+  coulomb: 52,            // px/s^2 constant sliding deceleration (raised with
+                          // maxSpeed so faster shots still settle promptly)
   stopSpeed: 8,           // below this a drink parks (and can trigger overcrowd)
   restitution: 0.5,       // drink vs drink
   wallRestitution: 0.8,   // drink vs rail
@@ -24,9 +25,11 @@ export const PHYS = {
 export const FRICTION = { sand: 1.52, wood: 0.91, marble: 0.48 };
 
 export const FLICK = {
-  maxDrag: 225,       // px of screen drag for full power (shorter pull, more punch)
-  maxSpeed: 1360,     // table px/s
-  minSpeed: 170,
+  maxDrag: 200,       // px of screen drag for full power (shorter pull, more punch)
+  maxSpeed: 1820,     // table px/s — the whole game is a shot and a wait, and the
+                      // wait was the long half, especially in Shift where a drink
+                      // has to cross the entire table to reach the dock
+  minSpeed: 210,
   cancelDrag: 30,     // release under this = cancel
 };
 

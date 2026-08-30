@@ -124,6 +124,13 @@ export class Game {
 
   emit(name, data) { if (this.onEvent) this.onEvent(name, data); }
 
+  // Endless and Rush have no fixed goal, so the target is always one better
+  // than the best drink you have made this run — it moves up as you do.
+  chaseTier() {
+    if (!this.endless && !this.rush) return this.level.goalTier;
+    return Math.min(TIERS.length, Math.max(3, (this.maxTierMade || 0) + 1));
+  }
+
   rollTier() {
     // Endless widens the spawn pool as the run gets long, so a survivor keeps
     // being pushed but is handed bigger drinks to keep the board escalating.
@@ -251,7 +258,7 @@ export class Game {
 
     // tee respawn delay
     if (!this.tee.ready) {
-      this.tee.t += dt * 1.8;
+      this.tee.t += dt * 3.4;
       if (this.tee.t >= 1) { this.tee.ready = true; this.tee.t = 1; }
     }
 
