@@ -77,6 +77,14 @@ export const SPECIES = {
   tapir:    { ears: 'round',  tail: 'stub',  extra: 'trunk' },
   quokka:   { ears: 'round',  tail: 'long',  extra: 'muzzle' },
   koalaish: { ears: 'fan',    tail: 'stub',  extra: 'muzzle' },
+  // China and Turkey: their own faces rather than a borrowed cast.
+  panda:    { ears: 'round',  tail: 'stub',  extra: 'bigeyes' },
+  redpanda: { ears: 'point',  tail: 'bushy', extra: 'whiskers' },
+  crane:    { ears: 'none',   tail: 'plume', extra: 'bigbeak' },
+  koi:      { ears: 'none',   tail: 'fin',   extra: 'gills' },
+  angora:   { ears: 'point',  tail: 'puff',  extra: 'whiskers' },
+  kangal:   { ears: 'floppy', tail: 'curl',  extra: 'muzzle' },
+  stork:    { ears: 'none',   tail: 'plume', extra: 'beak' },
 };
 
 // No cast by default: every tier renders its painted 3D sprite, which reads far
@@ -101,6 +109,15 @@ export function tierStyle(level, tierId, tiers) {
 // still override it (a themed stop), but nothing does by default.
 export let ACTIVE_CAST = null;
 export function setActiveCast(cast) { ACTIVE_CAST = cast && cast.length ? cast : null; }
+
+// A painted skin swaps the sprite each tier draws with. The map is
+// tier -> asset key; anything missing falls back to that tier's own art, so a
+// half-finished set still renders. Set by main.js when a skin is equipped.
+export let ACTIVE_ART = null;
+export function setActiveArt(map) { ACTIVE_ART = map && Object.keys(map).length ? map : null; }
+export function tierAssetKey(tier) {
+  return (ACTIVE_ART && ACTIVE_ART[tier]) || 'tier' + String(tier).padStart(2, '0');
+}
 
 export function creatureFor(level, tierId) {
   const cast = (level && level.cast) || ACTIVE_CAST || DEFAULT_CAST;
@@ -279,30 +296,105 @@ export class Renderer {
       for (const iw of level.innerWalls) this.drawRail3D(ctx, iw.pts, level, 0.8);
     }
 
-    // ---- front apron (the table's near face) ----
+    // ---- the bar front, from the near edge to the bottom of the screen ----
+    //
+    // Pulling the camera back to leave room under the tee exposed whatever the
+    // backdrop photo happened to have down there — usually a pale slab of sand
+    // or pavement that read as an unfinished white band. You are standing AT a
+    // bar, so what belongs below the counter edge is the counter's own front
+    // panel, in that destination's material, all the way off the bottom.
     const e0 = view.project(nearL.x, 0, TABLE.foulLine);
     const e1 = view.project(nearR.x, 0, TABLE.foulLine);
-    const apronH = Math.min(h - Math.min(e0.y, e1.y), 78);
-    if (apronH > 4) {
-      const ag = ctx.createLinearGradient(0, e0.y, 0, e0.y + apronH);
-      ag.addColorStop(0, shade('#7c4e2e', -0.05));
-      ag.addColorStop(0.12, shade('#5e3a20', -0.05));
-      ag.addColorStop(1, shade('#2e1c0e', -0.2));
-      ctx.fillStyle = ag;
-      ctx.fillRect(Math.min(e0.x, e1.x) - 30, e0.y - 2, Math.abs(e1.x - e0.x) + 60, apronH + 4);
-      // apron grain
-      ctx.strokeStyle = 'rgba(0,0,0,0.18)';
-      for (let i = 0; i < 12; i++) {
-        const ax = Math.min(e0.x, e1.x) + (i + 0.5) * (Math.abs(e1.x - e0.x) / 12);
-        ctx.lineWidth = 1 + (i % 3);
-        ctx.beginPath(); ctx.moveTo(ax, e0.y); ctx.lineTo(ax + 4, e0.y + apronH); ctx.stroke();
-      }
-      // top edge highlight
-      ctx.fillStyle = 'rgba(255,230,190,0.25)';
-      ctx.fillRect(Math.min(e0.x, e1.x) - 30, e0.y - 2, Math.abs(e1.x - e0.x) + 60, 3);
-    }
+    const topY = Math.min(e0.y, e1.y);
+    const frontH = h - topY;
+    if (frontH > 4) this.drawBarFront(ctx, w, h, topY, frontH, level);
 
     this.tableCanvas = c;
+  }
+
+  // The panelled face of the bar below the counter edge. It takes the level's
+  // rail colour so a bamboo bar has a bamboo front and a marble one marble, and
+  // it runs to the bottom of the canvas so no backdrop is ever visible under
+  // the table — the phone's bottom edge becomes part of the counter.
+  drawBarFront(ctx, w, h, topY, frontH, level) {
+    // Real bars pair a light top with a dark cabinet underneath, and half the
+    // rail colours here are pale stone — using the rail straight gave a flat
+    // grey wall that read as more background. Mixing it into deep wood keeps a
+    // trace of the destination's hue and always lands dark enough to sit under
+    // the counter rather than compete with it.
+    const base = mix(level.rail || '#7c4e2e', '#38210f', 0.74);
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(0, topY - 2, w, frontH + 4);
+    ctx.clip();
+
+    const g = ctx.createLinearGradient(0, topY, 0, h);
+    g.addColorStop(0, shade(base, 0.10));
+    g.addColorStop(0.18, base);
+    g.addColorStop(0.75, shade(base, -0.24));
+    g.addColorStop(1, shade(base, -0.46));
+    ctx.fillStyle = g;
+    ctx.fillRect(0, topY - 2, w, frontH + 4);
+
+    // The counter casts onto its own front.
+    const cast = ctx.createLinearGradient(0, topY, 0, topY + Math.min(70, frontH));
+    cast.addColorStop(0, 'rgba(0,0,0,0.42)');
+    cast.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = cast;
+    ctx.fillRect(0, topY, w, Math.min(70, frontH));
+
+    // A row of recessed panels, splayed outward from the centre so they agree
+    // with the perspective of the top the player is looking down at.
+    const panelTop = topY + frontH * 0.20;
+    const panelBot = topY + frontH * 0.78;
+    const n = 4, gap = w * 0.028, pw = (w - gap * (n + 1)) / n;
+    const splay = (x) => (x - w / 2) * 0.10;
+    for (let i = 0; i < n; i++) {
+      const x0 = gap + i * (pw + gap), x1 = x0 + pw;
+      const b0 = x0 + splay(x0), b1 = x1 + splay(x1);
+      const face = ctx.createLinearGradient(0, panelTop, 0, panelBot);
+      face.addColorStop(0, shade(base, -0.26));
+      face.addColorStop(1, shade(base, -0.10));
+      ctx.fillStyle = face;
+      ctx.beginPath();
+      ctx.moveTo(x0, panelTop); ctx.lineTo(x1, panelTop);
+      ctx.lineTo(b1, panelBot); ctx.lineTo(b0, panelBot);
+      ctx.closePath(); ctx.fill();
+      // bevel: lit on the left and top, dark on the right and bottom
+      ctx.lineWidth = 2.2;
+      ctx.strokeStyle = 'rgba(255,238,210,0.13)';
+      ctx.beginPath(); ctx.moveTo(b0, panelBot); ctx.lineTo(x0, panelTop); ctx.lineTo(x1, panelTop); ctx.stroke();
+      ctx.strokeStyle = 'rgba(0,0,0,0.40)';
+      ctx.beginPath(); ctx.moveTo(x1, panelTop); ctx.lineTo(b1, panelBot); ctx.lineTo(b0, panelBot); ctx.stroke();
+    }
+
+    // Grain across the whole face, fine and low-contrast.
+    ctx.globalAlpha = 0.5;
+    for (let i = 0; i < 34; i++) {
+      const x = ((i * 97) % 100) / 100 * w;
+      ctx.strokeStyle = i % 2 ? 'rgba(0,0,0,0.10)' : 'rgba(255,235,205,0.045)';
+      ctx.lineWidth = 1 + (i % 3) * 0.6;
+      ctx.beginPath(); ctx.moveTo(x, topY); ctx.lineTo(x + splay(x), h); ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+
+    // The lit bullnose where the counter top rolls over into the front.
+    const lip = ctx.createLinearGradient(0, topY - 4, 0, topY + 16);
+    lip.addColorStop(0, shade(base, 0.44));
+    lip.addColorStop(0.30, shade(base, 0.16));
+    lip.addColorStop(1, 'rgba(0,0,0,0.34)');
+    ctx.fillStyle = lip;
+    ctx.fillRect(0, topY - 4, w, 19);
+
+    // Corners fall away from the light, which stops the band looking like a
+    // flat rectangle laid over the screen.
+    const vig = ctx.createLinearGradient(0, 0, w, 0);
+    vig.addColorStop(0, 'rgba(0,0,0,0.34)');
+    vig.addColorStop(0.5, 'rgba(0,0,0,0)');
+    vig.addColorStop(1, 'rgba(0,0,0,0.34)');
+    ctx.fillStyle = vig;
+    ctx.fillRect(0, topY, w, frontH);
+    ctx.restore();
   }
 
   // ---- surface materials (drawn inside the clipped, gradient-filled tabletop) ----
@@ -629,7 +721,7 @@ export class Renderer {
     if (b.kind === 'ball') { this.drawBall(ctx, b, p, time); return; }
 
     const tier = tierStyle(this.level, b.tier, TIERS);
-    const img = this.assets.image('tier' + String(b.tier).padStart(2, '0'));
+    const img = this.assets.image(tierAssetKey(b.tier));
     const born = b.born === undefined ? 1 : b.born;
     const pop = born < 1 ? 0.7 + 0.38 * easeOutBack(born) : 1;
     // the queued tee drink "breathes" to feel alive and invite the flick;
@@ -1633,7 +1725,7 @@ export class Renderer {
       ctx.lineWidth = 2.5 * s;
       roundRect(ctx, p.x - w / 2, p.y - h, w, h, 14 * s);
       ctx.stroke();
-      const img = this.assets.image('tier' + String(o.tier).padStart(2, '0'));
+      const img = this.assets.image(tierAssetKey(o.tier));
       const iw = 54 * s;
       if (img) ctx.drawImage(img, p.x - iw / 2 - 30 * s, p.y - h + 8 * s, iw, iw);
       const frac = 1 - o.t / ORDERS.softTimer;
@@ -1694,6 +1786,13 @@ function shade(hex, amt) {
     r *= 1 + amt; g *= 1 + amt; b *= 1 + amt;
   }
   return `rgb(${r | 0},${g | 0},${b | 0})`;
+}
+
+// Blend two hex colours; t is how much of `b` to take.
+function mix(a, b, t) {
+  const na = parseInt(a.slice(1), 16), nb = parseInt(b.slice(1), 16);
+  const ch = (s) => Math.round((((na >> s) & 255) * (1 - t)) + (((nb >> s) & 255) * t));
+  return `#${((1 << 24) | (ch(16) << 16) | (ch(8) << 8) | ch(0)).toString(16).slice(1)}`;
 }
 
 function hexToRgba(hex, a) {

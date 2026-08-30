@@ -48,6 +48,19 @@ export const SKINS = [
     stars: 80,
     price: '$2.99',
   },
+  {
+    id: 'signature',
+    name: 'Signature Bar',
+    blurb: 'The eleven house signatures, hand-painted, poured for the whole chain.',
+    kind: 'art',
+    // Ordered small cup to grand trophy, so the chain still reads as a
+    // progression the way the default set does.
+    art: ['anatolian-sunset', 'torii-sunrise', 'medianoche', 'limoncello-sole',
+      'siam-sunrise', 'aloha-comet', 'jade-dragon', 'riviera-royale',
+      'golden-agave', 'volcano-bloom', 'lagoon-crown'],
+    stars: 150,
+    price: '$2.99',
+  },
 ];
 
 export function skinById(id) { return SKINS.find(s => s.id === id) || SKINS[0]; }
@@ -56,4 +69,20 @@ export function skinById(id) { return SKINS.find(s => s.id === id) || SKINS[0]; 
 export function castFor(skinId) {
   const s = skinById(skinId);
   return s.kind === 'creature' ? s.cast : null;
+}
+
+// tier -> asset key for a painted skin, or null for the default set.
+export function artFor(skinId) {
+  const s = skinById(skinId);
+  if (s.kind !== 'art' || !s.art) return null;
+  const map = {};
+  s.art.forEach((slug, i) => { map[i + 1] = 'sig_' + slug; });
+  return map;
+}
+
+// [assetKey, url] pairs a painted skin needs loaded before it can be worn.
+export function artAssets(skinId) {
+  const s = skinById(skinId);
+  if (s.kind !== 'art' || !s.art) return [];
+  return s.art.map(slug => ['sig_' + slug, `assets/signatures/${slug}.png`]);
 }

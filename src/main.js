@@ -7,8 +7,8 @@ import { View } from './view.js';
 import { Slingshot } from './input.js';
 import { Game, S } from './game.js';
 import { Ads, admobProvider } from './ads.js';
-import { SKINS, skinById, castFor } from './skins.js';
-import { setActiveCast } from './render.js';
+import { SKINS, skinById, castFor, artFor, artAssets } from './skins.js';
+import { setActiveCast, setActiveArt } from './render.js';
 import { Renderer } from './render.js';
 import { Backdrop } from './backdrop.js';
 import { Fx } from './fx.js';
@@ -41,7 +41,19 @@ if (realAds.available()) ads.use(realAds);
 // the game only offers a refill when an ad can actually be shown
 game.canOfferRefill = () => ads.available();
 game.aimAssist = save.data.settings.aimLine;
-setActiveCast(castFor(save.data.activeSkin));
+// Wear a skin: its cast (drawn creatures) or its painted set, whichever it is.
+// A painted set needs its images in the cache before the tier lookup can find
+// them, so the load is kicked off here and the map applied either way — a tier
+// whose picture hasn't landed yet falls back to the default art for a frame
+// rather than drawing nothing.
+function applySkin(id) {
+  setActiveCast(castFor(id));
+  const art = artFor(id);
+  setActiveArt(art);
+  const need = artAssets(id);
+  if (need.length) assets.loadAll(need);
+}
+applySkin(save.data.activeSkin);
 const ui = new UI(uiRoot, save, audio);
 const backdropCanvas = document.createElement('canvas');
 backdropCanvas.id = 'bg';
@@ -287,7 +299,7 @@ ui.on('shop', () => { screen = 'shop'; ui.showShop(); });
 ui.on('equipSkin', d => {
   if (!save.data.ownedSkins.includes(d.id)) return;
   save.data.activeSkin = d.id; save.write();
-  setActiveCast(castFor(d.id));
+  applySkin(d.id);
   ui.showShop();
 });
 ui.on('unlockSkin', d => {
@@ -296,7 +308,7 @@ ui.on('unlockSkin', d => {
   if (!sk.stars || stars < sk.stars || save.data.ownedSkins.includes(sk.id)) return;
   save.data.ownedSkins.push(sk.id);
   save.data.activeSkin = sk.id; save.write();
-  setActiveCast(castFor(sk.id));
+  applySkin(sk.id);
   audio.play('fanfare', { volume: 0.6 });
   ui.showShop();
 });

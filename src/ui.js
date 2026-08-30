@@ -2,7 +2,7 @@
 
 import { TIERS, COMBO_CALLOUTS, REFILL } from './config.js';
 import { LEVELS, TOURS, tourById, levelsOfTour, tierNameFor } from './levels.js';
-import { creatureIcon } from './render.js';
+import { creatureIcon, ACTIVE_ART } from './render.js';
 import { SKINS } from './skins.js';
 import { todayKey } from './save.js';
 
@@ -24,8 +24,12 @@ export class UI {
   on(act, fn) { this.handlers[act] = fn; }
 
   drinkImg(tier, cls = '') {
-    // creature tiers draw their own icon so the UI matches the table
-    const src = creatureIcon(tier) || `assets/drinks/tier${String(tier).padStart(2, '0')}.png`;
+    // The UI must show whatever the table is showing: a creature icon if a cast
+    // is worn, the painted skin's art if one is, else the default set.
+    const art = ACTIVE_ART && ACTIVE_ART[tier];
+    const src = creatureIcon(tier)
+      || (art ? `assets/signatures/${art.replace(/^sig_/, '')}.png` : null)
+      || `assets/drinks/tier${String(tier).padStart(2, '0')}.png`;
     return `<img class="drink-icon ${cls}" src="${src}" alt="${TIERS[tier - 1].name}" onerror="this.style.visibility='hidden'">`;
   }
 
@@ -240,13 +244,13 @@ export class UI {
       const owned = d.ownedSkins.includes(sk.id);
       const active = d.activeSkin === sk.id;
       const canStar = !owned && sk.stars && stars >= sk.stars;
-      const preview = (sk.kind === 'creature' ? [2, 5, 8, 10] : [2, 5, 8, 10])
-        .map(t => {
-          const src = sk.kind === 'creature'
-            ? creatureIcon(t, 96, { cast: sk.cast })
-            : `assets/drinks/tier${String(t).padStart(2, '0')}.png`;
-          return `<img class="skin-pic" src="${src}" alt="">`;
-        }).join('');
+      const preview = [2, 5, 8, 10].map(t => {
+        let src;
+        if (sk.kind === 'creature') src = creatureIcon(t, 96, { cast: sk.cast });
+        else if (sk.kind === 'art') src = `assets/signatures/${sk.art[t - 1]}.png`;
+        else src = `assets/drinks/tier${String(t).padStart(2, '0')}.png`;
+        return `<img class="skin-pic" src="${src}" alt="">`;
+      }).join('');
       let action;
       if (active) action = '<div class="skin-on">EQUIPPED</div>';
       else if (owned) action = `<button class="btn tiny zen" data-act="equipSkin" data-id="${sk.id}">Wear it</button>`;

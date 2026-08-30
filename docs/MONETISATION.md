@@ -45,8 +45,12 @@ the placeholder.
 
 **Already done in the game**
 
-- `src/skins.js` is the catalogue: id, name, blurb, the cast it swaps in, a star
-  price and a money price.
+- `src/skins.js` is the catalogue: id, name, blurb, what it swaps in (a drawn
+  creature cast, or a painted set), a star price and a money price.
+- **Signature Bar** is the one worth charging for: all eleven tiers repainted
+  with the hand-painted country signatures. The drawn creature skins are bonuses
+  — they change ears and tails, not the whole cup, and pricing them would be
+  charging for the weakest art in the game.
 - `save.data.ownedSkins` / `activeSkin` persist ownership; `setActiveCast()`
   applies it to every drink and every UI icon at once.
 - The shop (`ui.showShop`) shows each skin with a live preview of its cast.
@@ -56,8 +60,9 @@ the placeholder.
 **What you need to do**
 
 1. In App Store Connect → Flicktail → **In-App Purchases**, create one
-   *non-consumable* per paid skin (suggested ids `skin.critters`, `skin.reef`,
-   `skin.safari`) with the prices in `skins.js`.
+   *non-consumable* per paid skin. Start with `skin.signature` ($2.99) — it is
+   the only set that looks like a purchase. `skin.critters`, `skin.reef` and
+   `skin.safari` can follow if their art is ever repainted.
 2. Fill the paid-apps agreement and banking details under Business — purchases
    cannot be tested until that is active.
 3. Add a StoreKit bridge (`@capacitor-community/in-app-purchases` or similar),
