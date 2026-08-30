@@ -111,4 +111,19 @@ export const SHIFT = {
   bonusPerLeft: 25, // score for each flick still in the cooler at the end
 };
 
+// The ad board. A real AdMob banner is a native view the SDK draws itself —
+// its pixels cannot be read back and painted onto the table, and obscuring or
+// compositing one is against AdMob policy. So the game draws the FRAME and
+// leaves the middle empty: a signboard hung on the front of the bar, with the
+// live banner sitting inside it. The ad stays untouched and fully visible; only
+// the woodwork around it belongs to the game.
+export const BANNER = {
+  w: 320, h: 50,     // the standard banner the slot is sized for (CSS px)
+  padX: 12,          // frame thickness around the ad
+  padTop: 14,        // extra room above for the rope and the monkey's hands
+  padBottom: 10,
+  minFrontH: 118,    // below this much bar front, the board is not hung at all
+  swing: 0.03,       // radians of idle sway
+};
+
 export const COMBO_CALLOUTS = { 2: 'Double Pour!', 3: 'Happy Hour!', 4: 'Tiki Time!', 5: 'TIDAL WAVE!' };

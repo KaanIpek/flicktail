@@ -6,7 +6,7 @@ import { Physics } from './physics.js';
 import { View } from './view.js';
 import { Slingshot } from './input.js';
 import { Game, S } from './game.js';
-import { Ads, admobProvider } from './ads.js';
+import { Ads, admobProvider, admobBanner } from './ads.js';
 import { SKINS, skinById, castFor, artFor, artAssets } from './skins.js';
 import { setActiveCast, setActiveArt } from './render.js';
 import { Renderer } from './render.js';
@@ -38,6 +38,20 @@ const ads = new Ads();
 const AD_UNIT = (window.FLICKTAIL_AD_UNIT || '').trim();
 const realAds = admobProvider(AD_UNIT);
 if (realAds.available()) ads.use(realAds);
+
+// The banner lives in the signboard the renderer paints on the bar front. It is
+// only ever mounted while a round is actually being played — never over a menu,
+// a result card or the map.
+const BANNER_UNIT = (window.FLICKTAIL_BANNER_UNIT || '').trim();
+const banner = admobBanner(BANNER_UNIT);
+let bannerWanted = false;
+function syncBanner(want) {
+  if (want === bannerWanted) return;
+  bannerWanted = want;
+  if (!banner.available()) { renderer.bannerLive = false; return; }
+  if (want) banner.show(renderer.adSlot).then(ok => { renderer.bannerLive = !!ok; });
+  else banner.hide().then(() => { renderer.bannerLive = false; });
+}
 // the game only offers a refill when an ad can actually be shown
 game.canOfferRefill = () => ads.available();
 game.aimAssist = save.data.settings.aimLine;
@@ -104,7 +118,7 @@ function resize() {
   view.camZ = -520;
   view.pitch = 1.02;
   view.fit(W, H, TABLE.halfW, 1.16, 0.87);
-  if (currentLevel) renderer.setLevel(currentLevel, W, H);
+  if (currentLevel) renderer.setLevel(currentLevel, W, H, DPR);
   backdrop.render();
 }
 addEventListener('resize', resize);
@@ -208,7 +222,7 @@ function resumeSaved() {
   zenMode = false;
   paused = false;
   backdrop.set(level.backdrop); backdrop.render(); setBgFill(level.backdrop);
-  renderer.setLevel(level, W, H);
+  renderer.setLevel(level, W, H, DPR);
   game.loadLevel(level, { seed: s.seed, restore: s });
   audio.music(musicFor(level)); audio.ambient(ambientFor(level));
   beginPlay();
@@ -240,7 +254,7 @@ function startLevel(id, { zen = false, seed = null, restore = null } = {}) {
   backdrop.set(level.backdrop);
   backdrop.render();
   setBgFill(level.backdrop);
-  renderer.setLevel(level, W, H);
+  renderer.setLevel(level, W, H, DPR);
   game.loadLevel(level, { zen, seed, restore });
   ui.showIntro(level, zen);
   audio.music(musicFor(level));
@@ -257,7 +271,7 @@ function startEndless() {
   screen = 'intro';
   paused = false;
   backdrop.set(level.backdrop); backdrop.render(); setBgFill(level.backdrop);
-  renderer.setLevel(level, W, H);
+  renderer.setLevel(level, W, H, DPR);
   game.loadLevel(level, { endless: true });
   ui.showModeIntro('endless');
   audio.music(musicFor(level)); audio.ambient(ambientFor(level));
@@ -272,7 +286,7 @@ function startRush() {
   screen = 'intro';
   paused = false;
   backdrop.set(level.backdrop); backdrop.render(); setBgFill(level.backdrop);
-  renderer.setLevel(level, W, H);
+  renderer.setLevel(level, W, H, DPR);
   game.loadLevel(level, { rush: true });
   ui.showModeIntro('rush');
   audio.music(musicFor(level)); audio.ambient(ambientFor(level));
@@ -287,7 +301,7 @@ function startShift() {
   screen = 'intro';
   paused = false;
   backdrop.set(level.backdrop); backdrop.render(); setBgFill(level.backdrop);
-  renderer.setLevel(level, W, H);
+  renderer.setLevel(level, W, H, DPR);
   game.loadLevel(level, { shift: true });
   ui.showModeIntro('shift');
   audio.music(musicFor(level)); audio.ambient(ambientFor(level));
@@ -303,7 +317,7 @@ function startDaily() {
   screen = 'intro';
   paused = false;
   backdrop.set(level.backdrop); backdrop.render(); setBgFill(level.backdrop);
-  renderer.setLevel(level, W, H);
+  renderer.setLevel(level, W, H, DPR);
   game.loadLevel(level, { endless: true, daily: true, seed: daySeed(key), dayKey: key });
   ui.showModeIntro('daily', { level, streak: save.liveStreak(key), done: save.data.dailyTodayDone === key });
   audio.music(musicFor(level)); audio.ambient(ambientFor(level));
@@ -490,6 +504,9 @@ function frame(now) {
   last = now;
   if (dt > 0.25) dt = 0.25;
 
+  // The board is only up while a round is actually being played.
+  syncBanner(screen === 'game' && !paused && game.state === 'aiming');
+
   if (screen === 'game' && !paused) {
     game.advanceTimeScale(dt);         // recover slow-mo on REAL time
     const sdt = dt * game.timeScale;   // simulation runs on scaled time
@@ -613,7 +630,7 @@ window.__ft = {
   retune(camH, camZ, pitch, nearFrac, baseFrac) {
     view.camH = camH; view.camZ = camZ; view.pitch = pitch;
     view.fit(W, H, TABLE.halfW, nearFrac ?? 0.97, baseFrac ?? 0.965);
-    if (currentLevel) renderer.setLevel(currentLevel, W, H);
+    if (currentLevel) renderer.setLevel(currentLevel, W, H, DPR);
     return [view.project(0, 0, TABLE.length).y / H, view.project(0, 0, TABLE.foulLine).y / H];
   },
 };

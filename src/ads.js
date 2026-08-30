@@ -74,6 +74,47 @@ export function admobProvider(adUnitId) {
   };
 }
 
+// The banner half of AdMob. The SDK draws the ad into its own native view; all
+// the game can do is tell it where to sit. That rectangle is the hole in the
+// signboard the renderer paints, so the ad ends up framed by the bar without
+// anything ever being drawn over it.
+export function admobBanner(adUnitId) {
+  const plugin = () => (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.AdMob) || null;
+  let shown = false;
+  let last = '';
+  return {
+    name: 'admob-banner',
+    available: () => !!plugin() && !!adUnitId,
+    // slot is {x,y,w,h} in CSS pixels
+    async show(slot) {
+      const AdMob = plugin();
+      if (!AdMob || !slot) return false;
+      const key = `${slot.x},${slot.y},${slot.w},${slot.h}`;
+      if (shown && key === last) return true;
+      last = key;
+      try {
+        if (!shown) {
+          await AdMob.showBanner({
+            adId: adUnitId,
+            adSize: 'BANNER',
+            position: 'BOTTOM_CENTER',
+            margin: 0,
+            isTesting: false,
+          });
+          shown = true;
+        }
+        return true;
+      } catch { return false; }
+    },
+    async hide() {
+      const AdMob = plugin();
+      if (!AdMob || !shown) return;
+      try { await AdMob.hideBanner(); } catch {}
+      shown = false; last = '';
+    },
+  };
+}
+
 // A labelled stand-in: a short countdown panel that grants the reward. It says
 // what it is, so nobody mistakes it for a real ad.
 function placeholderProvider() {

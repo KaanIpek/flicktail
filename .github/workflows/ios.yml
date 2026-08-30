@@ -53,6 +53,14 @@ jobs:
       - name: Copy the game into the shell
         run: node mobile/sync-web.mjs
 
+      # The two ad unit ids reach the web layer as globals. Unset, both ad
+      # providers report unavailable and the game hangs its own signboard.
+      - name: Ad unit ids
+        env:
+          FLICKTAIL_BANNER_UNIT: ${{ vars.FLICKTAIL_BANNER_UNIT }}
+          FLICKTAIL_AD_UNIT: ${{ vars.FLICKTAIL_AD_UNIT }}
+        run: node mobile/inject-ad-units.mjs
+
       - name: Install Capacitor and generate the iOS project
         working-directory: mobile
         run: |
@@ -69,6 +77,24 @@ jobs:
           sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = [0-9.]*;/IPHONEOS_DEPLOYMENT_TARGET = 15.0;/g' ios/App/App.xcodeproj/project.pbxproj
           grep -m1 'IPHONEOS_DEPLOYMENT_TARGET' ios/App/App.xcodeproj/project.pbxproj
           npx cap sync ios
+
+      # AdMob needs the app id in Info.plist and, for iOS 14+, the tracking
+      # usage string, or the SDK refuses to start and every request fails.
+      # With the variable unset the plugin ships dormant, which is exactly how
+      # the browser build behaves.
+      - name: AdMob identifiers
+        working-directory: mobile/ios/App/App
+        env:
+          ADMOB_APP_ID: ${{ vars.FLICKTAIL_ADMOB_APP_ID }}
+        run: |
+          PB=/usr/libexec/PlistBuddy
+          if [ -n "$ADMOB_APP_ID" ]; then
+            $PB -c "Add :GADApplicationIdentifier string $ADMOB_APP_ID" Info.plist || $PB -c "Set :GADApplicationIdentifier $ADMOB_APP_ID" Info.plist
+            $PB -c "Add :NSUserTrackingUsageDescription string 'Flicktail asks so the ads it shows can be relevant. Decline and you still get ads, just untargeted.'" Info.plist || true
+            echo "AdMob app id set"
+          else
+            echo "FLICKTAIL_ADMOB_APP_ID is not set - shipping without ads"
+          fi
 
       # `cap add ios` leaves Capacitor's own placeholder icon in the catalog.
       - name: Install the app icon

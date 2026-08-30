@@ -6,7 +6,7 @@
 // subtle billboard lean toward the camera), and every level gets a light
 // grade + vignette so the backdrop and the table feel like one place.
 
-import { TABLE, TIERS, ORDERS, FRICTION, CAT_TIERS } from './config.js';
+import { TABLE, TIERS, ORDERS, FRICTION, CAT_TIERS, BANNER } from './config.js';
 
 const RAIL_H = 24;        // world units of rail height
 const RAIL_TH = 26;       // world units of rail thickness (outward)
@@ -140,8 +140,11 @@ export class Renderer {
     this.level = null;
   }
 
-  setLevel(level, w, h) {
+  setLevel(level, w, h, dpr = 1) {
     this.level = level;
+    // the ad slot is reported in CSS pixels, because that is what a native ad
+    // view is positioned in
+    this.dpr = dpr;
     // table dressing: props react to drinks sliding past, so they live here
     // (dynamic) rather than baked into the prerendered tabletop
     this.props = (level.decor || []).map((d, i) => ({ ...d, hitT: -9, seed: i * 1.7 }));
@@ -312,6 +315,7 @@ export class Renderer {
     const topY = Math.min(e0.y, e1.y);
     const frontH = h - topY;
     if (frontH > 4) this.drawBarFront(ctx, w, h, topY, frontH, level);
+    this.adSlot = this.layoutAdBoard(w, h, topY, frontH);
 
     this.tableCanvas = c;
   }
@@ -398,6 +402,133 @@ export class Renderer {
     vig.addColorStop(1, 'rgba(0,0,0,0.34)');
     ctx.fillStyle = vig;
     ctx.fillRect(0, topY, w, frontH);
+    ctx.restore();
+  }
+
+  // What hangs in the board when there is no ad mounted: the bar's own sign,
+  // so the frame always reads as part of the scene.
+  drawHouseCard(ctx, x, y, bw, bh, time) {
+    const d = this.dpr || 1;
+    const g = ctx.createLinearGradient(x, y, x, y + bh);
+    g.addColorStop(0, '#123a56'); g.addColorStop(1, '#0d2740');
+    ctx.fillStyle = g;
+    roundRect(ctx, x, y, bw, bh, 4 * d); ctx.fill();
+
+    const glow = 0.72 + 0.28 * Math.sin(time * 1.6);
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = `rgba(255,215,94,${glow.toFixed(2)})`;
+    ctx.font = `800 ${Math.round(bh * 0.42)}px "Baloo 2", system-ui, sans-serif`;
+    ctx.fillText('FLICKTAIL', x + bw / 2, y + bh * 0.36);
+    ctx.fillStyle = 'rgba(220,235,250,0.72)';
+    ctx.font = `700 ${Math.round(bh * 0.24)}px Nunito, system-ui, sans-serif`;
+    ctx.fillText('happy hour, all day', x + bw / 2, y + bh * 0.72);
+    ctx.textAlign = 'start'; ctx.textBaseline = 'alphabetic';
+  }
+
+  // Where the live banner goes, in CSS pixels, or null when the bar front is too
+  // shallow to hang a board on. main.js hands this to the native ad view; the
+  // renderer only ever draws AROUND it.
+  layoutAdBoard(w, h, topY, frontH) {
+    if (frontH < BANNER.minFrontH) return null;
+    const dpr = this.dpr || 1;
+    const bw = Math.min(BANNER.w, (w / dpr) - 2 * BANNER.padX - 16);
+    const bh = BANNER.h;
+    const cssW = w / dpr, cssH = h / dpr, cssTop = topY / dpr, cssFront = frontH / dpr;
+    const x = Math.round((cssW - bw) / 2);
+    // sit it in the middle of the front panel, a little below the counter lip
+    const y = Math.round(cssTop + (cssFront - bh) * 0.30);
+    return { x, y, w: Math.round(bw), h: bh };
+  }
+
+  // The signboard: two ropes off the counter lip, a plank frame, and a monkey
+  // leaning over the top rail holding it steady. The middle is left blank —
+  // that rectangle is the ad.
+  drawAdBoard(ctx, time) {
+    const slot = this.adSlot;
+    if (!slot) return;
+    const d = this.dpr || 1;
+    const x = slot.x * d, y = slot.y * d, bw = slot.w * d, bh = slot.h * d;
+    const px = BANNER.padX * d, pt = BANNER.padTop * d, pb = BANNER.padBottom * d;
+    const fx = x - px, fy = y - pt, fw = bw + px * 2, fh = bh + pt + pb;
+    const sway = Math.sin(time * 0.9) * BANNER.swing;
+
+    ctx.save();
+    ctx.translate(fx + fw / 2, fy);
+    ctx.rotate(sway);
+    ctx.translate(-(fx + fw / 2), -fy);
+
+    // ropes up to the counter
+    ctx.strokeStyle = 'rgba(214,186,138,0.75)';
+    ctx.lineWidth = Math.max(2, 2.6 * d);
+    for (const rx of [fx + fw * 0.18, fx + fw * 0.82]) {
+      ctx.beginPath(); ctx.moveTo(rx, fy); ctx.lineTo(rx + (fx + fw / 2 - rx) * 0.12, fy - 22 * d); ctx.stroke();
+    }
+
+    // the plank
+    const g = ctx.createLinearGradient(0, fy, 0, fy + fh);
+    g.addColorStop(0, '#8a5f37'); g.addColorStop(0.5, '#734d2c'); g.addColorStop(1, '#5c3d22');
+    ctx.fillStyle = g;
+    roundRect(ctx, fx, fy, fw, fh, 10 * d); ctx.fill();
+    ctx.strokeStyle = 'rgba(255,235,200,0.22)'; ctx.lineWidth = Math.max(1, 1.6 * d);
+    roundRect(ctx, fx + 1, fy + 1, fw - 2, fh - 2, 10 * d); ctx.stroke();
+    ctx.strokeStyle = 'rgba(0,0,0,0.45)'; ctx.lineWidth = Math.max(1, 1.2 * d);
+    roundRect(ctx, fx, fy, fw, fh, 10 * d); ctx.stroke();
+
+    // the recess the ad sits in, so the banner reads as mounted rather than pasted
+    ctx.fillStyle = 'rgba(0,0,0,0.55)';
+    roundRect(ctx, x - 3 * d, y - 3 * d, bw + 6 * d, bh + 6 * d, 5 * d); ctx.fill();
+
+    // four brass screws
+    ctx.fillStyle = '#d8b46a';
+    for (const [sx, sy] of [[fx + 9 * d, fy + 9 * d], [fx + fw - 9 * d, fy + 9 * d],
+                            [fx + 9 * d, fy + fh - 9 * d], [fx + fw - 9 * d, fy + fh - 9 * d]]) {
+      ctx.beginPath(); ctx.arc(sx, sy, 2.6 * d, 0, Math.PI * 2); ctx.fill();
+    }
+
+    if (!this.bannerLive) this.drawHouseCard(ctx, x, y, bw, bh, time);
+
+    this.drawBoardMonkey(ctx, fx + fw * 0.78, fy, fw, time);
+    ctx.restore();
+  }
+
+  // A little monkey draped over the top edge of the board, hands on the rail,
+  // tail curling off to one side. Same drawn-charm language as the bar cat.
+  drawBoardMonkey(ctx, cx, topY, fw, time) {
+    const d = this.dpr || 1;
+    const s = Math.min(26 * d, fw * 0.11);
+    const bob = Math.sin(time * 1.7) * s * 0.06;
+    const y = topY - s * 0.62 + bob;
+    ctx.save();
+    ctx.translate(cx, y);
+
+    // tail, curling to the right and swishing
+    ctx.strokeStyle = '#a97b4e'; ctx.lineWidth = s * 0.16; ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(s * 0.42, s * 0.36);
+    ctx.quadraticCurveTo(s * (1.05 + Math.sin(time * 2.1) * 0.12), s * 0.1,
+                         s * (0.82 + Math.sin(time * 2.1) * 0.16), s * 0.62);
+    ctx.stroke();
+
+    // head
+    ctx.fillStyle = '#a97b4e';
+    ctx.beginPath(); ctx.arc(0, 0, s * 0.5, 0, Math.PI * 2); ctx.fill();
+    for (const ex of [-1, 1]) {
+      ctx.beginPath(); ctx.arc(ex * s * 0.5, -s * 0.06, s * 0.2, 0, Math.PI * 2); ctx.fill();
+    }
+    // muzzle
+    ctx.fillStyle = '#e2c39c';
+    ctx.beginPath(); ctx.ellipse(0, s * 0.16, s * 0.32, s * 0.24, 0, 0, Math.PI * 2); ctx.fill();
+    // eyes, with a slow blink
+    const open = (Math.sin(time * 0.7) > -0.93) ? 1 : 0.12;
+    ctx.fillStyle = '#2a1c12';
+    for (const ex of [-1, 1]) {
+      ctx.beginPath(); ctx.ellipse(ex * s * 0.17, -s * 0.08, s * 0.075, s * 0.075 * open, 0, 0, Math.PI * 2); ctx.fill();
+    }
+    // hands gripping the rail
+    ctx.fillStyle = '#a97b4e';
+    for (const hx of [-1, 1]) {
+      ctx.beginPath(); ctx.ellipse(hx * s * 0.56, s * 0.56, s * 0.17, s * 0.12, 0, 0, Math.PI * 2); ctx.fill();
+    }
     ctx.restore();
   }
 
@@ -659,6 +790,8 @@ export class Renderer {
       quad(ctx, view, [-TABLE.halfW, TABLE.foulLine], [TABLE.halfW, TABLE.foulLine],
         [TABLE.halfW, lineZ], [-TABLE.halfW, lineZ]);
     }
+
+    this.drawAdBoard(ctx, time);
 
     if (game.aim && game.tee.ready) this.drawAim(ctx, game);
 
