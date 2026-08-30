@@ -3,6 +3,7 @@
 import { TIERS, COMBO_CALLOUTS, REFILL } from './config.js';
 import { LEVELS, TOURS, tourById, levelsOfTour, tierNameFor } from './levels.js';
 import { creatureIcon } from './render.js';
+import { SKINS } from './skins.js';
 import { todayKey } from './save.js';
 
 export class UI {
@@ -26,6 +27,14 @@ export class UI {
     // creature tiers draw their own icon so the UI matches the table
     const src = creatureIcon(tier) || `assets/drinks/tier${String(tier).padStart(2, '0')}.png`;
     return `<img class="drink-icon ${cls}" src="${src}" alt="${TIERS[tier - 1].name}" onerror="this.style.visibility='hidden'">`;
+  }
+
+  // A country's own signature bottle when it has been painted, otherwise the
+  // generic tier-11 bottle. Never leave the card empty if the art is missing.
+  sigImg(tour, cls = '') {
+    if (!tour || !tour.sigArt) return this.drinkImg(11, cls);
+    return `<img class="drink-icon ${cls}" src="${tour.sigArt}" alt="${tour.special}"
+      onerror="this.style.visibility='hidden'">`;
   }
 
   stars(n, cls = '') {
@@ -59,6 +68,10 @@ export class UI {
         <div class="title-row">
           <button class="btn ghost half" data-act="collection">Collection</button>
           <button class="btn ghost half" data-act="passport">Passport</button>
+        </div>
+        <div class="title-row">
+          <button class="btn ghost half" data-act="shop">Skins</button>
+          <button class="btn ghost half" data-act="about">Settings</button>
         </div>
       </div>
       <p class="title-foot">A world tour in 12 drinks 🍹</p>
@@ -173,7 +186,7 @@ export class UI {
       // the country's signature creature is the top of its own cast
       return `
       <div class="col-card sig-card ${done ? '' : 'undiscovered'}">
-        ${done ? this.drinkImg(11) : '<div class="sig-lock">🔒</div>'}
+        ${done ? this.sigImg(t) : '<div class="sig-lock">🔒</div>'}
         <div class="col-name">${done ? t.special : '???'}</div>
         <div class="col-tier">${t.flag} ${t.name}</div>
       </div>`;
@@ -213,6 +226,51 @@ export class UI {
         </div>
         <div class="pass-stamps-title">Destinations toasted</div>
         <div class="pass-stamps">${stamps}</div>
+      </div>
+    </div>`;
+  }
+
+  // Drink skins. Prices are shown honestly: a paid skin says so, but the button
+  // only offers what the game can actually deliver today — a star unlock —
+  // until a store connection exists (see ui.iapAvailable).
+  showShop() {
+    const d = this.save.data;
+    const stars = this.save.totalStars();
+    const cards = SKINS.map(sk => {
+      const owned = d.ownedSkins.includes(sk.id);
+      const active = d.activeSkin === sk.id;
+      const canStar = !owned && sk.stars && stars >= sk.stars;
+      const preview = (sk.kind === 'creature' ? [2, 5, 8, 10] : [2, 5, 8, 10])
+        .map(t => {
+          const src = sk.kind === 'creature'
+            ? creatureIcon(t, 96, { cast: sk.cast })
+            : `assets/drinks/tier${String(t).padStart(2, '0')}.png`;
+          return `<img class="skin-pic" src="${src}" alt="">`;
+        }).join('');
+      let action;
+      if (active) action = '<div class="skin-on">EQUIPPED</div>';
+      else if (owned) action = `<button class="btn tiny zen" data-act="equipSkin" data-id="${sk.id}">Wear it</button>`;
+      else if (canStar) action = `<button class="btn tiny primary" data-act="unlockSkin" data-id="${sk.id}">Unlock ★ ${sk.stars}</button>`;
+      else action = `<div class="skin-locked">★ ${sk.stars} to unlock${sk.price ? ` &middot; or ${sk.price} soon` : ''}</div>`;
+      return `
+      <div class="skin-card ${owned ? '' : 'locked'}">
+        <div class="skin-row">${preview}</div>
+        <div class="skin-name">${sk.name}</div>
+        <div class="skin-blurb">${sk.blurb}</div>
+        ${action}
+      </div>`;
+    }).join('');
+    this.root.innerHTML = `
+    <div class="screen shop-screen">
+      <div class="map-head">
+        <button class="btn icon" data-act="title">‹</button>
+        <h2>Drink Skins</h2>
+        <div class="map-stars">★ ${stars}</div>
+      </div>
+      <div class="shop-scroll">
+        <p class="shop-note">Skins change how every drink looks. Earn one with stars now
+          &mdash; card payment arrives once the store is connected.</p>
+        ${cards}
       </div>
     </div>`;
   }
@@ -432,7 +490,7 @@ export class UI {
     if (!tour) return;
     const levels = levelsOfTour(tourId);
     const lv = levels[0];
-    const bottle = this.drinkImg(11, 'td-bottle');
+    const bottle = this.sigImg(tour, 'td-bottle');
     const parade = [2, 4, 6, 8, 10].map((t, i) =>
       `<span class="parade-pet" style="animation-delay:${(i * 0.13).toFixed(2)}s">${this.drinkImg(t)}</span>`
     ).join('');

@@ -13,6 +13,8 @@ const DEFAULTS = {
   settings: { music: true, sfx: true, haptics: true, aimLine: true },
   seenTutorial: false,
   toursDone: {},       // tourId -> true once its completion has been celebrated
+  ownedSkins: ['classic'],
+  activeSkin: 'classic',
   endlessBest: 0,
   // daily challenge
   dailyBest: 0,       // best daily score ever

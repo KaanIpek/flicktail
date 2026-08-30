@@ -6,7 +6,9 @@ import { Physics } from './physics.js';
 import { View } from './view.js';
 import { Slingshot } from './input.js';
 import { Game, S } from './game.js';
-import { Ads } from './ads.js';
+import { Ads, admobProvider } from './ads.js';
+import { SKINS, skinById, castFor } from './skins.js';
+import { setActiveCast } from './render.js';
 import { Renderer } from './render.js';
 import { Backdrop } from './backdrop.js';
 import { Fx } from './fx.js';
@@ -31,9 +33,15 @@ const physics = new Physics();
 const fx = new Fx();
 const game = new Game(physics, fx, audio, save);
 const ads = new Ads();
+// Prefer a real rewarded ad when the native plugin is installed; the labelled
+// placeholder only stands in when it isn't. AD_UNIT comes from the build.
+const AD_UNIT = (window.FLICKTAIL_AD_UNIT || '').trim();
+const realAds = admobProvider(AD_UNIT);
+if (realAds.available()) ads.use(realAds);
 // the game only offers a refill when an ad can actually be shown
 game.canOfferRefill = () => ads.available();
 game.aimAssist = save.data.settings.aimLine;
+setActiveCast(castFor(save.data.activeSkin));
 const ui = new UI(uiRoot, save, audio);
 const backdropCanvas = document.createElement('canvas');
 backdropCanvas.id = 'bg';
@@ -275,6 +283,23 @@ ui.on('tours', () => { game.clearSaved(); showMap(); });
 ui.on('tour', d => showTour(d.id));
 ui.on('collection', () => { screen = 'collection'; ui.showCollection(); });
 ui.on('passport', () => { screen = 'passport'; ui.showPassport(); });
+ui.on('shop', () => { screen = 'shop'; ui.showShop(); });
+ui.on('equipSkin', d => {
+  if (!save.data.ownedSkins.includes(d.id)) return;
+  save.data.activeSkin = d.id; save.write();
+  setActiveCast(castFor(d.id));
+  ui.showShop();
+});
+ui.on('unlockSkin', d => {
+  const sk = skinById(d.id);
+  const stars = save.totalStars();
+  if (!sk.stars || stars < sk.stars || save.data.ownedSkins.includes(sk.id)) return;
+  save.data.ownedSkins.push(sk.id);
+  save.data.activeSkin = sk.id; save.write();
+  setActiveCast(castFor(sk.id));
+  audio.play('fanfare', { volume: 0.6 });
+  ui.showShop();
+});
 ui.on('level', d => { audio.unlock(); startLevel(+d.id); });
 ui.on('zen', d => { audio.unlock(); startLevel(+d.id, { zen: true }); });
 ui.on('endless', () => { audio.unlock(); startEndless(); });

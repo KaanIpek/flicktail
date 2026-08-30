@@ -34,6 +34,34 @@ export class Ads {
   }
 }
 
+// The real thing, once the native plugin is present. Capacitor exposes the
+// AdMob plugin on window.Capacitor.Plugins.AdMob; if it isn't there (web, or
+// a build without the pod) this provider reports unavailable and the game
+// falls back to whatever else is registered. Wire it with:
+//     import { admobProvider } from './ads.js';
+//     const p = admobProvider('ca-app-pub-XXX/YYY');
+//     if (p.available()) ads.use(p);
+export function admobProvider(adUnitId) {
+  const plugin = () => (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.AdMob) || null;
+  let prepared = false;
+  return {
+    name: 'admob',
+    available: () => !!plugin() && !!adUnitId,
+    async show() {
+      const AdMob = plugin();
+      if (!AdMob) return false;
+      const opts = { adId: adUnitId };
+      try {
+        if (!prepared) { await AdMob.initialize({}); prepared = true; }
+        await AdMob.prepareRewardVideoAd(opts);
+        const reward = await AdMob.showRewardVideoAd();
+        // the plugin resolves with the reward payload only when it was earned
+        return !!reward;
+      } catch { return false; }
+    },
+  };
+}
+
 // A labelled stand-in: a short countdown panel that grants the reward. It says
 // what it is, so nobody mistakes it for a real ad.
 function placeholderProvider() {

@@ -97,8 +97,13 @@ export function tierStyle(level, tierId, tiers) {
   return o ? { ...base, color: o[0], alt: o[1] || base.alt } : base;
 }
 
+// The active skin's cast, set by main when a skin is equipped. A level can
+// still override it (a themed stop), but nothing does by default.
+export let ACTIVE_CAST = null;
+export function setActiveCast(cast) { ACTIVE_CAST = cast && cast.length ? cast : null; }
+
 export function creatureFor(level, tierId) {
-  const cast = (level && level.cast) || DEFAULT_CAST;
+  const cast = (level && level.cast) || ACTIVE_CAST || DEFAULT_CAST;
   const name = cast[tierId - 1];
   if (!name) return null;                       // tier 11 on the World Tour = the Atlas sprite
   const parts = SPECIES[name] || SPECIES.cat;
