@@ -422,6 +422,7 @@ const DRINK_SETS = {
   med: { 4: 'lavender-tumbler', 5: 'spritz-orange', 6: 'honey-vine', 7: 'anise-cup' },
   desert: { 4: 'mint-brass', 5: 'saffron-cream', 6: 'hibiscus-ruby', 7: 'cardamom-copper' },
   asia: { 4: 'matcha-bamboo', 5: 'lychee-pearl', 6: 'plum-porcelain', 7: 'coffee-steel' },
+  latin: { 4: 'agave-salt', 5: 'caipirinha-muddle', 6: 'michelada-red', 7: 'acai-coupe' },
 };
 
 // Which set a country pours. Anything unlisted keeps the tropical house set.
@@ -430,6 +431,7 @@ const SET_BY_TOUR = {
   portugal: 'med', croatia: 'med', turkey: 'med',
   uae: 'desert', egypt: 'desert', morocco: 'desert',
   thailand: 'asia', indonesia: 'asia', vietnam: 'asia', japan: 'asia', china: 'asia',
+  mexico: 'latin', brazil: 'latin',
 };
 
 function setArtFor(tourId) {

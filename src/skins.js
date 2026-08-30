@@ -61,6 +61,17 @@ export const SKINS = [
     stars: 150,
     price: '$2.99',
   },
+  {
+    id: 'grand',
+    name: 'Grand Tour',
+    blurb: 'The other ten signatures, from the Aegean to the Southern Cross.',
+    kind: 'art',
+    art: ['scarab-gold', 'sea-organ', 'starlit-tide', 'riad-lantern',
+      'aegean-mythos', 'algarve-gold', 'southern-cross', 'karst-mist',
+      'desert-pearl', 'carnival-punch', 'lagoon-crown'],
+    stars: 260,
+    price: '$2.99',
+  },
 ];
 
 export function skinById(id) { return SKINS.find(s => s.id === id) || SKINS[0]; }
