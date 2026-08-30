@@ -353,7 +353,7 @@ export const COUNTRIES = [
     stops: ['Malé', 'Hulhumalé', 'Maafushi', 'Baa Atoll', 'Vaadhoo', 'Fulhadhoo', 'Thoddoo'],
     tables: [
       { surface: 'glass', c: ['#0d7f8c', '#159aa8', '#20b5c4'], glow: '#a8f6ef' },
-      { surface: 'wave', c: ['#ece4d2', '#f4ede0', '#fbf6ec'], dark: '#3a3a34' },
+      { surface: 'wave', c: ['#ece4d2', '#f4ede0', '#fbf6ec'], dark: '#c3ad86' },
       { surface: 'bamboo', c: ['#c8a862', '#d8b872', '#e6c886'] },
     ],
     hazards: ['reef', 'tide', 'calm', 'ball', 'reef'],
