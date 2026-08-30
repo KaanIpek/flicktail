@@ -4,7 +4,7 @@
 
 export const TABLE = {
   halfW: 310,
-  length: 900,
+  length: 1020,   // longer table: more room to build, less backdrop
   foulLine: 60,       // z below this = the gutter drop (near edge is open)
   launchZ: 92,        // where the queued drink tees up
   launchStripZ: 120,  // sleeping drinks nearer than this trigger the overcrowd timer
@@ -24,9 +24,9 @@ export const PHYS = {
 export const FRICTION = { sand: 1.52, wood: 0.91, marble: 0.48 };
 
 export const FLICK = {
-  maxDrag: 260,       // px of screen drag for full power
-  maxSpeed: 1100,     // table px/s
-  minSpeed: 150,
+  maxDrag: 225,       // px of screen drag for full power (shorter pull, more punch)
+  maxSpeed: 1360,     // table px/s
+  minSpeed: 170,
   cancelDrag: 30,     // release under this = cancel
 };
 

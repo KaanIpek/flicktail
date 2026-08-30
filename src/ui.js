@@ -171,13 +171,9 @@ export class UI {
       const levels = levelsOfTour(t.id);
       const done = levels.length > 0 && levels.every(l => (s.stars[l.id] || 0) >= 1);
       // the country's signature creature is the top of its own cast
-      const icon = done && levels[0]
-        ? creatureIcon(11, 128, levels[0])
-        : null;
       return `
       <div class="col-card sig-card ${done ? '' : 'undiscovered'}">
-        ${icon ? `<img class="drink-icon" src="${icon}" alt="${t.special}">`
-               : '<div class="sig-lock">🔒</div>'}
+        ${done ? this.drinkImg(11) : '<div class="sig-lock">🔒</div>'}
         <div class="col-name">${done ? t.special : '???'}</div>
         <div class="col-tier">${t.flag} ${t.name}</div>
       </div>`;
@@ -436,21 +432,17 @@ export class UI {
     if (!tour) return;
     const levels = levelsOfTour(tourId);
     const lv = levels[0];
-    const bottle = lv ? creatureIcon(11, 160, lv) : null;
-    const seen = new Set();
-    const parade = (lv && lv.cast ? lv.cast.slice(0, 10) : []).map((name, i) => {
-      if (seen.has(name)) return '';
-      seen.add(name);
-      const src = creatureIcon(i + 1, 96, lv);
-      return src ? `<img class="parade-pet" style="animation-delay:${(i * 0.11).toFixed(2)}s" src="${src}" alt="${name}">` : '';
-    }).join('');
+    const bottle = this.drinkImg(11, 'td-bottle');
+    const parade = [2, 4, 6, 8, 10].map((t, i) =>
+      `<span class="parade-pet" style="animation-delay:${(i * 0.13).toFixed(2)}s">${this.drinkImg(t)}</span>`
+    ).join('');
     const stars = levels.reduce((a, l) => a + (this.save.data.stars[l.id] || 0), 0);
     this.root.innerHTML = `
     <div class="screen tour-done-screen">
       <div class="td-flag">${tour.flag}</div>
       <h2 class="td-title">${tour.name} complete!</h2>
       <p class="td-sub">Every stop toasted &middot; ★ ${stars}/${levels.length * 3}</p>
-      ${bottle ? `<img class="td-bottle" src="${bottle}" alt="${tour.special}">` : ''}
+      ${bottle}
       <div class="td-name">${tour.special}</div>
       <p class="td-note">Added to your Collection</p>
       <div class="td-parade">${parade}</div>
@@ -567,9 +559,13 @@ export class UI {
     </div>`);
   }
 
+  // Closes whatever modal is open. This used to remove #pauseModal by id only,
+  // so the refill offer stayed on screen after you accepted it — the flicks
+  // were granted but the "watch or end" card never left, which read as the ad
+  // having done nothing (and "End the run" then threw the round away).
   closeModal() {
-    const m = document.getElementById('pauseModal');
-    if (m) m.remove();
+    for (const m of this.root.querySelectorAll('.modal')) m.remove();
+    for (const m of document.querySelectorAll('body > .modal')) m.remove();
   }
 
   showTutorial(step) {

@@ -79,9 +79,11 @@ export const SPECIES = {
   koalaish: { ears: 'fan',    tail: 'stub',  extra: 'muzzle' },
 };
 
-// The default cast — the World Tour line-up, tiers 1..10.
-export const DEFAULT_CAST = ['frog', 'cat', 'piglet', 'turtle', 'bunny', 'fox',
-  'octopus', 'duckling', 'seal', 'crab'];
+// No cast by default: every tier renders its painted 3D sprite, which reads far
+// better than a drawn cup. The creature drawer stays for SKINS — a level (or a
+// bought skin) opts in by setting `cast`, and only then does a tier become an
+// animal.
+export const DEFAULT_CAST = [];
 
 const BELLY = ['#eafbc8', '#ffe6c2', '#ffdfe4', '#d8f4ff', '#fffaf0',
   '#ffe0bd', '#e8d4ff', '#fff2c2', '#eafcfa', '#ffd9e2', '#fff0d0'];
@@ -275,7 +277,7 @@ export class Renderer {
     // ---- front apron (the table's near face) ----
     const e0 = view.project(nearL.x, 0, TABLE.foulLine);
     const e1 = view.project(nearR.x, 0, TABLE.foulLine);
-    const apronH = Math.min(h - Math.min(e0.y, e1.y), 140);
+    const apronH = Math.min(h - Math.min(e0.y, e1.y), 78);
     if (apronH > 4) {
       const ag = ctx.createLinearGradient(0, e0.y, 0, e0.y + apronH);
       ag.addColorStop(0, shade('#7c4e2e', -0.05));
@@ -631,7 +633,7 @@ export class Renderer {
       : (b.sleeping ? Math.sin(time * 2 + b.id) * 0.012 : 0);
     const squash = b.justHit > 0 ? 1 - b.justHit * 0.6 : 1;
     // oversized silhouettes for small tiers; physics footprint stays honest
-    const vis = 1.62 - 0.034 * (b.tier - 1);
+    const vis = 1.92 - 0.038 * (b.tier - 1);   // the longer table shrinks everything; hold the read
     const wpx = b.r * 2 * p.s * vis * pop * (1 + bob);
     const hpx = view.project(b.x, b.y, b.z);
     // The 3D-rendered sprites already carry a fixed 3/4 perspective, so the old

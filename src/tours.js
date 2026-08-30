@@ -432,7 +432,7 @@ export function buildCountryLevels() {
         rail: c.rail,
         time: c.times[i % c.times.length],
         table,
-        cast: c.cast,
+        // cast is opt-in (skins); the painted sprites are the default look
         names: { 4: c.drinks[0], 5: c.drinks[1], 6: c.drinks[2],
           7: c.drinks[3], 8: c.drinks[4], 11: c.special },
         colors: { 11: [c.accent, c.sigAlt || '#fff4d8'] },

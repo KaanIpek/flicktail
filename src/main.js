@@ -75,10 +75,15 @@ function resize() {
   uiRoot.style.top = '0px';
   // Pulled-in camera: the near rails run off the bottom corners so the player
   // sits AT the table; the far rail lands around 0.40H under the backdrop.
-  view.camH = 1050;
-  view.camZ = -460;
-  view.pitch = 1.00;
-  view.fit(W, H, TABLE.halfW, 1.18, 1.02);
+  // The near edge used to land at 102% of screen height, so the tee sat on the
+  // very bottom pixel and there was nowhere to pull back from. It now rests at
+  // 87%, leaving a thumb's worth of table below the launch spot. Pulling the
+  // camera back a little also trades backdrop for tabletop, which is what the
+  // player actually plays on.
+  view.camH = 1180;
+  view.camZ = -520;
+  view.pitch = 1.02;
+  view.fit(W, H, TABLE.halfW, 1.16, 0.87);
   if (currentLevel) renderer.setLevel(currentLevel, W, H);
   backdrop.render();
 }

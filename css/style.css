@@ -461,3 +461,7 @@ h1, h2, h3, .logo, .btn, .hud-score, .combo, .callout, .result-title, .intro-pla
 .parade-pet { width: 46px; height: 46px; object-fit: contain; animation: tdBob 1.6s ease-in-out infinite; }
 @keyframes tdBob { 50% { transform: translateY(-9px) rotate(3deg); } }
 .td-claim { background: linear-gradient(160deg, #ffd75e, #ffa53c); color: #3a2600; text-shadow: none; }
+
+/* parade items wrap a sprite now, so size the image inside */
+.parade-pet .drink-icon { width: 48px; height: 48px; object-fit: contain; }
+img.td-bottle { width: 132px; height: 132px; object-fit: contain; }
