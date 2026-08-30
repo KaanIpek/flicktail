@@ -413,6 +413,31 @@ export const COUNTRIES = [
 ];
 
 // Seven stops per country: a real trip, not a taster.
+// Regional drink sets. Eleven glasses shared by twenty-one countries made every
+// table look the same; a country now draws its middle tiers from the set that
+// suits its coast, so a spritz in Italy is not the same object as a mint tea in
+// Morocco. Tiers outside a set fall through to the house art, so a half-painted
+// set still renders.
+const DRINK_SETS = {
+  med: { 4: 'lavender-tumbler', 5: 'spritz-orange', 6: 'honey-vine', 7: 'anise-cup' },
+  desert: { 4: 'mint-brass', 5: 'saffron-cream', 6: 'hibiscus-ruby', 7: 'cardamom-copper' },
+};
+
+// Which set a country pours. Anything unlisted keeps the tropical house set.
+const SET_BY_TOUR = {
+  italy: 'med', greece: 'med', france: 'med', spain: 'med',
+  portugal: 'med', croatia: 'med', turkey: 'med',
+  uae: 'desert', egypt: 'desert', morocco: 'desert',
+};
+
+function setArtFor(tourId) {
+  const set = DRINK_SETS[SET_BY_TOUR[tourId]];
+  if (!set) return {};
+  const out = {};
+  for (const [tier, slug] of Object.entries(set)) out[tier] = `assets/drinks/sets/${slug}.png`;
+  return out;
+}
+
 // Eight: the last one is the country's signature run. Until it existed the
 // special drink was tier 11 while no stop ever asked for more than tier 9, so
 // it could be earned as a collection trophy and never once poured.
@@ -655,7 +680,11 @@ export function buildCountryLevels() {
         // Tier 11 is this country's own painted signature, so the trophy drink
         // is visible ON THE TABLE and not only in the collection — every
         // country's chain used to end in the same generic bottle.
-        art: c.sigArt ? { 11: c.sigArt } : null,
+        art: (() => {
+          const a = setArtFor(c.id);
+          if (c.sigArt) a[11] = c.sigArt;
+          return Object.keys(a).length ? a : null;
+        })(),
         // cast is opt-in (skins); the painted sprites are the default look
         names: { 4: c.drinks[0], 5: c.drinks[1], 6: c.drinks[2],
           7: c.drinks[3], 8: c.drinks[4], 11: c.special },
