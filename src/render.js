@@ -115,8 +115,12 @@ export function setActiveCast(cast) { ACTIVE_CAST = cast && cast.length ? cast :
 // half-finished set still renders. Set by main.js when a skin is equipped.
 export let ACTIVE_ART = null;
 export function setActiveArt(map) { ACTIVE_ART = map && Object.keys(map).length ? map : null; }
-export function tierAssetKey(tier) {
-  return (ACTIVE_ART && ACTIVE_ART[tier]) || 'tier' + String(tier).padStart(2, '0');
+// Order matters: a skin the player chose to wear beats the level's own art,
+// which in turn beats the house set.
+export function tierAssetKey(tier, level) {
+  return (ACTIVE_ART && ACTIVE_ART[tier])
+    || (level && level.art && level.art[tier] && 'lvl_' + tier + '_' + level.id)
+    || 'tier' + String(tier).padStart(2, '0');
 }
 
 export function creatureFor(level, tierId) {
@@ -636,18 +640,24 @@ export class Renderer {
       ellipseStroke(ctx, p2.x, p2.y, rr * (0.72 + 0.06 * Math.sin(time * 2.2)), rr * 0.36);
     }
 
-    if (game.level.orders) this.drawDocks(ctx, game, time);
+    if (game.level.orders || game.shift) this.drawDocks(ctx, game, time);
     // after the docks so the cat is never hidden behind an order card
     if (game.level.barCat) this.drawBarCat(ctx, game, time);
     this.drawTableGuest(ctx, game, time);
 
-    // overcrowd warning pulse
+    // Rush draws the line it is defending, always — the whole mode is "do not
+    // let the pile cross this", and a rule you cannot see is not a rule.
+    if (game.rush) this.drawOverflowLine(ctx, game, time);
+
+    // overcrowd warning pulse, from the fail line down to the near edge
     if (game.overcrowdT > 0) {
-      const p = Math.min(1, game.overcrowdT / 2);
-      const a = 0.18 + 0.2 * Math.sin(time * 10) + p * 0.25;
+      const lineZ = game.failLineZ ? game.failLineZ() : TABLE.launchStripZ;
+      const p = game.overflowPressure ? game.overflowPressure() : Math.min(1, game.overcrowdT / 2);
+      const k = game.rush ? 0.42 : 1;
+      const a = (0.18 + 0.2 * Math.sin(time * 10) + p * 0.25) * k;
       ctx.fillStyle = `rgba(255,60,60,${Math.max(0, a)})`;
       quad(ctx, view, [-TABLE.halfW, TABLE.foulLine], [TABLE.halfW, TABLE.foulLine],
-        [TABLE.halfW, TABLE.launchStripZ], [-TABLE.halfW, TABLE.launchStripZ]);
+        [TABLE.halfW, lineZ], [-TABLE.halfW, lineZ]);
     }
 
     if (game.aim && game.tee.ready) this.drawAim(ctx, game);
@@ -721,7 +731,7 @@ export class Renderer {
     if (b.kind === 'ball') { this.drawBall(ctx, b, p, time); return; }
 
     const tier = tierStyle(this.level, b.tier, TIERS);
-    const img = this.assets.image(tierAssetKey(b.tier));
+    const img = this.assets.image(tierAssetKey(b.tier, this.level));
     const born = b.born === undefined ? 1 : b.born;
     const pop = born < 1 ? 0.7 + 0.38 * easeOutBack(born) : 1;
     // the queued tee drink "breathes" to feel alive and invite the flick;
@@ -791,6 +801,41 @@ export class Renderer {
 
   // Wet streaks left by sliding drinks — the table remembers the shot for a
   // moment, which makes the surface feel physical rather than painted.
+  // The overflow line: a painted hazard stripe across the table with the danger
+  // it is measuring drawn straight onto it.
+  drawOverflowLine(ctx, game, time) {
+    const view = this.view;
+    const z = game.failLineZ();
+    const p = game.overflowPressure();
+    const a = view.project(-TABLE.halfW, 0, z), b = view.project(TABLE.halfW, 0, z);
+
+    // hatched band just behind the line, so it reads as a zone not a wire
+    ctx.save();
+    ctx.beginPath();
+    const c0 = view.project(-TABLE.halfW, 0, z + 26), c1 = view.project(TABLE.halfW, 0, z + 26);
+    ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.lineTo(c1.x, c1.y); ctx.lineTo(c0.x, c0.y);
+    ctx.closePath();
+    ctx.fillStyle = `rgba(255,${Math.round(190 - 120 * p)},60,${0.16 + 0.22 * p})`;
+    ctx.fill();
+    ctx.clip();
+    ctx.strokeStyle = `rgba(20,10,0,${0.20 + 0.18 * p})`;
+    ctx.lineWidth = 7;
+    for (let x = -TABLE.halfW - 120; x < TABLE.halfW + 120; x += 46) {
+      const s0 = view.project(x, 0, z), s1 = view.project(x + 60, 0, z + 26);
+      ctx.beginPath(); ctx.moveTo(s0.x, s0.y); ctx.lineTo(s1.x, s1.y); ctx.stroke();
+    }
+    ctx.restore();
+
+    // the line itself, brightening and thickening as the pile closes in
+    const pulse = p > 0 ? 0.5 + 0.5 * Math.sin(time * 9) : 0;
+    ctx.strokeStyle = `rgba(255,${Math.round(180 - 140 * p)},${Math.round(70 - 60 * p)},${0.75 + 0.25 * pulse})`;
+    ctx.lineWidth = 5 + 3.5 * p;
+    ctx.setLineDash([22, 14]);
+    ctx.lineDashOffset = -(time * 26) % 36;
+    ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
   drawTrails(ctx, game, time) {
     if (!this.trail) this.trail = [];
     for (const b of game.phys.bodies) {
@@ -1725,7 +1770,7 @@ export class Renderer {
       ctx.lineWidth = 2.5 * s;
       roundRect(ctx, p.x - w / 2, p.y - h, w, h, 14 * s);
       ctx.stroke();
-      const img = this.assets.image(tierAssetKey(o.tier));
+      const img = this.assets.image(tierAssetKey(o.tier, this.level));
       const iw = 54 * s;
       if (img) ctx.drawImage(img, p.x - iw / 2 - 30 * s, p.y - h + 8 * s, iw, iw);
       const frac = 1 - o.t / ORDERS.softTimer;

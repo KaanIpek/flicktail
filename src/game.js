@@ -1,7 +1,7 @@
 // Level state machine: spawn queue, flicks, merges, combos, orders, hazards,
 // win/fail. Physics events are consumed here, end-of-step.
 
-import { TABLE, PHYS, FLICK, TIERS, TOP_TIER_CLINK_BONUS, COMBO, ORDERS, SPAWN, FAIL, COMBO_CALLOUTS, CAT_TIERS, REFILL } from './config.js';
+import { TABLE, PHYS, FLICK, TIERS, TOP_TIER_CLINK_BONUS, COMBO, ORDERS, SPAWN, FAIL, COMBO_CALLOUTS, CAT_TIERS, REFILL, RUSH, SHIFT } from './config.js';
 import { makeBody, buildWalls } from './physics.js';
 
 function mulberry32(seed) {
@@ -27,11 +27,17 @@ export class Game {
     this.onEvent = null;   // (name, data) -> UI hooks
   }
 
-  loadLevel(level, { zen = false, seed = null, restore = null, endless = false, daily = false, dayKey = '' } = {}) {
+  loadLevel(level, { zen = false, seed = null, restore = null, endless = false, daily = false, rush = false, shift = false, dayKey = '' } = {}) {
     this.level = level;
     this.zen = zen;
     this.endless = endless;
     this.daily = daily;
+    this.rush = rush;
+    this.shift = shift;
+    this.ticketsLeft = shift ? SHIFT.tickets : 0;
+    this.dropIn = RUSH.dropFirst;
+    this.dropEvery = RUSH.dropEvery;
+    this.dropped = 0;
     this.dayKey = dayKey;
     this.seed = seed ?? ((Math.random() * 1e9) | 0);
     this.rng = mulberry32(this.seed);
@@ -49,7 +55,7 @@ export class Game {
 
     this.state = S.AIMING;
     this.score = 0;
-    this.flicksLeft = (zen || endless) ? Infinity : level.flicks;
+    this.flicksLeft = (zen || endless || rush) ? Infinity : (shift ? SHIFT.flicks : level.flicks);
     this.combo = 0;
     this.comboTimer = 0;
     this.maxTierMade = 0;
@@ -100,7 +106,9 @@ export class Game {
 
     // orders
     this.orders = [];
-    if (level.orders) {
+    if (shift) {
+      for (let i = 0; i < ORDERS.maxCards; i++) this.pushOrder(i);
+    } else if (level.orders) {
       const n = Math.min(ORDERS.maxCards, 2);
       for (let i = 0; i < n; i++) this.pushOrder(i);
     }
@@ -119,8 +127,9 @@ export class Game {
   rollTier() {
     // Endless widens the spawn pool as the run gets long, so a survivor keeps
     // being pushed but is handed bigger drinks to keep the board escalating.
-    if (this.endless) {
-      const top = Math.min(7, 3 + Math.floor(this.time / 45));  // grows every 45s, capped at 7
+    if (this.endless || this.rush) {
+      const step = this.rush ? RUSH.topTierAt : 45;
+      const top = Math.min(7, 3 + Math.floor(this.time / step));  // grows over time, capped at 7
       const pool = [];
       for (let t = 1; t <= top; t++) pool.push(t);
       return pool[(this.rng() * pool.length) | 0];
@@ -145,7 +154,11 @@ export class Game {
   }
 
   pushOrder(slot) {
-    const { minTier, maxTier } = this.level.orders;
+    // A shift board asks across its own range, not the level's, and never asks
+    // for something the cooler cannot reach yet.
+    const { minTier, maxTier } = this.shift
+      ? { minTier: SHIFT.minTier, maxTier: Math.min(SHIFT.maxTier, SHIFT.minTier + 1 + this.ordersServed) }
+      : this.level.orders;
     const tier = minTier + ((this.rng() * (maxTier - minTier + 1)) | 0);
     const x = slot === 0 ? -150 : 150;
     this.orders[slot] = { tier, x, z: TABLE.length - 6, t: 0, slot, serveAnim: 0 };
@@ -257,6 +270,7 @@ export class Game {
     this.checkGutter();
     this.checkOrders(dt);
     this.checkOvercrowd(dt);
+    this.tickRush(dt);
     this.checkEnd(dt);
   }
 
@@ -523,7 +537,7 @@ export class Game {
   }
 
   checkOrders(dt) {
-    if (!this.level.orders) return;
+    if (!this.level.orders && !this.shift) return;
     for (let i = 0; i < this.orders.length; i++) {
       const o = this.orders[i];
       if (!o) continue;
@@ -543,6 +557,16 @@ export class Game {
           this.audio.play('pour', { volume: 0.5, detune: 0.08 });
           this.audio.haptic([10, 30, 20]);
           this.emit('orderServed', { tier: o.tier, pts });
+          if (this.shift) {
+            this.ticketsLeft--;
+            if (this.ticketsLeft <= 0) {
+              // a clean shift pays for whatever is left in the cooler
+              this.addScore(Math.max(0, this.flicksLeft) * SHIFT.bonusPerLeft, 0, TABLE.length / 2, true);
+              this.orders[i] = null;
+              this.finish(true, 'shift');
+              return;
+            }
+          }
           this.pushOrder(i);
           break;
         }
@@ -550,20 +574,47 @@ export class Game {
     }
   }
 
+  // Where the pile may not reach. Rush draws it much further out than the
+  // launch strip, because in Rush the table is what you are defending.
+  failLineZ() { return this.rush ? RUSH.lineZ : TABLE.launchStripZ; }
+
+  // How close to losing, 0..1 — the UI turns this into a bar so the danger is
+  // legible before it is fatal.
+  overflowPressure() {
+    const limit = this.rush ? RUSH.dwell : FAIL.dwell;
+    return Math.max(0, Math.min(1, this.overcrowdT / limit));
+  }
+
+  // Rush keeps pouring whether or not you are ready, and speeds up as it goes.
+  tickRush(dt) {
+    if (!this.rush || this.state !== S.AIMING) return;
+    this.dropIn -= dt;
+    if (this.dropIn > 0) return;
+    this.dropEvery = Math.max(RUSH.dropFloor, this.dropEvery * RUSH.tighten);
+    this.dropIn = this.dropEvery;
+    this.dropped++;
+    const half = TABLE.halfW - 70;
+    const x = -half + this.rng() * half * 2;
+    const tier = this.rollTier();
+    const b = this.phys.add(makeBody(tier, x, RUSH.spawnZ, TIERS[tier - 1].r));
+    b.born = 0;
+    this.emit('rushDrop', { tier, x });
+  }
+
   checkOvercrowd(dt) {
     let crowding = false;
     for (const b of this.phys.bodies) {
       if (b.dead || b.fixed || b.kind === 'ball') continue;
-      if (b.sleeping && b.immunity <= 0 && b.z - b.r < TABLE.launchStripZ) { crowding = true; break; }
+      if (b.sleeping && b.immunity <= 0 && b.z - b.r < this.failLineZ()) { crowding = true; break; }
     }
     if (crowding) {
       this.overcrowdT += dt;
-      if (this.overcrowdT >= FAIL.dwell) {
+      if (this.overcrowdT >= (this.rush ? RUSH.dwell : FAIL.dwell)) {
         if (this.zen) {
           // vacation mode: auto-serve the offender instead of failing
           let victim = null;
           for (const b of this.phys.bodies) {
-            if (!b.dead && !b.fixed && b.kind !== 'ball' && b.sleeping && b.z - b.r < TABLE.launchStripZ) { victim = b; break; }
+            if (!b.dead && !b.fixed && b.kind !== 'ball' && b.sleeping && b.z - b.r < this.failLineZ()) { victim = b; break; }
           }
           if (victim) {
             victim.dead = true;
@@ -582,6 +633,19 @@ export class Game {
 
   checkEnd(dt) {
     if (this.zen) return;
+    if (this.rush) return;   // Rush ends only at the overflow line
+    if (this.shift) {
+      if (this.offering) return;
+      if (this.flicksLeft <= 0 && this.tee.ready && !this.phys.anyMoving() && this.comboTimer <= 0) {
+        if ((this.refills || 0) < REFILL.max && this.canOfferRefill && this.canOfferRefill()) {
+          this.offering = true;
+          this.emit('offerRefill', { left: this.ticketsLeft });
+        } else {
+          this.finish(false, 'flicks');
+        }
+      }
+      return;
+    }
     // Reaching the goal does NOT end the level — the remaining flicks are
     // the star budget. The player can cash out early via finishNow().
     if (this.offering) return;                 // waiting on the refill answer
@@ -614,7 +678,7 @@ export class Game {
   finishNow() {
     if (this.state !== S.AIMING) return;
     // Zen/Endless/Daily have no "cash out" — they end only by clogging the line.
-    if (this.zen || this.endless) return;
+    if (this.zen || this.endless || this.rush || this.shift) return;
     if (this.goalDone && this.sideGoalDone()) this.finish(true);
   }
 
@@ -652,9 +716,13 @@ export class Game {
 
     // Endless / Daily: score-chase runs, no stars, own records. Daily runs on
     // the endless ruleset (endless:true) too, so check daily FIRST.
-    if (this.endless || this.daily) {
+    if (this.endless || this.daily || this.rush || this.shift) {
       let isBest = false, streak = 0;
-      if (this.daily) {
+      if (this.rush) {
+        isBest = this.save.recordRush(this.score);
+      } else if (this.shift) {
+        isBest = this.save.recordShift(this.score);
+      } else if (this.daily) {
         const r = this.save.recordDaily(this.dayKey, this.score);
         isBest = r.isBest; streak = r.streak;
       } else {
@@ -663,9 +731,13 @@ export class Game {
       this.audio.play(won ? 'win' : 'lose');
       this.result = {
         won, reason, score: this.score, seed: this.seed,
-        mode: this.daily ? 'daily' : 'endless',
-        newBest: isBest, best: this.daily ? this.save.data.dailyBest : this.save.data.endlessBest,
-        streak, maxTier: this.maxTierMade,
+        mode: this.rush ? 'rush' : (this.shift ? 'shift' : (this.daily ? 'daily' : 'endless')),
+        newBest: isBest,
+        best: this.rush ? this.save.data.rushBest
+          : (this.shift ? this.save.data.shiftBest
+            : (this.daily ? this.save.data.dailyBest : this.save.data.endlessBest)),
+        streak, maxTier: this.maxTierMade, served: this.dropped,
+        tickets: SHIFT.tickets - (this.ticketsLeft || 0), ticketsTotal: SHIFT.tickets,
       };
       // NOTE: do NOT clearSaved() here. Endless/Daily never write the campaign
       // run slot (autosave skips them), so clearing it would wipe an unrelated

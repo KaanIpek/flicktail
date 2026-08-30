@@ -5,178 +5,233 @@
   "goalTier": 5,
   "flicks": 15,
   "star2": 40,
-  "star3": 64,
+  "star3": 59,
   "winRate": "6/6",
-  "star3Rate": "1/6",
+  "star3Rate": "2/6",
   "scoreMin": 34,
   "scoreMed": 40,
   "scoreP80": 59,
   "scoreMax": 65,
-  "maxTierReached": 5
+  "maxTierReached": 5,
+  "why": {
+   "won": 6
+  },
+  "flicksLeftMed": 6
  },
  {
   "id": 2,
   "place": "South Beach",
   "goalTier": 6,
   "flicks": 27,
-  "star2": 108,
-  "star3": 174,
+  "star2": 187,
+  "star3": 188,
   "winRate": "5/6",
-  "star3Rate": "5/6",
+  "star3Rate": "2/6",
   "scoreMin": 160,
   "scoreMed": 187,
   "scoreP80": 188,
   "scoreMax": 228,
-  "maxTierReached": 6
+  "maxTierReached": 6,
+  "why": {
+   "flicks": 1,
+   "won": 5
+  },
+  "flicksLeftMed": 2
  },
  {
   "id": 3,
   "place": "Cancún",
   "goalTier": 6,
   "flicks": 42,
-  "star2": 212,
-  "star3": 342,
+  "star2": 356,
+  "star3": 368,
   "winRate": "4/6",
-  "star3Rate": "2/6",
+  "star3Rate": "1/6",
   "scoreMin": 270,
   "scoreMed": 356,
   "scoreP80": 368,
   "scoreMax": 457,
-  "maxTierReached": 7
+  "maxTierReached": 7,
+  "why": {
+   "won": 4,
+   "flicks": 2
+  },
+  "flicksLeftMed": 4
  },
  {
   "id": 4,
   "place": "Copacabana",
   "goalTier": 7,
   "flicks": 34,
-  "star2": 186,
-  "star3": 300,
+  "star2": 277,
+  "star3": 303,
   "winRate": "3/6",
   "star3Rate": "1/6",
   "scoreMin": 165,
   "scoreMed": 277,
   "scoreP80": 303,
   "scoreMax": 327,
-  "maxTierReached": 7
+  "maxTierReached": 7,
+  "why": {
+   "won": 3,
+   "flicks": 3
+  },
+  "flicksLeftMed": 6
  },
  {
   "id": 5,
   "place": "Promenade",
   "goalTier": 7,
   "flicks": 26,
-  "star2": 182,
-  "star3": 294,
+  "star2": 157,
+  "star3": 170,
   "winRate": "6/6",
-  "star3Rate": "0/6",
+  "star3Rate": "2/6",
   "scoreMin": 130,
   "scoreMed": 157,
   "scoreP80": 170,
   "scoreMax": 185,
-  "maxTierReached": 8
+  "maxTierReached": 8,
+  "why": {
+   "won": 6
+  },
+  "flicksLeftMed": 6
  },
  {
   "id": 6,
   "place": "Positano",
   "goalTier": 7,
   "flicks": 24,
-  "star2": 198,
-  "star3": 319,
+  "star2": 180,
+  "star3": 197,
   "winRate": "6/6",
-  "star3Rate": "0/6",
+  "star3Rate": "2/6",
   "scoreMin": 138,
   "scoreMed": 180,
   "scoreP80": 197,
   "scoreMax": 205,
-  "maxTierReached": 8
+  "maxTierReached": 8,
+  "why": {
+   "won": 6
+  },
+  "flicksLeftMed": 6
  },
  {
   "id": 7,
   "place": "Oia",
   "goalTier": 8,
   "flicks": 38,
-  "star2": 253,
-  "star3": 408,
+  "star2": 311,
+  "star3": 351,
   "winRate": "5/6",
-  "star3Rate": "0/6",
+  "star3Rate": "2/6",
   "scoreMin": 242,
   "scoreMed": 311,
   "scoreP80": 351,
   "scoreMax": 357,
-  "maxTierReached": 8
+  "maxTierReached": 8,
+  "why": {
+   "won": 5,
+   "flicks": 1
+  },
+  "flicksLeftMed": 6
  },
  {
   "id": 8,
   "place": "Ibiza",
   "goalTier": 8,
   "flicks": 39,
-  "star2": 275,
-  "star3": 443,
+  "star2": 318,
+  "star3": 320,
   "winRate": "5/6",
-  "star3Rate": "0/6",
+  "star3Rate": "2/6",
   "scoreMin": 249,
   "scoreMed": 318,
   "scoreP80": 320,
   "scoreMax": 355,
-  "maxTierReached": 8
+  "maxTierReached": 8,
+  "why": {
+   "won": 5,
+   "flicks": 1
+  },
+  "flicksLeftMed": 6
  },
  {
   "id": 9,
   "place": "Jumeirah",
   "goalTier": 8,
   "flicks": 41,
-  "star2": 347,
-  "star3": 560,
+  "star2": 454,
+  "star3": 463,
   "winRate": "5/6",
-  "star3Rate": "1/6",
+  "star3Rate": "2/6",
   "scoreMin": 65,
   "scoreMed": 454,
   "scoreP80": 463,
   "scoreMax": 651,
-  "maxTierReached": 9
+  "maxTierReached": 9,
+  "why": {
+   "won": 5,
+   "overcrowd": 1
+  },
+  "flicksLeftMed": 6
  },
  {
   "id": 10,
   "place": "Kata Beach",
   "goalTier": 9,
   "flicks": 44,
-  "star2": 535,
-  "star3": 863,
+  "star2": 505,
+  "star3": 515,
   "winRate": "5/6",
-  "star3Rate": "0/6",
+  "star3Rate": "2/6",
   "scoreMin": 461,
   "scoreMed": 505,
   "scoreP80": 515,
   "scoreMax": 521,
-  "maxTierReached": 9
+  "maxTierReached": 9,
+  "why": {
+   "won": 5,
+   "flicks": 1
+  },
+  "flicksLeftMed": 6
  },
  {
   "id": 11,
   "place": "Tanah Lot",
   "goalTier": 9,
   "flicks": 50,
-  "star2": 632,
-  "star3": 1020,
+  "star2": 618,
+  "star3": 647,
   "winRate": "6/6",
-  "star3Rate": "0/6",
+  "star3Rate": "2/6",
   "scoreMin": 579,
   "scoreMed": 618,
   "scoreP80": 647,
   "scoreMax": 816,
-  "maxTierReached": 10
+  "maxTierReached": 10,
+  "why": {
+   "won": 6
+  },
+  "flicksLeftMed": 6
  },
  {
   "id": 12,
   "place": "Bora Bora",
   "goalTier": 11,
   "flicks": 135,
-  "star2": 487,
-  "star3": 785,
-  "winRate": "3/6",
+  "star2": 762,
+  "star3": 808,
+  "winRate": "6/6",
   "star3Rate": "2/6",
   "scoreMin": 282,
   "scoreMed": 762,
   "scoreP80": 808,
   "scoreMax": 1016,
-  "maxTierReached": 11
+  "maxTierReached": 11,
+  "why": {
+   "won": 6
+  },
+  "flicksLeftMed": 108
  }
 ]

@@ -118,6 +118,11 @@ function preload() {
     const k = 'tier' + String(i).padStart(2, '0');
     entries.push([k, 'assets/drinks/' + k + '.png']);
   }
+  // Each country's signature bottle, keyed the way tierAssetKey() asks for it.
+  for (const l of ALL_LEVELS) {
+    if (!l.art) continue;
+    for (const [tier, url] of Object.entries(l.art)) entries.push([`lvl_${tier}_${l.id}`, url]);
+  }
   const seenBg = new Set();
   for (const l of ALL_LEVELS) {
     if (seenBg.has(l.backdrop)) continue;
@@ -258,6 +263,36 @@ function startEndless() {
   audio.music(musicFor(level)); audio.ambient(ambientFor(level));
 }
 
+// Rush: one long shift behind the bar. The cooler never runs out and the orders
+// never stop — you lose when the pile crosses the line, not when you run dry.
+function startRush() {
+  const level = levelById(1);
+  currentLevel = level;
+  zenMode = false;
+  screen = 'intro';
+  paused = false;
+  backdrop.set(level.backdrop); backdrop.render(); setBgFill(level.backdrop);
+  renderer.setLevel(level, W, H);
+  game.loadLevel(level, { rush: true });
+  ui.showModeIntro('rush');
+  audio.music(musicFor(level)); audio.ambient(ambientFor(level));
+}
+
+// Shift: an order board and a finite cooler. You are not building the biggest
+// drink you can — you are filling exactly what was asked for, twelve times.
+function startShift() {
+  const level = levelById(1);
+  currentLevel = level;
+  zenMode = false;
+  screen = 'intro';
+  paused = false;
+  backdrop.set(level.backdrop); backdrop.render(); setBgFill(level.backdrop);
+  renderer.setLevel(level, W, H);
+  game.loadLevel(level, { shift: true });
+  ui.showModeIntro('shift');
+  audio.music(musicFor(level)); audio.ambient(ambientFor(level));
+}
+
 function startDaily() {
   const key = todayKey();
   // the day picks any stop on the map, not just a flagship one
@@ -317,6 +352,10 @@ ui.on('zen', d => { audio.unlock(); startLevel(+d.id, { zen: true }); });
 ui.on('endless', () => { audio.unlock(); startEndless(); });
 ui.on('daily', () => { audio.unlock(); startDaily(); });
 ui.on('endlessAgain', () => startEndless());
+ui.on('rush', () => { audio.unlock(); startRush(); });
+ui.on('shift', () => { audio.unlock(); startShift(); });
+ui.on('shiftAgain', () => startShift());
+ui.on('rushAgain', () => startRush());
 ui.on('tourDone', d => { screen = 'map'; ui.showTourComplete(d.id); });
 ui.on('start', beginPlay);
 // Restart the CURRENT run in its own mode — a campaign restart must not silently
@@ -325,6 +364,8 @@ ui.on('start', beginPlay);
 function restartCurrent(seed = null) {
   ui.closeModal(); paused = false;
   if (game.daily) startDaily();
+  else if (game.rush) startRush();
+  else if (game.shift) startShift();
   else if (game.endless) startEndless();
   else startLevel(currentLevel.id, { zen: zenMode, seed });
 }
@@ -551,7 +592,7 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
 // QA / debug hook (harmless in production, invaluable for automated testing)
 window.__ft = {
   game, view, renderer, physics, fx, save, audio, backdrop, ui, ads,
-  startLevel, showMap,
+  startLevel, showMap, startRush, startShift, startEndless,
   async spawn(tier, x, z, vx = 0, vz = 0) {
     const { makeBody } = await import('./physics.js');
     const { TIERS } = await import('./config.js');

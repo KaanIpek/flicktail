@@ -23,12 +23,14 @@ export class UI {
 
   on(act, fn) { this.handlers[act] = fn; }
 
-  drinkImg(tier, cls = '') {
+  drinkImg(tier, cls = '', level = null) {
     // The UI must show whatever the table is showing: a creature icon if a cast
-    // is worn, the painted skin's art if one is, else the default set.
+    // is worn, then the painted skin's art, then the level's own signature,
+    // then the house set.
     const art = ACTIVE_ART && ACTIVE_ART[tier];
     const src = creatureIcon(tier)
       || (art ? `assets/signatures/${art.replace(/^sig_/, '')}.png` : null)
+      || (level && level.art && level.art[tier])
       || `assets/drinks/tier${String(tier).padStart(2, '0')}.png`;
     return `<img class="drink-icon ${cls}" src="${src}" alt="${TIERS[tier - 1].name}" onerror="this.style.visibility='hidden'">`;
   }
@@ -51,6 +53,8 @@ export class UI {
     const streak = this.save.liveStreak(todayKey());
     const dailyDone = this.save.data.dailyTodayDone === todayKey();
     const endlessBest = this.save.data.endlessBest || 0;
+    const rushBest = this.save.data.rushBest || 0;
+    const shiftBest = this.save.data.shiftBest || 0;
     this.root.innerHTML = `
     <div class="screen title-screen">
       <button class="btn corner-gear" data-act="about" aria-label="Settings & about">⚙</button>
@@ -68,6 +72,10 @@ export class UI {
         <div class="title-row">
           <button class="btn ghost half" data-act="daily">Daily${streak > 0 ? ` 🔥${streak}` : ''}${dailyDone ? ' ✓' : ''}</button>
           <button class="btn ghost half" data-act="endless">Endless${endlessBest ? ` · ${endlessBest}` : ''}</button>
+        </div>
+        <div class="title-row">
+          <button class="btn ghost half" data-act="rush">🍸 Rush${rushBest ? ` · ${rushBest}` : ''}</button>
+          <button class="btn ghost half" data-act="shift">🧾 Shift${shiftBest ? ` · ${shiftBest}` : ''}</button>
         </div>
         <div class="title-row">
           <button class="btn ghost half" data-act="collection">Collection</button>
@@ -319,7 +327,7 @@ export class UI {
         <div class="intro-country">${level.country}</div>
         <div class="intro-goal">
           ${zen ? '<div class="zen-badge">☀ Vacation Mode — no pressure</div>' : `
-          <div class="goal-row">${this.drinkImg(level.goalTier)}<div>Mix a <b>${goal.name}</b></div></div>
+          <div class="goal-row">${this.drinkImg(level.goalTier, '', level)}<div>Mix a <b>${goal.name}</b></div></div>
           ${level.sideGoal ? `<div class="goal-side">+ ${level.sideGoal.label}</div>` : ''}
           <div class="goal-flicks">${level.flicks} drinks in the cooler</div>`}
         </div>
@@ -331,7 +339,37 @@ export class UI {
   }
 
   showModeIntro(mode, opts = {}) {
-    if (mode === 'endless') {
+    if (mode === 'shift') {
+      this.root.innerHTML = `
+      <div class="screen intro-screen" data-act="start">
+        <div class="intro-card">
+          <div class="intro-place">The Shift</div>
+          <div class="intro-country">Fill the board</div>
+          <div class="intro-goal">
+            <div class="mode-line">Twelve tickets, one cooler. Each ticket names a drink — mix it and
+              roll it onto the dock. The orders get taller as the night goes on.</div>
+            ${this.save.data.shiftBest ? `<div class="goal-side">Best: ${this.save.data.shiftBest}</div>` : ''}
+          </div>
+          <div class="intro-mech">💡 Every flick left over at the end pays a bonus.</div>
+          <button class="btn big primary" data-act="start">CLOCK IN!</button>
+        </div>
+      </div>`;
+    } else if (mode === 'rush') {
+      this.root.innerHTML = `
+      <div class="screen intro-screen" data-act="start">
+        <div class="intro-card">
+          <div class="intro-place">Rush Hour</div>
+          <div class="intro-country">Hold the line</div>
+          <div class="intro-goal">
+            <div class="mode-line">The bar keeps sending drinks whether you are ready or not, faster and faster.
+              Flicks are unlimited — the pile is what will beat you.</div>
+            ${this.save.data.rushBest ? `<div class="goal-side">Best: ${this.save.data.rushBest}</div>` : ''}
+          </div>
+          <div class="intro-mech">💡 Never let a drink park past the striped line.</div>
+          <button class="btn big primary" data-act="start">OPEN THE BAR!</button>
+        </div>
+      </div>`;
+    } else if (mode === 'endless') {
       this.root.innerHTML = `
       <div class="screen intro-screen" data-act="start">
         <div class="intro-card">
@@ -371,17 +409,20 @@ export class UI {
         <button class="btn icon" data-act="pause">II</button>
         <div class="hud-score-wrap"><div id="hudScore" class="hud-score">0</div>
         <div class="hud-place">${l.place}</div>
-        <div class="hud-stars" id="hudStars">
+        <div class="hud-stars ${game.rush || game.shift ? 'hidden' : ''}" id="hudStars">
           <div class="hs-bar"><div class="hs-fill" id="hsFill"></div></div>
           <div class="hs-need" id="hsNeed"></div>
-        </div></div>
+        </div>
+        ${game.shift ? '<div class="hud-tickets" id="hudTickets"></div>' : ''}</div>
         <div class="hud-goal" id="hudGoal">
-          ${this.drinkImg(l.goalTier, 'goal-icon')}
+          ${game.rush ? '<span class="goal-icon rush-icon">🍸</span>'
+            : game.shift ? '<span class="goal-icon rush-icon">🧾</span>'
+            : this.drinkImg(l.goalTier, 'goal-icon', l)}
           <div id="hudFlicks" class="hud-flicks"></div>
         </div>
       </div>
       <div class="hud-missions" id="hudMissions">
-        <div class="mission" id="missionMain">
+        <div class="mission ${game.rush || game.shift ? 'hidden' : ''}" id="missionMain">
           <span class="mission-tick" id="mainTick">○</span>
           <span class="mission-text">Mix a <b>${tierNameFor(l, l.goalTier, TIERS)}</b></span>
         </div>
@@ -404,6 +445,8 @@ export class UI {
     this.hudScore = document.getElementById('hudScore');
     this.hsFill = document.getElementById('hsFill');
     this.hsNeed = document.getElementById('hsNeed');
+    this.hudTickets = document.getElementById('hudTickets');
+    this.lastTickets = -1;
     this.lastNeed = '';
     this.hudFlicks = document.getElementById('hudFlicks');
     this.hudGoal = document.getElementById('hudGoal');
@@ -429,11 +472,17 @@ export class UI {
       this.hudScore.classList.add('bump');
       this.lastScore = game.score;
     }
+    if (this.hudTickets && game.ticketsLeft !== this.lastTickets) {
+      const done = (game.result ? game.result.ticketsTotal : 12) - game.ticketsLeft;
+      this.hudTickets.textContent = `🧾 ${game.ticketsLeft} left`;
+      this.hudTickets.classList.toggle('close', game.ticketsLeft <= 3);
+      this.lastTickets = game.ticketsLeft;
+    }
     // What the next star costs, and how close the run is to it. Without this you
     // are flicking at an invisible target and every level feels the same.
     if (this.hsNeed) {
       const l = game.level, sc = game.score;
-      const endless = game.zen || game.endless;
+      const endless = game.zen || game.endless || game.rush || game.shift;
       let label, from, to;
       if (endless || !l.star2) { label = ''; from = 0; to = 0; }
       else if (sc >= l.star3) { label = '★★★'; from = l.star3; to = l.star3; }
@@ -448,7 +497,7 @@ export class UI {
       this.hsFill.style.width = (label ? pct * 100 : 0).toFixed(1) + '%';
       this.hsFill.classList.toggle('maxed', label === '★★★');
     }
-    const unlimited = game.zen || game.endless;
+    const unlimited = game.zen || game.endless || game.rush;
     const fl = unlimited ? '∞' : game.flicksLeft;
     if (fl !== this.lastFlicks) {
       this.hudFlicks.textContent = fl;
@@ -458,7 +507,7 @@ export class UI {
     const q = game.queue.slice(0, 2).join(',');
     if (q !== this.lastQueue) {
       this.nextQueue.innerHTML = game.queue.slice(0, 2)
-        .map((t, i) => this.drinkImg(t, i === 0 ? 'next1' : 'next2')).join('');
+        .map((t, i) => this.drinkImg(t, i === 0 ? 'next1' : 'next2', game.level)).join('');
       this.lastQueue = q;
     }
     if (game.goalDone) this.hudGoal.classList.add('done');
@@ -560,7 +609,7 @@ export class UI {
           <div class="result-buttons">
             ${isDaily
               ? `<button class="btn big primary" data-act="title">HOME</button><button class="btn ghost" data-act="daily">Play again</button>`
-              : `<button class="btn big primary" data-act="endlessAgain">POUR AGAIN</button><button class="btn ghost" data-act="title">Home</button>`}
+              : `<button class="btn big primary" data-act="${r.mode === 'rush' ? 'rushAgain' : (r.mode === 'shift' ? 'shiftAgain' : 'endlessAgain')}">POUR AGAIN</button><button class="btn ghost" data-act="title">Home</button>`}
           </div>
         </div>
       </div>`;
@@ -617,7 +666,7 @@ export class UI {
         <h3>Out of drinks!</h3>
         <p class="refill-line">You still need a <b>${goal.name}</b>.<br>
           The bar can send <b>${gives} more</b>.</p>
-        ${this.drinkImg(game.level.goalTier, 'refill-icon')}
+        ${this.drinkImg(game.level.goalTier, 'refill-icon', game.level)}
         <div class="result-buttons">
           <button class="btn big primary" data-act="refillYes">▶ WATCH FOR +${gives}</button>
           <button class="btn ghost" data-act="refillNo">End the run</button>

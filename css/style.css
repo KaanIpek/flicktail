@@ -512,3 +512,22 @@ img.td-bottle { width: 132px; height: 132px; object-fit: contain; }
   text-shadow: 0 1px 3px rgba(0,0,0,0.55);
 }
 .hs-need.maxed { color: #ffd75e; }
+
+/* Rush Hour gets a full-width slot on the title so the new mode is not lost
+   between the two existing half-buttons. */
+.title-row .btn.wide { flex: 1 1 100%; width: 100%; }
+
+/* Rush has no goal drink; the chip keeps its shape with a glass instead. */
+.rush-icon { font-size: 26px; line-height: 1; display: inline-block; }
+
+/* Shift counts tickets where the campaign counts stars. */
+.hud-tickets {
+  margin-top: 4px;
+  background: rgba(10,25,40,0.55); backdrop-filter: blur(5px);
+  border: 1.5px solid rgba(255,255,255,0.13);
+  border-radius: 999px; padding: 4px 12px 5px;
+  font: 800 13px/1.1 Nunito, system-ui, sans-serif;
+  color: rgba(255,255,255,0.9);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.55);
+}
+.hud-tickets.close { color: #ffd75e; border-color: rgba(255,215,94,0.4); }

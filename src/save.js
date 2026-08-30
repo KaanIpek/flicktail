@@ -16,6 +16,8 @@ const DEFAULTS = {
   ownedSkins: ['classic'],
   activeSkin: 'classic',
   endlessBest: 0,
+  rushBest: 0,
+  shiftBest: 0,
   // daily challenge
   dailyBest: 0,       // best daily score ever
   dailyStreak: 0,     // consecutive days played
@@ -55,6 +57,22 @@ export class Save {
     const d = this.data;
     const isBest = score > d.endlessBest;
     if (isBest) d.endlessBest = score;
+    this.write();
+    return isBest;
+  }
+
+  recordRush(score) {
+    const d = this.data;
+    const isBest = score > d.rushBest;
+    if (isBest) d.rushBest = score;
+    this.write();
+    return isBest;
+  }
+
+  recordShift(score) {
+    const d = this.data;
+    const isBest = score > d.shiftBest;
+    if (isBest) d.shiftBest = score;
     this.write();
     return isBest;
   }

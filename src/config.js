@@ -82,4 +82,30 @@ export const FAIL = {
                     // (generous: the launch line is a warning, not a guillotine)
 };
 
+// Rush: the bar keeps sending drinks whether you are ready or not, and a line
+// across the table marks how far the pile may come. Cross it and stay across it
+// and the shift is over. The drop interval tightens as the run goes on, so the
+// run always ends — the question is how long you hold it.
+export const RUSH = {
+  lineZ: 330,        // world z of the overflow line
+  dwell: 2.2,        // seconds a parked drink may sit past the line
+  dropFirst: 3.4,    // seconds before the first automatic drop
+  dropEvery: 4.6,    // seconds between drops at the start
+  dropFloor: 1.5,    // fastest it ever gets
+  tighten: 0.965,    // each drop shortens the interval by this factor
+  spawnZ: 880,       // drops land near the far rail
+  topTierAt: 55,     // seconds before the pool widens by one tier
+};
+
+// Shift: the order board is the whole game. A fixed number of tickets, each
+// naming one drink, and a cooler that does run out — the pressure is matching
+// what is asked for rather than building the biggest thing you can.
+export const SHIFT = {
+  tickets: 12,      // orders to fill for a clean shift
+  flicks: 90,       // the cooler for the whole shift
+  minTier: 3,
+  maxTier: 7,
+  bonusPerLeft: 25, // score for each flick still in the cooler at the end
+};
+
 export const COMBO_CALLOUTS = { 2: 'Double Pour!', 3: 'Happy Hour!', 4: 'Tiki Time!', 5: 'TIDAL WAVE!' };
