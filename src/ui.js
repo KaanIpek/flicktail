@@ -1,7 +1,7 @@
 // DOM overlay: title, world map, HUD, level intro, win/fail, pause, collection.
 
 import { TIERS, COMBO_CALLOUTS, REFILL } from './config.js';
-import { LEVELS, TOURS, tourById, levelsOfTour, tierNameFor } from './levels.js';
+import { LEVELS, ALL_LEVELS, TOURS, tourById, levelsOfTour, tierNameFor } from './levels.js';
 import { creatureIcon, ACTIVE_ART } from './render.js';
 import { SKINS } from './skins.js';
 import { todayKey } from './save.js';
@@ -86,7 +86,7 @@ export class UI {
           <button class="btn ghost half" data-act="about">Settings</button>
         </div>
       </div>
-      <p class="title-foot">A world tour in 12 drinks 🍹</p>
+      <p class="title-foot">${TOURS.length - 1} countries &middot; ${ALL_LEVELS.length} stops 🍹</p>
     </div>`;
   }
 
