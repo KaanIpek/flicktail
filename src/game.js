@@ -645,6 +645,8 @@ export class Game {
   }
 
   finish(won, reason = null) {
+    // kept on the instance so tooling can ask why a run ended, not just whether
+    this.failReason = won ? null : reason;
     if (this.state === S.WON || this.state === S.FAILED) return;
     this.state = won ? S.WON : S.FAILED;
 

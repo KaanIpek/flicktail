@@ -370,7 +370,11 @@ export class UI {
       <div class="hud-top">
         <button class="btn icon" data-act="pause">II</button>
         <div class="hud-score-wrap"><div id="hudScore" class="hud-score">0</div>
-        <div class="hud-place">${l.place}</div></div>
+        <div class="hud-place">${l.place}</div>
+        <div class="hud-stars" id="hudStars">
+          <div class="hs-bar"><div class="hs-fill" id="hsFill"></div></div>
+          <div class="hs-need" id="hsNeed"></div>
+        </div></div>
         <div class="hud-goal" id="hudGoal">
           ${this.drinkImg(l.goalTier, 'goal-icon')}
           <div id="hudFlicks" class="hud-flicks"></div>
@@ -398,6 +402,9 @@ export class UI {
       <div id="toast" class="toast hidden"></div>
     </div>`;
     this.hudScore = document.getElementById('hudScore');
+    this.hsFill = document.getElementById('hsFill');
+    this.hsNeed = document.getElementById('hsNeed');
+    this.lastNeed = '';
     this.hudFlicks = document.getElementById('hudFlicks');
     this.hudGoal = document.getElementById('hudGoal');
     this.comboEl = document.getElementById('combo');
@@ -421,6 +428,25 @@ export class UI {
       void this.hudScore.offsetWidth;
       this.hudScore.classList.add('bump');
       this.lastScore = game.score;
+    }
+    // What the next star costs, and how close the run is to it. Without this you
+    // are flicking at an invisible target and every level feels the same.
+    if (this.hsNeed) {
+      const l = game.level, sc = game.score;
+      const endless = game.zen || game.endless;
+      let label, from, to;
+      if (endless || !l.star2) { label = ''; from = 0; to = 0; }
+      else if (sc >= l.star3) { label = '★★★'; from = l.star3; to = l.star3; }
+      else if (sc >= l.star2) { label = `★★★ ${l.star3}`; from = l.star2; to = l.star3; }
+      else { label = `★★ ${l.star2}`; from = 0; to = l.star2; }
+      if (label !== this.lastNeed) {
+        this.hsNeed.textContent = label;
+        this.hsNeed.classList.toggle('maxed', label === '★★★');
+        this.lastNeed = label;
+      }
+      const pct = to > from ? Math.max(0, Math.min(1, (sc - from) / (to - from))) : 1;
+      this.hsFill.style.width = (label ? pct * 100 : 0).toFixed(1) + '%';
+      this.hsFill.classList.toggle('maxed', label === '★★★');
     }
     const unlimited = game.zen || game.endless;
     const fl = unlimited ? '∞' : game.flicksLeft;
