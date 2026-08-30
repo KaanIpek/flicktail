@@ -343,7 +343,7 @@ export const COUNTRIES = [
     times: ['day', 'day', 'sunset', 'night', 'day'],
   },
   {
-    id: 'maldives', name: 'Maldives', flag: '🇲🇻', backdrop: 'borabora',
+    id: 'maldives', name: 'Maldives', flag: '🇲🇻', backdrop: 'maldives',
     accent: '#2FD9D1', rail: '#e8dcc4',
     drinks: ['Atoll Aqua', 'Coconut Dhoni', 'Bioluminous', 'Reef Spritz', 'Manta Mule'],
     special: 'Starlit Tide',
@@ -394,7 +394,7 @@ export const COUNTRIES = [
     times: ['day', 'day', 'sunset', 'night', 'sunset'],
   },
   {
-    id: 'croatia', name: 'Croatia', flag: '🇭🇷', backdrop: 'positano',
+    id: 'croatia', name: 'Croatia', flag: '🇭🇷', backdrop: 'croatia',
     accent: '#1E88C7', rail: '#ddd6c6',
     drinks: ['Dalmatian Fig', 'Lavender Spritz', 'Maraschino Sour', 'Adriatic Blue', 'Olive Grove'],
     special: 'Sea Organ',
