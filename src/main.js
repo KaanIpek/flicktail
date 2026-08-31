@@ -615,8 +615,15 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
   navigator.serviceWorker.addEventListener('controllerchange', () => {
     if (reloading) return;
     reloading = true;
-    if (screen === 'game' || screen === 'result') {
-      ui.toast('Update ready — it will apply next time you return here', 2600);
+    // A reload is only invisible on the title screen. Anywhere else — a run in
+    // progress, the world map, the intro card you just tapped through — it
+    // reads as the app restarting itself and throws away where you were. The
+    // first launch is exactly when this fires, because that is when the worker
+    // first claims the page, so the narrow game/result guard was letting a
+    // brand-new player get bounced back to the title on their first PLAY.
+    if (screen !== 'title') {
+      if (screen === 'game' || screen === 'result')
+        ui.toast('Update ready — it will apply next time you return here', 2600);
       pendingUpdate = true;
       reloading = false;
       return;
