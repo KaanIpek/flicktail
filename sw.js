@@ -2,10 +2,12 @@
 // else (backdrops, sprites, audio) so the game is fully playable offline
 // after the first visit.
 
-const VERSION = 'flicktail-v42';
+const VERSION = 'flicktail-v43';
 const BACKDROPS = ['waikiki', 'miami', 'cancun', 'rio', 'nice', 'positano',
   'santorini', 'ibiza', 'dubai', 'phuket', 'bali', 'borabora',
-  'okinawa', 'algarve', 'whitsundays', 'halong', 'morocco', 'egypt', 'croatia', 'maldives'];
+  'okinawa', 'algarve', 'whitsundays', 'halong', 'morocco', 'egypt', 'croatia', 'maldives',
+  // per-city views; a stop without one falls back to its country
+  'amalfi', 'capri', 'cinqueterre', 'portofino', 'taormina', 'sorrento', 'procida'];
 const SHELL = [
   '.', 'index.html', 'css/style.css', 'manifest.webmanifest',
   'assets/fonts/fonts.css',

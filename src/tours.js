@@ -146,7 +146,7 @@ export const COUNTRIES = [
     sigArt: 'assets/signatures/medianoche.png',
     cast: ['frog', 'gecko', 'songbird', 'turtle', 'lynx', 'fox',
       'owl', 'flamingo', 'crab', 'bull', 'owl'],
-    stops: ['Ibiza Town', 'Formentera', 'Sitges', 'Marbella', 'San Antonio', 'Menorca', 'Tarifa', 'Formentera'],
+    stops: ['Ibiza Town', 'Formentera', 'Sitges', 'Marbella', 'San Antonio', 'Menorca', 'Tarifa', 'Cadaqués'],
     tables: [
       { surface: 'glass', c: ['#180f2c', '#221540', '#2c1c50'], glow: '#C77DFF' },
       { surface: 'tile', c: ['#8a3f5a', '#a04c6c', '#b65a7e'], grout: 'rgba(40,12,26,0.5)', motif: '#ffd9ea' },
@@ -417,7 +417,10 @@ export const COUNTRIES = [
 // here by level id; anything absent falls back to the country backdrop, so the
 // set can be filled in a few cities at a time without a broken frame anywhere.
 // tools/../backdrop-check.mjs fails the build on a name with no file.
-const CITY_BACKDROP = {};
+const CITY_BACKDROP = {
+  120: 'amalfi', 121: 'capri', 122: 'cinqueterre', 123: 'portofino',
+  124: 'taormina', 125: 'sorrento', 126: 'procida',
+};
 
 // Regional drink sets. Eleven glasses shared by twenty-one countries made every
 // table look the same; a country now draws its middle tiers from the set that
