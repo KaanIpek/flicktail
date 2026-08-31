@@ -19,6 +19,7 @@ export function makeBody(tier, x, z, r, opts = {}) {
     sleeping: true,
     fixed: false,          // static obstacle (motu island)
     noMerge: false,        // beach ball etc.
+    family: 0,             // Split Pour tab; ignored by every other mode
     mergeLock: 0,          // seconds this body refuses to merge (post-spawn)
     immunity: 0,           // seconds of overcrowd-check immunity
     justHit: 0,
@@ -195,6 +196,9 @@ export class Physics {
     if (a.dead || b.dead || a.fixed || b.fixed) return;
     if (a.noMerge || b.noMerge) return;
     if (a.tier !== b.tier) return;
+    // Split Pour runs three tabs that never mix, so the game layer can veto a
+    // pairing the tiers alone would allow. Unset, everything merges as before.
+    if (this.mergeMatch && !this.mergeMatch(a, b)) return;
     if (a.mergeLock > 0 || b.mergeLock > 0) return;
     // Lock both so a triple contact in the same step can't claim a body twice;
     // the game layer executes the merge end-of-step.

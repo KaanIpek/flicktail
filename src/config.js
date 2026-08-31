@@ -126,4 +126,15 @@ export const BANNER = {
   swing: 0.03,       // radians of idle sway
 };
 
+// Split Pour: the bar is running three tabs at once and they do not mix. Two
+// drinks of the same tier only merge if they belong to the same tab, so you are
+// keeping three chains alive on one table instead of one.
+export const SPLIT = {
+  families: 3,
+  goalTier: 7,       // every tab has to reach this
+  flicks: 70,
+  colors: ['#ff8a5c', '#5cc9ff', '#9ee36b'],
+  names: ['Amber', 'Blue', 'Herb'],
+};
+
 export const COMBO_CALLOUTS = { 2: 'Double Pour!', 3: 'Happy Hour!', 4: 'Tiki Time!', 5: 'TIDAL WAVE!' };

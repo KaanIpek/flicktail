@@ -18,6 +18,7 @@ const DEFAULTS = {
   endlessBest: 0,
   rushBest: 0,
   shiftBest: 0,
+  splitBest: 0,
   // daily challenge
   dailyBest: 0,       // best daily score ever
   dailyStreak: 0,     // consecutive days played
@@ -73,6 +74,14 @@ export class Save {
     const d = this.data;
     const isBest = score > d.shiftBest;
     if (isBest) d.shiftBest = score;
+    this.write();
+    return isBest;
+  }
+
+  recordSplit(score) {
+    const d = this.data;
+    const isBest = score > d.splitBest;
+    if (isBest) d.splitBest = score;
     this.write();
     return isBest;
   }

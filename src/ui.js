@@ -1,6 +1,6 @@
 // DOM overlay: title, world map, HUD, level intro, win/fail, pause, collection.
 
-import { TIERS, COMBO_CALLOUTS, REFILL } from './config.js';
+import { TIERS, COMBO_CALLOUTS, REFILL, SPLIT } from './config.js';
 import { LEVELS, ALL_LEVELS, TOURS, tourById, levelsOfTour, tierNameFor } from './levels.js';
 import { creatureIcon, ACTIVE_ART } from './render.js';
 import { SKINS } from './skins.js';
@@ -55,6 +55,7 @@ export class UI {
     const endlessBest = this.save.data.endlessBest || 0;
     const rushBest = this.save.data.rushBest || 0;
     const shiftBest = this.save.data.shiftBest || 0;
+    const splitBest = this.save.data.splitBest || 0;
     this.root.innerHTML = `
     <div class="screen title-screen">
       <button class="btn corner-gear" data-act="about" aria-label="Settings & about">⚙</button>
@@ -76,6 +77,9 @@ export class UI {
         <div class="title-row">
           <button class="btn ghost half" data-act="rush">🍸 Rush${rushBest ? ` · ${rushBest}` : ''}</button>
           <button class="btn ghost half" data-act="shift">🧾 Shift${shiftBest ? ` · ${shiftBest}` : ''}</button>
+        </div>
+        <div class="title-row">
+          <button class="btn ghost wide" data-act="split">🍹 Split Pour${splitBest ? ` · ${splitBest}` : ''}</button>
         </div>
         <div class="title-row">
           <button class="btn ghost half" data-act="collection">Collection</button>
@@ -339,7 +343,23 @@ export class UI {
   }
 
   showModeIntro(mode, opts = {}) {
-    if (mode === 'shift') {
+    if (mode === 'split') {
+      this.root.innerHTML = `
+      <div class="screen intro-screen" data-act="start">
+        <div class="intro-card">
+          <div class="intro-place">Split Pour</div>
+          <div class="intro-country">Three tabs, one table</div>
+          <div class="intro-goal">
+            <div class="mode-line">The bar is running three tabs at once and they do not mix.
+              Two drinks only merge if the ring under them is the same colour, so you are
+              keeping three chains alive on one table.</div>
+            ${this.save.data.splitBest ? `<div class="goal-side">Best: ${this.save.data.splitBest}</div>` : ''}
+          </div>
+          <div class="intro-mech">💡 Every tab has to reach the same drink to close the night.</div>
+          <button class="btn big primary" data-act="start">POUR!</button>
+        </div>
+      </div>`;
+    } else if (mode === 'shift') {
       this.root.innerHTML = `
       <div class="screen intro-screen" data-act="start">
         <div class="intro-card">
@@ -413,18 +433,24 @@ export class UI {
           <div class="hs-bar"><div class="hs-fill" id="hsFill"></div></div>
           <div class="hs-need" id="hsNeed"></div>
         </div>
-        ${game.shift ? '<div class="hud-tickets" id="hudTickets"></div>' : ''}</div>
+        ${game.shift ? '<div class="hud-tickets" id="hudTickets"></div>' : ''}
+</div>
         <div class="hud-goal" id="hudGoal">
           ${game.rush ? '<span class="goal-icon rush-icon">🍸</span>'
             : game.shift ? '<span class="goal-icon rush-icon">🧾</span>'
+            : game.split ? this.drinkImg(SPLIT.goalTier, 'goal-icon', l)
             : this.drinkImg(l.goalTier, 'goal-icon', l)}
           <div id="hudFlicks" class="hud-flicks"></div>
         </div>
       </div>
       <div class="hud-missions" id="hudMissions">
+        ${game.split ? `<div class="hud-tabs" id="hudTabs">${SPLIT.colors.map((c,i)=>
+          `<span class="tab-pip" style="--tab:${c}"><i></i><b id="tabT${i}">0</b></span>`).join('')}</div>` : ''}
         <div class="mission ${game.shift ? 'hidden' : ''}" id="missionMain">
           <span class="mission-tick" id="mainTick">○</span>
-          <span class="mission-text">Mix a <b>${tierNameFor(l, game.chaseTier(), TIERS)}</b></span>
+          <span class="mission-text">${game.split
+            ? `Every tab to <b>${tierNameFor(l, SPLIT.goalTier, TIERS)}</b>`
+            : `Mix a <b>${tierNameFor(l, game.chaseTier(), TIERS)}</b>`}</span>
         </div>
         <div class="mission hidden" id="sideGoal">
           <span class="mission-tick" id="sideTick">○</span>
@@ -446,6 +472,8 @@ export class UI {
     this.hsFill = document.getElementById('hsFill');
     this.hsNeed = document.getElementById('hsNeed');
     this.hudTickets = document.getElementById('hudTickets');
+    this.missionsEl = document.getElementById('hudMissions');
+    this.lastFloor = -1;
     this.lastTickets = -1;
     this.lastNeed = '';
     this.lastChase = -1;
@@ -473,6 +501,21 @@ export class UI {
       this.hudScore.classList.add('bump');
       this.lastScore = game.score;
     }
+    if (game.split && this.familyShown !== game.familyBest.join()) {
+      for (let i = 0; i < game.familyBest.length; i++) {
+        const el = document.getElementById('tabT' + i);
+        if (el) { el.textContent = game.familyBest[i];
+          el.parentElement.classList.toggle('done', game.familyBest[i] >= SPLIT.goalTier); }
+      }
+      this.familyShown = game.familyBest.join();
+    }
+    // Tell the renderer how far down the screen the HUD reaches, so the order
+    // docks can hang below their anchor rather than under the mission chips.
+    if (this.renderer && this.missionsEl) {
+      const b = this.missionsEl.getBoundingClientRect();
+      const floor = b.height ? b.bottom + 6 : 0;
+      if (floor !== this.lastFloor) { this.renderer.hudFloor = floor; this.lastFloor = floor; }
+    }
     if (this.hudTickets && game.ticketsLeft !== this.lastTickets) {
       const done = (game.result ? game.result.ticketsTotal : 12) - game.ticketsLeft;
       this.hudTickets.textContent = `🧾 ${game.ticketsLeft} left`;
@@ -483,7 +526,7 @@ export class UI {
     // are flicking at an invisible target and every level feels the same.
     if (this.hsNeed) {
       const l = game.level, sc = game.score;
-      const endless = game.zen || game.endless || game.rush || game.shift;
+      const endless = game.zen || game.endless || game.rush || game.shift || game.split;
       let label, from, to;
       if (endless || !l.star2) { label = ''; from = 0; to = 0; }
       else if (sc >= l.star3) { label = '★★★'; from = l.star3; to = l.star3; }
@@ -620,7 +663,7 @@ export class UI {
           <div class="result-buttons">
             ${isDaily
               ? `<button class="btn big primary" data-act="title">HOME</button><button class="btn ghost" data-act="daily">Play again</button>`
-              : `<button class="btn big primary" data-act="${r.mode === 'rush' ? 'rushAgain' : (r.mode === 'shift' ? 'shiftAgain' : 'endlessAgain')}">POUR AGAIN</button><button class="btn ghost" data-act="title">Home</button>`}
+              : `<button class="btn big primary" data-act="${r.mode === 'rush' ? 'rushAgain' : (r.mode === 'shift' ? 'shiftAgain' : (r.mode === 'split' ? 'splitAgain' : 'endlessAgain'))}">POUR AGAIN</button><button class="btn ghost" data-act="title">Home</button>`}
           </div>
         </div>
       </div>`;

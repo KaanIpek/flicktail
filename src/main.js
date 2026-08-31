@@ -74,6 +74,10 @@ backdropCanvas.id = 'bg';
 stage.insertBefore(backdropCanvas, canvas);
 const backdrop = new Backdrop(backdropCanvas, assets);
 const renderer = new Renderer(view, assets);
+// The HUD tells the renderer how much of the top of the screen it occupies, so
+// the order docks know when they must hang below their anchor instead of above.
+ui.renderer = renderer;
+
 const input = new Slingshot(canvas, view);
 
 let screen = 'title';       // title | map | collection | intro | game | result
@@ -307,6 +311,20 @@ function startShift() {
   audio.music(musicFor(level)); audio.ambient(ambientFor(level));
 }
 
+// Split Pour: three tabs on one table that refuse to merge with each other.
+function startSplit() {
+  const level = levelById(1);
+  currentLevel = level;
+  zenMode = false;
+  screen = 'intro';
+  paused = false;
+  backdrop.set(level.backdrop); backdrop.render(); setBgFill(level.backdrop);
+  renderer.setLevel(level, W, H, DPR);
+  game.loadLevel(level, { split: true });
+  ui.showModeIntro('split');
+  audio.music(musicFor(level)); audio.ambient(ambientFor(level));
+}
+
 function startDaily() {
   const key = todayKey();
   // the day picks any stop on the map, not just a flagship one
@@ -369,6 +387,8 @@ ui.on('endlessAgain', () => startEndless());
 ui.on('rush', () => { audio.unlock(); startRush(); });
 ui.on('shift', () => { audio.unlock(); startShift(); });
 ui.on('shiftAgain', () => startShift());
+ui.on('split', () => { audio.unlock(); startSplit(); });
+ui.on('splitAgain', () => startSplit());
 ui.on('rushAgain', () => startRush());
 ui.on('tourDone', d => { screen = 'map'; ui.showTourComplete(d.id); });
 ui.on('start', beginPlay);
@@ -380,6 +400,7 @@ function restartCurrent(seed = null) {
   if (game.daily) startDaily();
   else if (game.rush) startRush();
   else if (game.shift) startShift();
+  else if (game.split) startSplit();
   else if (game.endless) startEndless();
   else startLevel(currentLevel.id, { zen: zenMode, seed });
 }
@@ -609,7 +630,7 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
 // QA / debug hook (harmless in production, invaluable for automated testing)
 window.__ft = {
   game, view, renderer, physics, fx, save, audio, backdrop, ui, ads,
-  startLevel, showMap, startRush, startShift, startEndless,
+  startLevel, showMap, startRush, startShift, startSplit, startEndless,
   async spawn(tier, x, z, vx = 0, vz = 0) {
     const { makeBody } = await import('./physics.js');
     const { TIERS } = await import('./config.js');

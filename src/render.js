@@ -6,7 +6,7 @@
 // subtle billboard lean toward the camera), and every level gets a light
 // grade + vignette so the backdrop and the table feel like one place.
 
-import { TABLE, TIERS, ORDERS, FRICTION, CAT_TIERS, BANNER } from './config.js';
+import { TABLE, TIERS, ORDERS, FRICTION, CAT_TIERS, BANNER, SPLIT } from './config.js';
 
 const RAIL_H = 24;        // world units of rail height
 const RAIL_TH = 26;       // world units of rail thickness (outward)
@@ -145,6 +145,7 @@ export class Renderer {
     // the ad slot is reported in CSS pixels, because that is what a native ad
     // view is positioned in
     this.dpr = dpr;
+    if (this.hudFloor === undefined) this.hudFloor = 0;
     // table dressing: props react to drinks sliding past, so they live here
     // (dynamic) rather than baked into the prerendered tabletop
     this.props = (level.decor || []).map((d, i) => ({ ...d, hitT: -9, seed: i * 1.7 }));
@@ -799,7 +800,7 @@ export class Renderer {
     const bodies = game.phys.bodies.filter(b => !b.dead).sort((x, y) => y.z - x.z);
     const glossA = this.gloss();
     for (const b of bodies) {
-      this.drawBody(ctx, b, time, glossA);   // b.born advanced by game.update on the fixed step
+      this.drawBody(ctx, b, time, glossA, game);   // b.born advanced by game.update on the fixed step
     }
 
     if (game.tee.ready && game.state === 'aiming') this.drawTee(ctx, game, time);
@@ -839,7 +840,7 @@ export class Renderer {
     if (this.vignette) ctx.drawImage(this.vignette, 0, 0);
   }
 
-  drawBody(ctx, b, time, glossA = 0.1) {
+  drawBody(ctx, b, time, glossA = 0.1, game = null) {
     const view = this.view;
     const p = view.project(b.x, 0, b.z);
 
@@ -862,6 +863,23 @@ export class Renderer {
       b.r * p.s * 1.02 * (2 - sh), b.r * p.s * 0.45 * (2 - sh), 0.34 * sh);
 
     if (b.kind === 'ball') { this.drawBall(ctx, b, p, time); return; }
+
+    // Split Pour: a coloured collar on the felt under each glass, because the
+    // rule "these two will not merge" has to be visible before you take the
+    // shot, not discovered after it.
+    if (game && game.split) {
+      const c = SPLIT.colors[b.family % SPLIT.colors.length];
+      const rr = b.r * p.s;
+      ctx.save();
+      ctx.strokeStyle = c;
+      ctx.lineWidth = Math.max(2, 3.4 * p.s);
+      ctx.globalAlpha = 0.95;
+      ellipseStroke(ctx, p.x, p.y, rr * 1.06, rr * 0.48);
+      ctx.globalAlpha = 0.22;
+      ctx.fillStyle = c;
+      ellipse(ctx, p.x, p.y, rr * 1.02, rr * 0.44);
+      ctx.restore();
+    }
 
     const tier = tierStyle(this.level, b.tier, TIERS);
     const img = this.assets.image(tierAssetKey(b.tier, this.level));
@@ -1891,32 +1909,59 @@ export class Renderer {
 
   drawDocks(ctx, game, time) {
     const view = this.view;
+    // The card is drawn hanging ABOVE its dock, which on a short phone puts it
+    // straight under the mission chips — measured at 2895px of overlap on a
+    // 375x667 screen while a 390x844 one had 53px of clear air, which is why
+    // this went unseen. The renderer reports the band it needs and the HUD
+    // keeps out of it; when even that is not enough the card drops below its
+    // dock instead of reaching up.
+    let top = Infinity, bottom = -Infinity;
+    const dpr = this.dpr || 1;
     for (const o of game.orders) {
       if (!o) continue;
       const p = view.project(o.x, RAIL_H, o.z + 40);
       const s = p.s;
       const w = 168 * s, h = 74 * s;
-      ctx.fillStyle = 'rgba(24,32,46,0.82)';
-      roundRect(ctx, p.x - w / 2, p.y - h, w, h, 14 * s);
+      // Flipping the card below its anchor was not enough: on a 667-tall screen
+      // the anchor ITSELF sits at 93 CSS px, well inside the HUD. The card is a
+      // label, not the delivery point — so it is pushed clear of the HUD and a
+      // leader line ties it back to the ring on the felt, which never moves.
+      const wanted = p.y - h;
+      const floor = (this.hudFloor || 0) * dpr;
+      const cardTop = Math.max(wanted, floor);
+      top = Math.min(top, cardTop / dpr);
+      bottom = Math.max(bottom, (cardTop + h) / dpr);
+      ctx.fillStyle = 'rgba(24,32,46,0.86)';
+      roundRect(ctx, p.x - w / 2, cardTop, w, h, 14 * s);
       ctx.fill();
       ctx.strokeStyle = '#ffd97b';
       ctx.lineWidth = 2.5 * s;
-      roundRect(ctx, p.x - w / 2, p.y - h, w, h, 14 * s);
+      roundRect(ctx, p.x - w / 2, cardTop, w, h, 14 * s);
       ctx.stroke();
       const img = this.assets.image(tierAssetKey(o.tier, this.level));
       const iw = 54 * s;
-      if (img) ctx.drawImage(img, p.x - iw / 2 - 30 * s, p.y - h + 8 * s, iw, iw);
+      if (img) ctx.drawImage(img, p.x - iw / 2 - 30 * s, cardTop + 8 * s, iw, iw);
       const frac = 1 - o.t / ORDERS.softTimer;
       ctx.strokeStyle = frac < 0.25 ? '#ff6d7f' : '#7fe3ff';
       ctx.lineWidth = 4 * s;
       ctx.beginPath();
-      ctx.arc(p.x + 38 * s, p.y - h / 2, 16 * s, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * frac);
+      ctx.arc(p.x + 38 * s, cardTop + h / 2, 16 * s, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * frac);
       ctx.stroke();
       const cg = view.project(o.x, 0, o.z);
+      // leader from the card down to the ring, so a pushed-down card still
+      // clearly belongs to its dock
+      if (cardTop > wanted + 1) {
+        ctx.strokeStyle = 'rgba(255,217,123,0.45)';
+        ctx.lineWidth = 2 * s;
+        ctx.setLineDash([5 * s, 5 * s]);
+        ctx.beginPath(); ctx.moveTo(p.x, cardTop + h); ctx.lineTo(cg.x, cg.y - 4); ctx.stroke();
+        ctx.setLineDash([]);
+      }
       ctx.strokeStyle = `rgba(255,217,123,${0.3 + 0.15 * Math.sin(time * 3 + o.slot)})`;
       ctx.lineWidth = 3;
       ellipseStroke(ctx, cg.x, cg.y, ORDERS.dockR * cg.s, ORDERS.dockR * cg.s * 0.45);
     }
+    this.dockBand = Number.isFinite(top) ? { top, bottom } : null;
   }
 
   drawWind(ctx, game, time) {

@@ -1,7 +1,7 @@
 // Level state machine: spawn queue, flicks, merges, combos, orders, hazards,
 // win/fail. Physics events are consumed here, end-of-step.
 
-import { TABLE, PHYS, FLICK, TIERS, TOP_TIER_CLINK_BONUS, COMBO, ORDERS, SPAWN, FAIL, COMBO_CALLOUTS, CAT_TIERS, REFILL, RUSH, SHIFT } from './config.js';
+import { TABLE, PHYS, FLICK, TIERS, TOP_TIER_CLINK_BONUS, COMBO, ORDERS, SPAWN, FAIL, COMBO_CALLOUTS, CAT_TIERS, REFILL, RUSH, SHIFT, SPLIT } from './config.js';
 import { makeBody, buildWalls } from './physics.js';
 
 function mulberry32(seed) {
@@ -27,13 +27,19 @@ export class Game {
     this.onEvent = null;   // (name, data) -> UI hooks
   }
 
-  loadLevel(level, { zen = false, seed = null, restore = null, endless = false, daily = false, rush = false, shift = false, dayKey = '' } = {}) {
+  loadLevel(level, { zen = false, seed = null, restore = null, endless = false, daily = false, rush = false, shift = false, split = false, dayKey = '' } = {}) {
     this.level = level;
     this.zen = zen;
     this.endless = endless;
     this.daily = daily;
     this.rush = rush;
     this.shift = shift;
+    this.split = split;
+    // best tier reached on each tab; the run is won when all of them arrive
+    this.familyBest = split ? new Array(SPLIT.families).fill(0) : null;
+    this.nextFamily = 0;
+    // Two drinks of the same tier only merge when they share a tab.
+    this.phys.mergeMatch = split ? (a, b) => a.family === b.family : null;
     this.ticketsLeft = shift ? SHIFT.tickets : 0;
     this.dropIn = RUSH.dropFirst;
     this.dropEvery = RUSH.dropEvery;
@@ -55,7 +61,8 @@ export class Game {
 
     this.state = S.AIMING;
     this.score = 0;
-    this.flicksLeft = (zen || endless || rush) ? Infinity : (shift ? SHIFT.flicks : level.flicks);
+    this.flicksLeft = (zen || endless || rush) ? Infinity
+      : (shift ? SHIFT.flicks : (split ? SPLIT.flicks : level.flicks));
     this.combo = 0;
     this.comboTimer = 0;
     this.maxTierMade = 0;
@@ -115,7 +122,9 @@ export class Game {
 
     // spawn queue: current tee drink + 2 previews
     this.queue = [this.rollTier(), this.rollTier(), this.rollTier()];
-    this.tee = { tier: this.queue[0], ready: true, t: 1 };
+    // Split Pour deals a tab alongside each tier, cycling so no tab starves.
+    this.famQueue = split ? [this.rollFamily(), this.rollFamily(), this.rollFamily()] : null;
+    this.tee = { tier: this.queue[0], family: this.famQueue ? this.famQueue[0] : 0, ready: true, t: 1 };
     this.aim = null;   // {dirX, dirZ, power} while dragging
 
     if (restore) this.restoreState(restore);
@@ -146,6 +155,20 @@ export class Game {
     // always enough low tiers to actually build pairs from.
     if (!this.bag || this.bag.length === 0) this.refillBag();
     return this.bag.pop();
+  }
+
+  // Cycle the tabs with a nudge toward whichever is furthest behind, so a run
+  // cannot be lost simply because one tab never came up.
+  rollFamily() {
+    const n = SPLIT.families;
+    if (this.rng() < 0.45 && this.familyBest) {
+      let worst = 0;
+      for (let i = 1; i < n; i++) if (this.familyBest[i] < this.familyBest[worst]) worst = i;
+      return worst;
+    }
+    const f = this.nextFamily % n;
+    this.nextFamily++;
+    return f;
   }
 
   refillBag() {
@@ -188,9 +211,13 @@ export class Game {
     const a = this.aim;
     if (a.dirZ <= 0.05) { this.aim = null; return false; }  // never toward the gutter
     const tier = this.queue.shift();
+    const fam = this.famQueue ? this.famQueue.shift() : 0;
     this.queue.push(this.rollTier());
+    if (this.famQueue) this.famQueue.push(this.rollFamily());
+    if (this.split) this.famQueue.push(this.rollFamily());
     const speed = Math.max(FLICK.minSpeed, Math.min(FLICK.maxSpeed, a.power));
     const b = this.phys.add(makeBody(tier, 0, TABLE.launchZ, TIERS[tier - 1].r));
+    if (this.split) b.family = fam;
     b.vx = a.dirX * speed;
     b.vz = a.dirZ * speed;
     b.sleeping = false;
@@ -199,7 +226,7 @@ export class Game {
     b.banks = 0;
     b.flicked = true;
     this.aim = null;
-    this.tee = { tier: this.queue[0], ready: false, t: 0 };
+    this.tee = { tier: this.queue[0], family: this.famQueue ? this.famQueue[0] : 0, ready: false, t: 0 };
     if (!this.zen) this.flicksLeft--;
     this.audio.play('flick', { volume: 0.5 + 0.5 * speed / FLICK.maxSpeed });
     this.audio.haptic(8);
@@ -443,6 +470,10 @@ export class Game {
     a.dead = b.dead = true;
 
     const nb = this.phys.add(makeBody(tier + 1, nx, nz, nt.r));
+    if (this.split) {
+      nb.family = a.family;
+      if (tier + 1 > this.familyBest[nb.family]) this.familyBest[nb.family] = tier + 1;
+    }
     // momentum conserved, clamped so a merge can never eject anything
     nb.vx = (a.vx * a.mass + b.vx * b.mass) / m * 0.7;
     nb.vz = (a.vz * a.mass + b.vz * b.mass) / m * 0.7;
@@ -641,6 +672,17 @@ export class Game {
   checkEnd(dt) {
     if (this.zen) return;
     if (this.rush) return;   // Rush ends only at the overflow line
+    if (this.split) {
+      if (this.offering) return;
+      if (this.familyBest.every(t => t >= SPLIT.goalTier)) { this.finish(true, 'split'); return; }
+      if (this.flicksLeft <= 0 && this.tee.ready && !this.phys.anyMoving() && this.comboTimer <= 0) {
+        if ((this.refills || 0) < REFILL.max && this.canOfferRefill && this.canOfferRefill()) {
+          this.offering = true;
+          this.emit('offerRefill', { left: 0 });
+        } else this.finish(false, 'flicks');
+      }
+      return;
+    }
     if (this.shift) {
       if (this.offering) return;
       if (this.flicksLeft <= 0 && this.tee.ready && !this.phys.anyMoving() && this.comboTimer <= 0) {
@@ -672,7 +714,7 @@ export class Game {
     this.offering = false;
     this.refills = (this.refills || 0) + 1;
     this.flicksLeft += n;
-    this.tee = { tier: this.queue[0], ready: true, t: 1 };
+    this.tee = { tier: this.queue[0], family: this.famQueue ? this.famQueue[0] : 0, ready: true, t: 1 };
     this.emit('refilled', { n, left: this.flicksLeft });
     this.autosave();
   }
@@ -685,7 +727,7 @@ export class Game {
   finishNow() {
     if (this.state !== S.AIMING) return;
     // Zen/Endless/Daily have no "cash out" — they end only by clogging the line.
-    if (this.zen || this.endless || this.rush || this.shift) return;
+    if (this.zen || this.endless || this.rush || this.shift || this.split) return;
     if (this.goalDone && this.sideGoalDone()) this.finish(true);
   }
 
@@ -723,12 +765,14 @@ export class Game {
 
     // Endless / Daily: score-chase runs, no stars, own records. Daily runs on
     // the endless ruleset (endless:true) too, so check daily FIRST.
-    if (this.endless || this.daily || this.rush || this.shift) {
+    if (this.endless || this.daily || this.rush || this.shift || this.split) {
       let isBest = false, streak = 0;
       if (this.rush) {
         isBest = this.save.recordRush(this.score);
       } else if (this.shift) {
         isBest = this.save.recordShift(this.score);
+      } else if (this.split) {
+        isBest = this.save.recordSplit(this.score);
       } else if (this.daily) {
         const r = this.save.recordDaily(this.dayKey, this.score);
         isBest = r.isBest; streak = r.streak;
@@ -738,11 +782,12 @@ export class Game {
       this.audio.play(won ? 'win' : 'lose');
       this.result = {
         won, reason, score: this.score, seed: this.seed,
-        mode: this.rush ? 'rush' : (this.shift ? 'shift' : (this.daily ? 'daily' : 'endless')),
+        mode: this.rush ? 'rush' : (this.shift ? 'shift' : (this.split ? 'split' : (this.daily ? 'daily' : 'endless'))),
         newBest: isBest,
         best: this.rush ? this.save.data.rushBest
           : (this.shift ? this.save.data.shiftBest
-            : (this.daily ? this.save.data.dailyBest : this.save.data.endlessBest)),
+            : (this.split ? this.save.data.splitBest
+              : (this.daily ? this.save.data.dailyBest : this.save.data.endlessBest))),
         streak, maxTier: this.maxTierMade, served: this.dropped,
         tickets: SHIFT.tickets - (this.ticketsLeft || 0), ticketsTotal: SHIFT.tickets,
       };
@@ -814,7 +859,7 @@ export class Game {
     this.bankMerges = s.bankMerges || 0;
     this.ordersServed = s.ordersServed || 0;
     this.runMaxCombo = s.runMaxCombo || 0;
-    this.tee = { tier: this.queue[0], ready: true, t: 1 };
+    this.tee = { tier: this.queue[0], family: this.famQueue ? this.famQueue[0] : 0, ready: true, t: 1 };
     for (const [tier, x, z] of s.bodies) {
       const b = this.phys.add(makeBody(tier, x, z, TIERS[tier - 1].r));
       b.immunity = 1.0;
