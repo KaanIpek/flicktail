@@ -3,7 +3,7 @@
 import { TIERS, COMBO_CALLOUTS, REFILL, SPLIT } from './config.js';
 import { LEVELS, ALL_LEVELS, TOURS, tourById, levelsOfTour, tierNameFor } from './levels.js';
 import { creatureIcon, ACTIVE_ART } from './render.js';
-import { SKINS } from './skins.js';
+import { SKINS, artDir } from './skins.js';
 import { todayKey } from './save.js';
 
 export class UI {
@@ -29,7 +29,7 @@ export class UI {
     // then the house set.
     const art = ACTIVE_ART && ACTIVE_ART[tier];
     const src = creatureIcon(tier)
-      || (art ? `assets/signatures/${art.replace(/^sig_/, '')}.png` : null)
+      || (art ? `${artDir(this.save.data.activeSkin)}/${art.replace(/^sig_/, '')}.png` : null)
       || (level && level.art && level.art[tier])
       || `assets/drinks/tier${String(tier).padStart(2, '0')}.png`;
     return `<img class="drink-icon ${cls}" src="${src}" alt="${TIERS[tier - 1].name}" onerror="this.style.visibility='hidden'">`;
@@ -259,7 +259,7 @@ export class UI {
       const preview = [2, 5, 8, 10].map(t => {
         let src;
         if (sk.kind === 'creature') src = creatureIcon(t, 96, { cast: sk.cast });
-        else if (sk.kind === 'art') src = `assets/signatures/${sk.art[t - 1]}.png`;
+        else if (sk.kind === 'art') src = `${sk.dir || 'assets/signatures'}/${sk.art[t - 1]}.png`;
         else src = `assets/drinks/tier${String(t).padStart(2, '0')}.png`;
         return `<img class="skin-pic" src="${src}" alt="">`;
       }).join('');

@@ -425,9 +425,11 @@ const CITY_BACKDROP = {};
 // Morocco. Tiers outside a set fall through to the house art, so a half-painted
 // set still renders.
 const DRINK_SETS = {
-  med: { 4: 'lavender-tumbler', 5: 'spritz-orange', 6: 'honey-vine', 7: 'anise-cup' },
+  med: { 4: 'lavender-tumbler', 5: 'spritz-orange', 6: 'honey-vine', 7: 'anise-cup',
+         8: 'sangria-bowl', 9: 'limoncello-pitcher' },
   desert: { 4: 'mint-brass', 5: 'saffron-cream', 6: 'hibiscus-ruby', 7: 'cardamom-copper' },
-  asia: { 4: 'matcha-bamboo', 5: 'lychee-pearl', 6: 'plum-porcelain', 7: 'coffee-steel' },
+  asia: { 4: 'matcha-bamboo', 5: 'lychee-pearl', 6: 'plum-porcelain', 7: 'coffee-steel',
+          8: 'matcha-kakigori', 9: 'thai-tea-tower' },
   latin: { 4: 'agave-salt', 5: 'caipirinha-muddle', 6: 'michelada-red', 7: 'acai-coupe' },
 };
 

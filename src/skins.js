@@ -72,6 +72,20 @@ export const SKINS = [
     stars: 260,
     price: '$2.99',
   },
+  {
+    id: 'world',
+    name: 'World Bar',
+    blurb: 'One glass from every coast: lavender, mint tea, matcha, agave.',
+    kind: 'art',
+    // The regional sets are already on the device — worn together they make a
+    // chain that changes continent every tier, which no single tour shows you.
+    art: ['agave-salt', 'lavender-tumbler', 'mint-brass', 'matcha-bamboo',
+      'caipirinha-muddle', 'spritz-orange', 'saffron-cream', 'lychee-pearl',
+      'michelada-red', 'honey-vine', 'cardamom-copper'],
+    dir: 'assets/drinks/sets',
+    stars: 60,
+    price: '$1.99',
+  },
 ];
 
 export function skinById(id) { return SKINS.find(s => s.id === id) || SKINS[0]; }
@@ -91,9 +105,16 @@ export function artFor(skinId) {
   return map;
 }
 
+// Where a painted skin's pictures live. Signatures are the default; a skin can
+// point somewhere else, which is how World Bar reuses the regional sets.
+export function artDir(skinId) {
+  return skinById(skinId).dir || 'assets/signatures';
+}
+
 // [assetKey, url] pairs a painted skin needs loaded before it can be worn.
 export function artAssets(skinId) {
   const s = skinById(skinId);
   if (s.kind !== 'art' || !s.art) return [];
-  return s.art.map(slug => ['sig_' + slug, `assets/signatures/${slug}.png`]);
+  const dir = s.dir || 'assets/signatures';
+  return s.art.map(slug => ['sig_' + slug, `${dir}/${slug}.png`]);
 }
