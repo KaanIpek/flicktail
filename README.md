@@ -1,4 +1,4 @@
-# Flicktail — Slide & Merge Cocktails
+# Flicktail — A Slingshot Bar Puzzle
 
 A premium-feel mobile web game: flick drinks up a beach-bar table and merge
 identical ones into ever-bigger cocktails across 12 world-famous vacation

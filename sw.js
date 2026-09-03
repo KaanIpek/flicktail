@@ -2,7 +2,7 @@
 // else (backdrops, sprites, audio) so the game is fully playable offline
 // after the first visit.
 
-const VERSION = 'flicktail-v45';
+const VERSION = 'flicktail-v46';
 const BACKDROPS = ['waikiki', 'miami', 'cancun', 'rio', 'nice', 'positano',
   'santorini', 'ibiza', 'dubai', 'phuket', 'bali', 'borabora',
   'okinawa', 'algarve', 'whitsundays', 'halong', 'morocco', 'egypt', 'croatia', 'maldives',

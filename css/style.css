@@ -543,3 +543,23 @@ img.td-bottle { width: 132px; height: 132px; object-fit: contain; }
 }
 .tab-pip i { width: 9px; height: 9px; border-radius: 50%; background: var(--tab); display: block; }
 .tab-pip.done { border-color: var(--tab); box-shadow: 0 0 8px color-mix(in srgb, var(--tab) 55%, transparent); }
+
+/* ---------- tablet ---------- */
+
+/* The stage widens to the table's own proportions on a tablet (see resize() in
+   main.js), which fixes the canvas but leaves the DOM screens at phone scale —
+   small buttons floating in a lot of sand. This scales the chrome to match the
+   glass. The breakpoint is the same test resize() uses: both axes >= 700. */
+@media (min-width: 700px) and (min-height: 700px) {
+  .btn { font-size: 20px; padding: 15px 28px; border-radius: 22px; }
+  .btn.big { font-size: 27px; padding: 19px 44px; border-radius: 26px; }
+  .btn.half { min-width: 190px; font-size: 19px; padding: 15px 20px; }
+  .btn.tiny { font-size: 16px; padding: 8px 16px; }
+  .title-block { margin-top: 9vh; }
+  .logo { font-size: clamp(78px, 11vw, 112px); }
+  .tagline { font-size: 23px; margin-top: 18px; }
+  .title-buttons { gap: 16px; }
+  .title-row { gap: 14px; }
+  .title-foot { font-size: 18px; margin-top: 14px; }
+  .mode-line { font-size: 18px; max-width: 400px; }
+}

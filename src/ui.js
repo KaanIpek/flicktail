@@ -61,7 +61,7 @@ export class UI {
       <button class="btn corner-gear" data-act="about" aria-label="Settings & about">⚙</button>
       <div class="title-block">
         <h1 class="logo">FLICK<span>TAIL</span></h1>
-        <p class="tagline">Slide &amp; Merge Cocktails</p>
+        <p class="tagline">A Slingshot Bar Puzzle</p>
       </div>
       <div class="title-buttons">
         ${resume ? `<button class="btn big primary resume-btn" data-act="resumeRun">
