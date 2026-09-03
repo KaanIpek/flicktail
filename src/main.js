@@ -92,8 +92,14 @@ let W = 0, H = 0, DPR = 1;
 function resize() {
   const vw = window.visualViewport ? window.visualViewport.width : innerWidth;
   const vh = window.visualViewport ? window.visualViewport.height : innerHeight;
-  // portrait stage; on landscape/desktop windows allow a slightly wider column
-  const aspect = vw > vh ? 0.60 : 9 / 16;
+  // Portrait stage. A phone gets the 9:16 column it was designed for, but on a
+  // tablet that column leaves a third of the glass as blurred filler and the
+  // game reads as a phone build someone padded out. The table itself is 620
+  // wide by 1020 long — a 0.61 world aspect — so a tablet can simply be given
+  // more of it. 0.72 is close enough to the table's own proportions that the
+  // extra width becomes tabletop rather than margin.
+  const tablet = Math.min(vw, vh) >= 700;
+  const aspect = vw > vh ? 0.60 : (tablet ? 0.72 : 9 / 16);
   let w = vw, h = vh;
   if (w / h > aspect) w = h * aspect;
   DPR = Math.min(devicePixelRatio || 1, 2);
@@ -121,7 +127,7 @@ function resize() {
   view.camH = 1180;
   view.camZ = -520;
   view.pitch = 1.02;
-  view.fit(W, H, TABLE.halfW, 1.16, 0.87);
+  view.fit(W, H, TABLE.halfW, 1.16, 0.87, TABLE.length);
   if (currentLevel) renderer.setLevel(currentLevel, W, H, DPR);
   backdrop.render();
 }
@@ -657,7 +663,7 @@ window.__ft = {
   },
   retune(camH, camZ, pitch, nearFrac, baseFrac) {
     view.camH = camH; view.camZ = camZ; view.pitch = pitch;
-    view.fit(W, H, TABLE.halfW, nearFrac ?? 0.97, baseFrac ?? 0.965);
+    view.fit(W, H, TABLE.halfW, nearFrac ?? 0.97, baseFrac ?? 0.965, TABLE.length);
     if (currentLevel) renderer.setLevel(currentLevel, W, H, DPR);
     return [view.project(0, 0, TABLE.length).y / H, view.project(0, 0, TABLE.foulLine).y / H];
   },
