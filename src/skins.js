@@ -51,7 +51,7 @@ export const SKINS = [
   {
     id: 'signature',
     name: 'Signature Bar',
-    blurb: 'The eleven house signatures, hand-painted, poured for the whole chain.',
+    blurb: 'The eleven house signatures, poured for the whole chain.',
     kind: 'art',
     // Ordered small cup to grand trophy, so the chain still reads as a
     // progression the way the default set does.
