@@ -1,0 +1,80 @@
+Flicktail — third-party notices
+===============================
+
+The code, the SFX synthesis and the game logic are original. This file covers
+the assets that came from somewhere else.
+
+--------------------------------------------------------------------------
+Music and ambience — assets/audio/
+--------------------------------------------------------------------------
+
+  music_desert.mp3   music_golden.mp3   music_lagoon.mp3   music_last.mp3
+  music_latin.mp3    music_morning.mp3  music_neon.mp3     music_riviera.mp3
+  amb_beach_day.mp3  amb_beach_sunset.mp3  amb_night.mp3
+
+Generated locally with Stable Audio 3 (stabilityai/stable-audio-3-medium-base).
+Nothing was uploaded and no third-party service was used to make them.
+
+  This Stability AI Model is licensed under the Stability AI Community License,
+  Copyright (c) Stability AI Ltd. All Rights Reserved.
+
+  Powered by Stability AI.
+
+The model bundles a Gemma-derived text encoder (t5gemma-b-b-ul2), redistributed
+under the Gemma Terms of Use:
+
+  Gemma is provided under and subject to the Gemma Terms of Use found at
+  ai.google.dev/gemma/terms
+
+Full licence text: https://stability.ai/community-license-agreement
+(the same text ships with the weights, as LICENSE.md).
+
+What that licence actually requires, quoted rather than paraphrased:
+
+  - OUTPUTS ARE OURS. The definition of "Derivative Work" in Section V ends
+    "...but do not include the output of any Model", so the generated audio is
+    not a derivative of the model. Shipping and selling these tracks is ours
+    to do.
+
+  - ATTRIBUTION, and it is satisfied in ONE place, not everywhere. Section
+    IV(a) asks for "Powered by Stability AI" on "a related website, user
+    interface, blogpost, about page, or product documentation" — any one of
+    them. The game's About screen carries it, which is why this is not also
+    required in a store listing or a video description.
+
+  - REGISTRATION for commercial use. Section III: "If You are using or
+    distributing the Stability AI Materials for a Commercial Purpose, You must
+    register with Stability AI at (https://stability.ai/community-license)."
+    Flicktail sells in-app purchases, so this applies. The licence itself
+    commences on access to the materials (Section IV(f)), so it is a covenant
+    inside a live agreement rather than a precondition — but it is unmet until
+    the form is filled in.
+
+  - THE $1M CEILING IS TOTAL REVENUE, NOT GAME REVENUE. Section III terminates
+    the grant if annual revenue passes USD $1,000,000 "regardless of whether
+    that revenue is generated directly or indirectly from the Stability AI
+    Materials". Termination there is automatic ("shall terminate"), unlike the
+    registration breach, which only gives Stability the option ("may
+    terminate").
+
+  - DO NOT CALL IT HUMAN-MADE. The Acceptable Use Policy names "misleading end
+    users about the nature of outputs from Stability AI Technology (such as
+    pretending it was made by a human)". Crediting a composer would breach it.
+
+  - DO NOT TRAIN ON THE OUTPUT. Section IV(b) forbids using the outputs to
+    train another audio model.
+
+The licence applies to "any individual person or entity" (Section I), so having
+no company changes nothing about who the licensee is.
+
+--------------------------------------------------------------------------
+Fonts
+--------------------------------------------------------------------------
+
+  Baloo 2, Nunito — SIL Open Font License 1.1, via Google Fonts.
+
+--------------------------------------------------------------------------
+Artwork
+--------------------------------------------------------------------------
+
+  Drink sprites and destination paintings were AI-generated for this project.

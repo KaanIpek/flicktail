@@ -312,7 +312,7 @@ export class UI {
         <div class="about-sec-title">About</div>
         <p class="about-blurb">Flick drinks up the table and merge matching cocktails Suika-style, touring twelve real beach destinations from Waikiki to Bora&nbsp;Bora.</p>
         <div class="about-credits">
-          <div class="cred-row"><span>Music &amp; ambience</span><span>Stable Audio · Stability AI</span></div>
+          <div class="cred-row"><span>Music &amp; ambience</span><span>Powered by Stability AI</span></div>
           <div class="cred-row"><span>Illustrations</span><span>AI-generated for this game</span></div>
           <div class="cred-row"><span>Typefaces</span><span>Baloo 2 &amp; Nunito · OFL</span></div>
           <div class="cred-row"><span>Engine</span><span>Hand-built, zero dependencies</span></div>

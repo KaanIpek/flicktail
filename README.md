@@ -37,14 +37,15 @@ Zero-dependency vanilla JS + Canvas. Physics is a custom swept-circle engine
 plane; the fake-3D look is a real perspective camera projecting that plane.
 Backdrops render on their own canvas at 30 fps with ambient movers (boats,
 cable cars, club beams, stingrays). SFX are fully procedural WebAudio; the
-four music loops were generated with a local Stable Audio 3 install.
+eight music loops and three ambience beds were generated with a local
+Stable Audio 3 install.
 
 ## Art & licences
 
 - Drink sprites and destination paintings: AI-generated for this project.
 - Fonts: Baloo 2, Nunito (SIL OFL 1.1, via Google Fonts).
-- Music: generated locally with Stable Audio 3 under the Stability Community
-  License (register before commercial sale).
+- Music: generated locally with Stable Audio 3 (`stabilityai/stable-audio-3-medium-base`)
+  under the Stability AI Community License. See [NOTICE](NOTICE).
 - Everything else (code, SFX synthesis): original.
 
 ## Dev notes
