@@ -44,7 +44,7 @@ export const LEVELS = [
     goalTier: 5, flicks: 14, star2: 40, star3: 40,
     friction: FRICTION.sand, rails: rectRails(), spawnTiers: [2, 3],
     preplace: [{ tier: 3, x: -70, z: 430 }, { tier: 3, x: 66, z: 430 }],
-    intro: 'Flick drinks up the table. Twins merge into bigger cocktails!',
+    intro: 'Flick drinks up the table. When two matching drinks touch, they mix into a bigger one!',
     mechanic: 'Sand-soft table — shots die gently.',
   },
   {
@@ -56,9 +56,9 @@ export const LEVELS = [
     table: { surface: 'terrazzo', c: ['#cfd8d2', '#dde6e0', '#e8f0ea'], fleck: ['#F26CA7', '#40E0D0', '#ffd75e'] },
     goalTier: 6, flicks: 20, star2: 132, star3: 134,
     friction: FRICTION.wood, rails: rectRails(), railBounce: 0.85, spawnTiers: [1, 2, 3, 4],
-    sideGoal: { type: 'bank', count: 1, label: 'Bank-shot merge', required: false, bonus: 25 },
+    sideGoal: { type: 'bank', count: 1, label: 'Bank-shot mix', required: false, bonus: 25 },
     intro: 'Chrome deco rails love a bank shot.',
-    mechanic: 'Bouncier rails (e=0.85). Side goal: 1 bank-shot merge.',
+    mechanic: 'Bouncier rails (e=0.85). Side goal: 1 mix made off a bank shot.',
   },
   {
     id: 3, place: 'Cancún', country: 'Mexico', backdrop: 'cancun',
@@ -169,7 +169,7 @@ export const LEVELS = [
     ],
     sideGoal: { type: 'combo', count: 4, label: 'Land a ×4 combo', required: false, bonus: 60 },
     intro: 'A glowing beach ball drifts across the party table.',
-    mechanic: 'Moving obstacle — light, bouncy, never merges.',
+    mechanic: 'Moving obstacle — light, bouncy, never mixes with a drink.',
   },
   {
     id: 9, place: 'Jumeirah', country: 'Dubai, UAE', backdrop: 'dubai',

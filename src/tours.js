@@ -747,7 +747,9 @@ export function buildTours(worldLevelIds) {
   return [
     {
       id: 'world', name: 'World Tour', flag: '🌍', backdrop: 'waikiki',
-      blurb: 'Twelve flagship stops, every country mixed together.',
+      // The World Tour has fewer stops than there are countries, so the card
+      // must not claim every country is in it.
+      blurb: `${worldLevelIds.length} stops from around the world.`,
       levels: worldLevelIds,
     },
     ...COUNTRIES.map((c, ci) => ({

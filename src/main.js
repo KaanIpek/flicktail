@@ -640,34 +640,25 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
 
 // ---- boot ----
 
-// QA / debug hook (harmless in production, invaluable for automated testing)
-window.__ft = {
-  game, view, renderer, physics, fx, save, audio, backdrop, ui, ads,
-  startLevel, showMap, startRush, startShift, startSplit, startEndless,
-  async spawn(tier, x, z, vx = 0, vz = 0) {
-    const { makeBody } = await import('./physics.js');
-    const { TIERS } = await import('./config.js');
-    const b = physics.add(makeBody(tier, x, z, TIERS[tier - 1].r));
-    b.vx = vx; b.vz = vz; b.sleeping = !(vx || vz); b.immunity = 1.5;
-    return b.id;
-  },
-  state() {
-    return {
-      screen, score: game.score, flicks: game.flicksLeft, combo: game.combo,
-      maxTier: game.maxTierMade, goalDone: game.goalDone, state: game.state,
-      bodies: physics.bodies.filter(b => !b.dead).map(b => ({
-        id: b.id, tier: b.tier, x: Math.round(b.x), z: Math.round(b.z),
-        sp: Math.round(Math.hypot(b.vx, b.vz)), sleeping: b.sleeping, kind: b.kind,
-      })),
-    };
-  },
-  retune(camH, camZ, pitch, nearFrac, baseFrac) {
-    view.camH = camH; view.camZ = camZ; view.pitch = pitch;
-    view.fit(W, H, TABLE.halfW, nearFrac ?? 0.97, baseFrac ?? 0.965, TABLE.length);
-    if (currentLevel) renderer.setLevel(currentLevel, W, H, DPR);
-    return [view.project(0, 0, TABLE.length).y / H, view.project(0, 0, TABLE.foulLine).y / H];
-  },
-};
+// The local QA harness drives the game through test hooks in qa/hook.js. They
+// sit outside src/ because mobile/sync-web.mjs copies src/ into the iOS app and
+// a store build must not carry them. They load only from a plain-http dev
+// server: the Capacitor app is served as capacitor://localhost, so checking the
+// hostname alone would let them into the app. screen, currentLevel, W, H and DPR
+// are reassigned after boot, hence getters rather than copies.
+const QA_HOSTS = ['localhost', '127.0.0.1'];
+if (location.protocol === 'http:' && !window.Capacitor
+    && (QA_HOSTS.includes(location.hostname) || new URLSearchParams(location.search).has('qa'))) {
+  import('../qa/hook.js')
+    .then(m => m.install({
+      game, view, renderer, physics, fx, save, audio, backdrop, ui, ads,
+      startLevel, showMap, startRush, startShift, startSplit, startEndless,
+      get screen() { return screen; },
+      get currentLevel() { return currentLevel; },
+      get size() { return { W, H, DPR }; },
+    }))
+    .catch(e => console.warn('QA hooks did not load', e));
+}
 
 resize();
 preload();

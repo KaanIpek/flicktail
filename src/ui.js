@@ -1,6 +1,6 @@
 // DOM overlay: title, world map, HUD, level intro, win/fail, pause, collection.
 
-import { TIERS, COMBO_CALLOUTS, REFILL, SPLIT } from './config.js';
+import { TIERS, COMBO_CALLOUTS, REFILL, SPLIT, SHIFT } from './config.js';
 import { LEVELS, ALL_LEVELS, TOURS, tourById, levelsOfTour, tierNameFor } from './levels.js';
 import { creatureIcon, ACTIVE_ART } from './render.js';
 import { SKINS, artDir } from './skins.js';
@@ -212,6 +212,9 @@ export class UI {
   showPassport() {
     const d = this.save.data;
     const toasted = LEVELS.filter(l => (d.stars[l.id] || 0) >= 1).length;
+    // totalStars() adds up the country tours as well as the World Tour, so its
+    // ceiling is three stars on every stop, not on the World Tour's alone.
+    const starCap = ALL_LEVELS.length * 3;
     const stat = (label, value, accent) =>
       `<div class="pass-stat"><div class="pass-val ${accent ? 'accent' : ''}">${value}</div><div class="pass-label">${label}</div></div>`;
     const stamps = LEVELS.map(l => {
@@ -231,8 +234,8 @@ export class UI {
       </div>
       <div class="pass-scroll">
         <div class="pass-stats">
-          ${stat('destinations', `${toasted}/12`)}
-          ${stat('stars', `${this.save.totalStars()}/36`, true)}
+          ${stat('destinations', `${toasted}/${LEVELS.length}`)}
+          ${stat('stars', `${this.save.totalStars()}/${starCap}`, true)}
           ${stat('drinks mixed', d.totalMerges || 0)}
           ${stat('best combo', `×${d.maxCombo || 0}`)}
           ${stat('endless best', d.endlessBest || 0)}
@@ -310,12 +313,14 @@ export class UI {
           ${tg('tgAim', 'Bounce guide', settings.aimLine)}
         </div>
         <div class="about-sec-title">About</div>
-        <p class="about-blurb">Flick drinks up the table and merge matching cocktails Suika-style, touring twelve real beach destinations from Waikiki to Bora&nbsp;Bora.</p>
+        <p class="about-blurb">Pull back, let go and bank a glass down the bar. Two matching drinks that touch mix into the next one up, across ${ALL_LEVELS.length} stops in ${TOURS.filter(t => t.id !== 'world').length} countries.</p>
         <div class="about-credits">
-          <div class="cred-row"><span>Music &amp; ambience</span><span>Powered by Stability AI</span></div>
-          <div class="cred-row"><span>Illustrations</span><span>AI-generated for this game</span></div>
-          <div class="cred-row"><span>Typefaces</span><span>Baloo 2 &amp; Nunito · OFL</span></div>
-          <div class="cred-row"><span>Engine</span><span>Hand-built, zero dependencies</span></div>
+          <div class="cred-row"><span>Drink art &amp; backdrops</span><span>AI-generated for this game</span></div>
+          <div class="cred-row"><span>Animal cups</span><span>Drawn at runtime by the game's code</span></div>
+          <div class="cred-row"><span>Music &amp; ambience</span><span>AI-generated with Stable Audio 3 · Powered by Stability AI</span></div>
+          <div class="cred-row"><span>Sound effects</span><span>AI-generated with Stable Audio 3; the tap and wind sounds are synthesized in code</span></div>
+          <div class="cred-row"><span>Typefaces</span><span>Baloo 2 &amp; Nunito · SIL Open Font License</span></div>
+          <div class="cred-row"><span>Code</span><span>Plain JavaScript, no game engine</span></div>
         </div>
         <p class="about-ver">Flicktail · v1.0</p>
       </div>
@@ -348,11 +353,11 @@ export class UI {
       <div class="screen intro-screen" data-act="start">
         <div class="intro-card">
           <div class="intro-place">Split Pour</div>
-          <div class="intro-country">Three tabs, one table</div>
+          <div class="intro-country">${SPLIT.families} tabs, one table</div>
           <div class="intro-goal">
-            <div class="mode-line">The bar is running three tabs at once and they do not mix.
-              Two drinks only merge if the ring under them is the same colour, so you are
-              keeping three chains alive on one table.</div>
+            <div class="mode-line">The bar is running ${SPLIT.families} tabs at once and they do not mix.
+              Two drinks only mix if the ring under them is the same colour, so you are
+              keeping ${SPLIT.families} chains alive on one table.</div>
             ${this.save.data.splitBest ? `<div class="goal-side">Best: ${this.save.data.splitBest}</div>` : ''}
           </div>
           <div class="intro-mech">💡 Every tab has to reach the same drink to close the night.</div>
@@ -366,7 +371,7 @@ export class UI {
           <div class="intro-place">The Shift</div>
           <div class="intro-country">Fill the board</div>
           <div class="intro-goal">
-            <div class="mode-line">Twelve tickets, one cooler. Each ticket names a drink — mix it and
+            <div class="mode-line">${SHIFT.tickets} tickets, one cooler. Each ticket names a drink — mix it and
               roll it onto the dock. The orders get taller as the night goes on.</div>
             ${this.save.data.shiftBest ? `<div class="goal-side">Best: ${this.save.data.shiftBest}</div>` : ''}
           </div>
@@ -748,7 +753,7 @@ export class UI {
             : '<button class="btn ghost" data-act="map">Quit to map</button>'
               + '<button class="btn ghost" data-act="title">Quit to menu</button>'}
         </div>
-        <p class="credits">Backdrops &amp; drink art generated for this game · Fonts: Baloo 2, Nunito (OFL)</p>
+        <p class="credits">Drink art &amp; backdrops AI-generated for this game · Music &amp; most sounds AI-generated with Stable Audio 3 · Fonts: Baloo 2, Nunito (OFL)</p>
       </div>
     </div>`);
   }
@@ -765,7 +770,7 @@ export class UI {
   showTutorial(step) {
     const texts = {
       1: 'Pull back anywhere on the table, then let go — like a slingshot! 🎯',
-      2: 'Hit the matching drink to MERGE them into a bigger one!',
+      2: 'Bump a drink into its twin and the two mix into a bigger one!',
       3: 'Careful: past the white line, drinks fall off the front edge!',
     };
     if (!texts[step]) return;

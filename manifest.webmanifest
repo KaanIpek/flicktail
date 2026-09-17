@@ -1,7 +1,7 @@
 {
   "name": "Flicktail — A Slingshot Bar Puzzle",
   "short_name": "Flicktail",
-  "description": "Flick drinks up the table and merge them into legendary cocktails across 12 world-famous beaches.",
+  "description": "Pull back, let go and flick drinks up a bar table. Two matching drinks that touch mix into the next drink up the chain.",
   "start_url": ".",
   "display": "standalone",
   "orientation": "portrait",

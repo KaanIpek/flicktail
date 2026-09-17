@@ -1,19 +1,25 @@
 Flicktail — third-party notices
 ===============================
 
-The code, the SFX synthesis and the game logic are original. This file covers
-the assets that came from somewhere else.
+This file covers the fonts, and the art and audio that were generated with AI
+tools rather than written as code in this repository.
 
 --------------------------------------------------------------------------
-Music and ambience — assets/audio/
+Music, ambience and sound effects — assets/audio/
 --------------------------------------------------------------------------
 
   music_desert.mp3   music_golden.mp3   music_lagoon.mp3   music_last.mp3
   music_latin.mp3    music_morning.mp3  music_neon.mp3     music_riviera.mp3
   amb_beach_day.mp3  amb_beach_sunset.mp3  amb_night.mp3
 
-Generated locally with Stable Audio 3 (stabilityai/stable-audio-3-medium-base).
-Nothing was uploaded and no third-party service was used to make them.
+  sfx/*.mp3          (the sound-effect one-shots)
+
+All of these were generated locally with Stable Audio 3
+(stabilityai/stable-audio-3-medium-base): the sound effects are sampled
+one-shots, not synthesis. Nothing was uploaded and no third-party service was
+used to make them. The game's WebAudio code (src/audio.js) synthesizes only the
+button tap and the wind gust, plus a stand-in voice for any one-shot that has
+not loaded.
 
   This Stability AI Model is licensed under the Stability AI Community License,
   Copyright (c) Stability AI Ltd. All Rights Reserved.
@@ -45,7 +51,10 @@ What that licence actually requires, quoted rather than paraphrased:
   - REGISTRATION for commercial use. Section III: "If You are using or
     distributing the Stability AI Materials for a Commercial Purpose, You must
     register with Stability AI at (https://stability.ai/community-license)."
-    Flicktail sells in-app purchases, so this applies. The licence itself
+    Flicktail sells nothing (it has no in-app purchases), but the iOS app
+    shows Google AdMob ads, which earn money, so this applies: Section III
+    defines "Commercial Purpose" as use "primarily intended for commercial
+    advantage or monetary compensation". The licence itself
     commences on access to the materials (Section IV(f)), so it is a covenant
     inside a live agreement rather than a precondition — but it is unmet until
     the form is filled in.
