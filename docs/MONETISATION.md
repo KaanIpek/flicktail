@@ -48,7 +48,7 @@ the placeholder.
 - `src/skins.js` is the catalogue: id, name, blurb, what it swaps in (a drawn
   creature cast, or a painted set), a star price and a money price.
 - **Signature Bar** is the one worth charging for: all eleven tiers repainted
-  with the hand-painted country signatures. The drawn creature skins are bonuses
+  with the AI-generated country signatures. The drawn creature skins are bonuses
   — they change ears and tails, not the whole cup, and pricing them would be
   charging for the weakest art in the game.
 - `save.data.ownedSkins` / `activeSkin` persist ownership; `setActiveCast()`
