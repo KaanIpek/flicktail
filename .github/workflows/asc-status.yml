@@ -49,3 +49,9 @@ jobs:
                                   (.attributes.releaseType // "-"),
                                   ("build " + ($builds[.relationships.build.data.id // ""] // "?")),
                                   (.attributes.createdDate // "-")] | @tsv'
+
+          # The attached build above versus the newest one Apple has processed.
+          echo '--- newest builds: build  processingState  uploaded  expired ---'
+          node tools/asc.mjs GET "v1/builds?filter[app]=$APP&sort=-uploadedDate&limit=5" \
+            | jq -r '.data[] | [.attributes.version, .attributes.processingState,
+                                (.attributes.uploadedDate // "-"), (.attributes.expired | tostring)] | @tsv'
