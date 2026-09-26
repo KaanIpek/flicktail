@@ -16,11 +16,18 @@ put it. Two glasses that stop touching combine into the next drink up.
 
 ---
 
-## Status — 14 September 2026
+## Status — 26 September 2026
 
-**1.0.0 / build 59 is `WAITING_FOR_REVIEW`, submitted 3 September 2026.**
-Release type is `AFTER_APPROVAL`, so it goes live by itself when approved.
-Eleven days in review with no verdict is long; check before assuming anything.
+**Nothing is in App Review.** 1.0.0 reads `DEVELOPER_REJECTED` — it was
+removed from review by someone on the account between 14 and 26 September
+(the API does not say who or when), not rejected by Apple. Submission
+`6e254ac3` is `COMPLETE`. The version still carries build 59, and 59 is the
+newest build Apple has.
+
+Build 59 is `905d7b8` (3 September). Master has moved on since: `894829d`
+took the genre word out of the game's own copy, dropped the About screen's
+false "zero dependencies" claim and moved the `window.__ft` hooks out of the
+app. **A resubmission needs a new build from master**, not 59.
 
 Build 56 was **rejected on 2 September under Guideline 4.3(a) — Design: Spam**,
 reviewed on an iPad Air 11" (M3). 4.3(a) is not a code scan, it is a judgement:
@@ -35,14 +42,20 @@ another quiet resubmission.
 ### Checking the live state
 
 ```bash
-node asc.mjs GET "/v1/apps/6806109983/reviewSubmissions?limit=5"
+gh workflow run asc-status --repo KaanIpek/flicktail   # no .p8 needed
+node tools/asc.mjs GET "v1/apps/6806109983/reviewSubmissions?limit=5"
 ```
 
-`asc.mjs` is a small ES256-JWT client for the App Store Connect REST API. It is
-**not in this repo** — it carries the key ids, so it lives in the session
-scratchpad alongside the rest of the QA harness (see *Secrets* below). In Git
-Bash it needs `export MSYS_NO_PATHCONV=1 MSYS2_ARG_CONV_EXCL='*'` first, or the
-URL paths get rewritten into Windows paths and every call 404s.
+`tools/asc.mjs` is a small ES256-JWT client for the App Store Connect REST API.
+It carries no credentials: it reads `ASC_KEY_ID`, `ASC_ISSUER_ID` and the key
+(`ASC_KEY_PATH`, `ASC_KEY_P8` or `ASC_KEY_P8_B64`) from the environment, or
+finds `AuthKey_<id>.p8` in `~/Documents/Apple Developer Keys/`. Write the path
+without its leading slash and Git Bash has nothing to rewrite.
+
+The `asc-status` workflow prints the submission, version and build states from
+a GitHub runner using the repo's own ASC secrets — the route for a machine
+without the key, or a cloud session whose network cannot reach apple.com. It
+runs by itself when `tools/asc.mjs` or the workflow changes.
 
 (The `qa/` folder that *is* committed holds only two autoplay result files.)
 
@@ -66,16 +79,15 @@ path on the new machine** or the Browser-pane preview serves nothing.
 
 | What | Where it lives | Used for |
 | --- | --- | --- |
-| App Store Connect API key `.p8` | `~/Documents/Apple Developer Keys/` | `qa/asc.mjs`, `altool` upload |
-| ASC key id + issuer id | inside `asc.mjs` (scratchpad) | signing the JWT |
+| App Store Connect API key `.p8` | `~/Documents/Apple Developer Keys/` | `tools/asc.mjs`, `altool` upload |
+| ASC key id + issuer id | env `ASC_KEY_ID` / `ASC_ISSUER_ID`; repo secrets | signing the JWT |
 | iOS signing cert + profile | GitHub repo secrets (already set) | CI |
 | AdMob unit ids | GitHub repo **variables** (already set) | `mobile/inject-ad-units.mjs` |
 
 The QA harness — puppeteer-core driving the installed Chrome, the autoplay
 balance bot, the screenshot and App Store upload scripts — lives in the session
-scratchpad rather than in this repo, because `asc.mjs` carries the ASC key ids
-and this repo is public. It does not survive a machine move. If it is gone it is
-rebuildable; the load-bearing parts are `asc.mjs` (ES256 JWT + REST wrapper),
+scratchpad rather than in this repo. It does not survive a machine move. If it
+is gone it is rebuildable; the load-bearing parts are
 `autoplay.mjs` (the greedy bot the star lines were derived from) and
 `upload-shots.mjs` (reserve → PUT → commit-with-MD5, the only reliable way to
 get screenshots into ASC).
@@ -163,9 +175,11 @@ source images with shipped derivatives; `mobile/sync-web.mjs` excludes every
 
 ## Next up
 
-1. **Watch the review.** Approved → it auto-releases; check AdMob starts serving
-   (it is on limited serving until the app is actually on the store). Rejected
-   again → App Review Board appeal, don't just resubmit.
+1. **Get back into review.** New build from master, attach it to 1.0.0, notes
+   and listing re-checked against decision 1, submit. Approved → it
+   auto-releases; check AdMob starts serving (limited serving until the app is
+   on the store). Rejected again under 4.3 → App Review Board appeal, don't
+   just resubmit.
 2. **Per-city backdrops — 173 of 180 stops still missing.** Only Italy's seven
    are painted (`CITY_BACKDROP` in `src/tours.js`); every other stop falls back
    to its country view, and Ravello (127) falls back even within Italy. This is
