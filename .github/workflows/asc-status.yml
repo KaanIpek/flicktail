@@ -1,0 +1,51 @@
+# Where the App Store submission stands, read with the repo's own ASC key.
+#
+# The key never leaves the repository secrets, so a machine or a cloud session
+# without the .p8 (or without a route to apple.com) can still check a review.
+# GET calls only. This repo is public, so these logs are too: they print states
+# and dates, never the token.
+#
+#   gh workflow run asc-status --repo KaanIpek/flicktail
+#
+# Secrets: ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_P8_B64
+
+name: asc-status
+
+on:
+  workflow_dispatch:
+  push:
+    paths: ['tools/asc.mjs', '.github/workflows/asc-status.yml']
+
+jobs:
+  status:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Review submissions and versions
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_P8_B64: ${{ secrets.ASC_KEY_P8_B64 }}
+          APP: '6806109983'
+        run: |
+          set -o pipefail
+          # The API does not promise an order, so fetch generously and sort here.
+          echo '--- review submissions, newest first: id  platform  state  submitted ---'
+          node tools/asc.mjs GET "v1/apps/$APP/reviewSubmissions?limit=50" \
+            | jq -r '.data | sort_by(.attributes.submittedDate // "") | reverse | .[:6][]
+                     | [.id, .attributes.platform, .attributes.state, (.attributes.submittedDate // "-")] | @tsv'
+
+          echo '--- app store versions: version  appVersionState  appStoreState  releaseType  build  created ---'
+          node tools/asc.mjs GET "v1/apps/$APP/appStoreVersions?limit=5&include=build" \
+            | jq -r '((.included // []) | map({(.id): .attributes.version}) | add // {}) as $builds
+                     | .data[] | [.attributes.versionString,
+                                  (.attributes.appVersionState // "-"),
+                                  (.attributes.appStoreState // "-"),
+                                  (.attributes.releaseType // "-"),
+                                  ("build " + ($builds[.relationships.build.data.id // ""] // "?")),
+                                  (.attributes.createdDate // "-")] | @tsv'
